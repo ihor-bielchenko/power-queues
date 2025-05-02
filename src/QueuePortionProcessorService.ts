@@ -1,77 +1,34 @@
-import { QueuePortionService  } from './QueuePortionService';
+import { QueueProcessorService  } from './QueueProcessorService';
 import { ProcessorService } from './ProcessorService';
 
-export class QueuePortionProcessorService extends QueuePortionService  {
-	private providedProcessors: Array<ProcessorService> = [];
+export class QueuePortionProcessorService extends QueueProcessorService  {
+	public readonly portionSize: number = 1;
 
-	setProcessors(processorServices: Array<ProcessorService>): QueuePortionProcessorService {
-		this.providedProcessors = [ ...processorServices ];
-		return this;
-	}
+	async select(queueName: string, attemptIndex: number): Promise<Array<any>> {
+		let i = 0,
+			output = [];
 
-	getProcessors(): Array<ProcessorService> {
-		return [ ...this.providedProcessors ];
-	}
+		while (i < this.portionSize) {
+			const item = await super.select(queueName, attemptIndex);
 
-	getProcessorIndexByName(name: string): number {
-		return (this.providedProcessors ?? []).findIndex((item) => item.name === name);
-	}
-
-	getProcessorByIndex(index: number): ProcessorService | null {
-		return (this.providedProcessors ?? [])[index] ?? null;
-	}
-
-	getProcessorByName(name: string): ProcessorService | null {
-		return (this.providedProcessors ?? []).find((processor: ProcessorService) => processor.name === name) ?? null;
-	}
-
-	getProcessorByDataItem(dataItem: any): ProcessorService | null {
-		return null;
-	}
-
-	listen(queueName: string): void {
-		const processors = this.getProcessors();
-		let i = 0;
-
-		while (i < processors.length) {
-			const methods = processors[i].orderMethods();
-			let ii = 0;
-
-			while (ii < methods.length) {
-				super.listen(`${queueName}.${processors[i].name}.${ii}`);
-				ii++;
+			if (item) {
+				output.push(item);
 			}
 			i++;
 		}
+		return output;
 	}
 
-	async excecute(queueName: string, attemptIndex: number, inputData: Array<any>): Promise<void> {
-		const queueNameSplit = queueName.split(`.`);
-		const processorName = queueNameSplit[queueNameSplit.length - 2];
-		const methodIndex = queueNameSplit[queueNameSplit.length - 1];
-		const processor = this.getProcessorByName(processorName);
-		let isBadReturn = true;
+	async allowExcecute(queueName: string, attemptIndex: number, inputData: Array<any>): Promise<boolean> {
+		return inputData.length > 0 && inputData.filter((item) => !!item).length === inputData.length;
+	}
+	
+	async excecuteProcessorMethod(processor: ProcessorService, method: Function, queueName: string, attemptIndex: number, inputData: Array<any>): Promise<void> {
+		let i = 0;
 
-		if (processor) {
-			const methods = processor.orderMethods();
-			const method = methods[methodIndex];
-
-			if (typeof method === `function`) {
-				let i = 0;
-
-				while (i < inputData.length) {
-					try {
-						this.success(queueName, attemptIndex, inputData[i], await method.call(processor, attemptIndex, inputData[i]));
-						isBadReturn = false;
-					}
-					catch (err) {
-						this.retry(queueName, attemptIndex, inputData[i], err);
-					}
-					i++;
-				}
-			}
+		while (i < inputData.length) {
+			await super.excecuteProcessorMethod(processor, method, queueName, attemptIndex, inputData[i]);
+			i++;
 		}
-		isBadReturn 
-			&& this.error(queueName, attemptIndex, inputData, new Error(`Undefined processor or method is not a function.`));
 	}
 }
