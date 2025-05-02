@@ -5,6 +5,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+pnpm-debug.log*
 .pnpm-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
@@ -75,8 +76,11 @@ web_modules/
 # dotenv environment variable files
 .env
 .env.development.local
+.env.development
 .env.test.local
+.env.test
 .env.production.local
+.env.production
 .env.local
 
 # parcel-bundler cache (https://parceljs.org/)
@@ -102,6 +106,7 @@ dist
 
 # vuepress v2.x temp and cache directory
 .temp
+.tmp
 .cache
 
 # vitepress build output
@@ -134,3 +139,43 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# clickhouse local client
+/data
+/dictionaries_lib
+/flags
+/format_schemas
+/metadata
+/metadata_dropped
+/preprocessed_configs
+/store
+/user_files
+/user_scripts
+/status
+/uuid
+
+package-lock.json
+build

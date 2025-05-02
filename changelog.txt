@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.2] - 2025-05-03
+
+### Added
+
+- QueueService class.
+- QueuePortionProcessorService class.
+- QueuePortionProcessorService class.
+- QueuePortionProcessorOrderService class.
+- ProcessorService class.
+
 ## [0.0.1] - 2025-05-03
 
 ### Added
@@ -16,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Create .gitignore file.
 - Provide LICENSE file.
 - Create master branch.
+- Create develop branch.
 - Start changelog.txt file.
 
 [unreleased]: https://github.com/ihor-bielchenko/power-queues/tree/master...HEAD
