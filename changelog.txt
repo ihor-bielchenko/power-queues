@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] - 2025-05-20
+
+### Added
+
+- Wrap processor methods by result callback.
+
+### Deleted
+
+- Delete not used methods from ProcessorService.
+- Delete test folder.
+
 ## [0.0.4] - 2025-05-06
 
 ### Added

@@ -13,20 +13,8 @@ export class QueueProcessorService extends QueueService  {
 		return [ ...this.providedProcessors ];
 	}
 
-	getProcessorIndexByName(name: string): number {
-		return (this.providedProcessors ?? []).findIndex((item) => item.name === name);
-	}
-
-	getProcessorByIndex(index: number): ProcessorService | null {
-		return (this.providedProcessors ?? [])[index] ?? null;
-	}
-
 	getProcessorByName(name: string): ProcessorService | null {
 		return (this.providedProcessors ?? []).find((processor: ProcessorService) => processor.name === name) ?? null;
-	}
-
-	getProcessorByDataItem(dataItem: any): ProcessorService | null {
-		return null;
 	}
 
 	listen(queueName: string): void {
@@ -63,6 +51,6 @@ export class QueueProcessorService extends QueueService  {
 	}
 
 	async excecuteProcessorMethod(processor: ProcessorService, method: Function, queueName: string, attemptIndex: number, inputData: any): Promise<void> {
-		this.success(queueName, attemptIndex, inputData, await method.call(processor, attemptIndex, inputData));
+		this.success(queueName, attemptIndex, inputData, await processor.result(await method.call(processor, attemptIndex, inputData)));
 	}
 }
