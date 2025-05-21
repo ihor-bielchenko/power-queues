@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.6] - 2025-05-21
+## [0.0.7] - 2025-05-21
 
 ### Updated
 
 - Fix QueuePortionProcessorOrderService redis key.
+- Fix retry and attempts condition.
+
+### Added
+
+- Provide retry method to QueuePortionProcessorService.
 
 ## [0.0.5] - 2025-05-20
 

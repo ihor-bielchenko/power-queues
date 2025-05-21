@@ -79,7 +79,7 @@ export class QueueService {
 
 	async retry(queueName: string, attemptIndex: number, inputData: any, err): Promise<number> {
 		try {
-			if (attemptIndex < this.attempts) {
+			if (attemptIndex < (this.attempts - 1)) {
 				return await this.redisService.rpush(`queue.${queueName}.${attemptIndex + 1}`, JSON.stringify(inputData));
 			}
 			this.error(queueName, attemptIndex, inputData, err);
