@@ -14,7 +14,7 @@ export class QueuePortionProcessorOrderService extends QueuePortionProcessorServ
 			if (typeof methods[newMethodIndex] === `function`) {
 				const key = `${queueNameSplit.slice(0, -2).join(`.`)}.${processorName}.${newMethodIndex}.0`;
 
-				await this.redisService.rpush(key, JSON.stringify({ 
+				await this.redisService.rpush(`queue.${key}`, JSON.stringify({ 
 					...inputData, 
 					resultData: { 
 						...(inputData.resultData || {}), 
