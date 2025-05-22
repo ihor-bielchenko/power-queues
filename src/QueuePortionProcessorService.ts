@@ -27,18 +27,8 @@ export class QueuePortionProcessorService extends QueueProcessorService  {
 		let i = 0;
 
 		while (i < inputData.length) {
-			await super.excecuteProcessorMethod(processor, method, queueName, attemptIndex, inputData[i]);
+			super.excecuteProcessorMethod(processor, method, queueName, attemptIndex, inputData[i]);
 			i++;
 		}
-	}
-
-	async retry(queueName: string, attemptIndex: number, inputData: any, err): Promise<number> {
-		let i = 0;
-
-		while (i < inputData.length) {
-			await super.retry(queueName, attemptIndex, inputData[i], err);
-			i++;
-		}
-		return 0;
 	}
 }

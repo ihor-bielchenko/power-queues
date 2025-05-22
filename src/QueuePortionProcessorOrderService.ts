@@ -23,10 +23,9 @@ export class QueuePortionProcessorOrderService extends QueuePortionProcessorServ
 				}));
 			}
 			else if (newMethodIndex > (methods.length - 1)) {
-				await this.catchProcessorOrderSuccess(queueName, attemptIndex, inputData, resultData);
+				await this.successOrder(queueName, attemptIndex, inputData, resultData);
 			}
 		}
-		await super.success(queueName, attemptIndex, inputData, resultData);
 	}
 
 	async error(queueName: string, attemptIndex: number, inputData: any, err): Promise<void> {
@@ -38,15 +37,9 @@ export class QueuePortionProcessorOrderService extends QueuePortionProcessorServ
 		if (processor) {
 			const criticalMethods = processor.criticalOrderMethods();
 
-			criticalMethods[methodIndex]
-				? await this.catchCriticalError(queueName, attemptIndex, inputData, err)
-				: await this.success(queueName, attemptIndex, inputData, {});
+			if (criticalMethods[methodIndex]) {
+				await this.errorCritical(queueName, attemptIndex, inputData, err);
+			}
 		}
-	}
-
-	async catchProcessorOrderSuccess(queueName: string, attemptIndex: number, inputData: any, resultData: any): Promise<void> {
-	}
-
-	async catchCriticalError(queueName: string, attemptIndex: number, inputData: any, err): Promise<void> {
 	}
 }

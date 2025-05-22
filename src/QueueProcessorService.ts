@@ -47,10 +47,20 @@ export class QueueProcessorService extends QueueService  {
 				return await this.excecuteProcessorMethod(processor, method, queueName, attemptIndex, inputData);
 			}
 		}
-		this.error(queueName, attemptIndex, inputData, new Error(`Undefined processor or method is not a function.`));
 	}
 
 	async excecuteProcessorMethod(processor: ProcessorService, method: Function, queueName: string, attemptIndex: number, inputData: any): Promise<void> {
-		this.success(queueName, attemptIndex, inputData, await processor.result(await method.call(processor, attemptIndex, inputData)));
+		try {
+			await this.success(queueName, attemptIndex, inputData, await processor.result(await method.call(processor, attemptIndex, inputData)));
+		}
+		catch (err) {
+			this.retry(queueName, attemptIndex, inputData, err);
+		}
+	}
+
+	async successOrder(queueName: string, attemptIndex: number, inputData: any, resultData: any) {
+	}
+
+	async errorCritical(queueName: string, attemptIndex: number, inputData: any, err) {
 	}
 }
