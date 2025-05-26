@@ -68,7 +68,11 @@ export class QueueService {
 	}
 
 	async excecute(queueName: string, attemptIndex: number, inputData: any): Promise<void> {
-		this.success(queueName, attemptIndex, inputData, {});
+		this.success(queueName, attemptIndex, inputData, await this.excecuteWrapper(queueName, attemptIndex, inputData));
+	}
+
+	async excecuteWrapper(queueName: string, attemptIndex: number, inputData: any): Promise<any> {
+		return {};
 	}
 
 	async success(queueName: string, attemptIndex: number, inputData: any, resultData: any): Promise<void> {

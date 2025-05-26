@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.8] - 2025-05-22
+## [0.0.9] - 2025-05-26
 
 ### Updated
 
@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Provide retry method to QueuePortionProcessorService.
-- successOrder and errorCritical methods.
+- Create successOrder and errorCritical methods.
+- Create excecuteWrapper for QueueService.
 
 ## [0.0.5] - 2025-05-20
 

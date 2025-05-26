@@ -58,6 +58,14 @@ export class QueueProcessorService extends QueueService  {
 		}
 	}
 
+	async success(queueName: string, attemptIndex: number, inputData: any, resultData: any): Promise<void> {
+		await this.successOrder(queueName, attemptIndex, inputData, resultData);
+	}
+
+	async error(queueName: string, attemptIndex: number, inputData: any, err): Promise<void> {
+		await this.errorCritical(queueName, attemptIndex, inputData, err);
+	}
+
 	async successOrder(queueName: string, attemptIndex: number, inputData: any, resultData: any) {
 	}
 
