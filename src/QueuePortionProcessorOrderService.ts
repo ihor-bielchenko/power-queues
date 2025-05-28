@@ -36,8 +36,9 @@ export class QueuePortionProcessorOrderService extends QueuePortionProcessorServ
 
 		if (processor) {
 			const criticalMethods = processor.criticalOrderMethods();
+			const methods = processor.orderMethods();
 
-			if (criticalMethods[methodIndex]) {
+			if (criticalMethods.find((method) => method.name === (methods[methodIndex] || {}).name)) {
 				await this.errorCritical(queueName, attemptIndex, inputData, err);
 			}
 		}
