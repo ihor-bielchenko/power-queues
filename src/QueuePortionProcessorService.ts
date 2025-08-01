@@ -6,7 +6,7 @@ export class QueuePortionProcessorService extends QueueProcessorService  {
 
 	async select(queueName: string, attemptIndex: number): Promise<Array<any>> {
 		return (await this.redisService.lpop(`queue.${queueName}.${attemptIndex}`, this.portionSize))
-			.map((item) => await this.dataProcessingAfterSelect(item));
+			.map((item) => this.dataProcessingAfterSelect(item));
 	}
 
 	async allowExcecute(queueName: string, attemptIndex: number, inputData: Array<any>): Promise<boolean> {

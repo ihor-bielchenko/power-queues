@@ -53,10 +53,10 @@ export class QueueService {
 	}
 
 	async select(queueName: string, attemptIndex: number): Promise<any> {
-		return await this.dataProcessingAfterSelect(await this.redisService.lpop(`queue.${queueName}.${attemptIndex}`));
+		return this.dataProcessingAfterSelect(await this.redisService.lpop(`queue.${queueName}.${attemptIndex}`));
 	}
 
-	async dataProcessingAfterSelect(inputData: any): Promise<any> {
+	dataProcessingAfterSelect(inputData: any): any {
 		try {
 			return JSON.parse(inputData);
 		}
