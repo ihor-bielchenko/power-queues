@@ -1,6 +1,6 @@
 {
 	"name": "power-queues",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"description": "Base classes for implementing custom queues in redis under high load conditions.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",

@@ -18,8 +18,9 @@ export class QueueService {
 
 	async listenByAttempt(queueName: string, attemptIndex: number): Promise<void> {
 		await this.redisService.rpush(`ready.${queueName}.${attemptIndex}`, this.threadId);
+		await new Promise((resolve) => setTimeout(resolve, this.loopTimeout));
 
-		setImmediate(() => this.loop(queueName, attemptIndex), this.loopTimeout);
+		setImmediate(() => this.loop(queueName, attemptIndex));
 		return;
 	}
 
@@ -46,7 +47,8 @@ export class QueueService {
 		catch (err) {
 			await this.error(queueName, attemptIndex, null, err);
 		}
-		setImmediate(() => this.loop(queueName, attemptIndex), this.loopTimeout);
+		await new Promise((resolve) => setTimeout(resolve, this.loopTimeout));
+		setImmediate(() => this.loop(queueName, attemptIndex));
 		return;
 	}
 
