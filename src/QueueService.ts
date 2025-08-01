@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class QueueService {
 	protected readonly redisService: Redis | null;
 	public readonly threadId: string = uuidv4();
-	public readonly loopTimeout: number = 0;
+	public readonly loopTimeout: number = Number(process.env.LOOP_TIMEOUT ?? 10);
 	public readonly attempts: number = 1;
 
 	listen(queueName: string): void {
@@ -19,7 +19,7 @@ export class QueueService {
 	async listenByAttempt(queueName: string, attemptIndex: number): Promise<void> {
 		await this.redisService.rpush(`ready.${queueName}.${attemptIndex}`, this.threadId);
 
-		setTimeout(() => this.loop(queueName, attemptIndex), this.loopTimeout);
+		setImmediate(() => this.loop(queueName, attemptIndex), this.loopTimeout);
 		return;
 	}
 
@@ -46,7 +46,7 @@ export class QueueService {
 		catch (err) {
 			await this.error(queueName, attemptIndex, null, err);
 		}
-		setTimeout(() => this.loop(queueName, attemptIndex), this.loopTimeout);
+		setImmediate(() => this.loop(queueName, attemptIndex), this.loopTimeout);
 		return;
 	}
 
