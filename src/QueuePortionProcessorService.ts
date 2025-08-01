@@ -5,18 +5,8 @@ export class QueuePortionProcessorService extends QueueProcessorService  {
 	public readonly portionSize: number = 1;
 
 	async select(queueName: string, attemptIndex: number): Promise<Array<any>> {
-		let i = 0,
-			output = [];
-
-		while (i < this.portionSize) {
-			const item = await super.select(queueName, attemptIndex);
-
-			if (item) {
-				output.push(item);
-			}
-			i++;
-		}
-		return output;
+		return (await this.redisService.lpop(`queue.${queueName}.${attemptIndex}`, this.portionSize))
+			.map((item) => await this.dataProcessingAfterSelect(item));
 	}
 
 	async allowExcecute(queueName: string, attemptIndex: number, inputData: Array<any>): Promise<boolean> {
