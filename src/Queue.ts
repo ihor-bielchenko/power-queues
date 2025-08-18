@@ -92,15 +92,7 @@ export class Queue {
 					}
 				}
 			}
-			try {
-				await this.redis.rpush(readyKey, this.threadId);
-			}
-			catch (err) {
-				console.log('eeeeeeeeeeee', err);
-			}
-		}
-		else {
-			console.log('????????????????????/', readyKey, readyThreadId, Date.now());
+			await this.redis.rpush(readyKey, this.threadId);
 		}
 	}
 
