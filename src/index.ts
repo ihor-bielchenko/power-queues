@@ -1,15 +1,15 @@
-import { QueuePortionProcessorOrderService } from './QueuePortionProcessorOrderService';
-import { QueuePortionProcessorService } from './QueuePortionProcessorService';
-import { QueuePortionService } from './QueuePortionService';
-import { QueueProcessorService } from './QueueProcessorService';
-import { QueueService } from './QueueService';
-import { ProcessorService } from './ProcessorService';
+import { QueuePortionProcessorMethod } from './QueuePortionProcessorMethod';
+import { QueuePortionProcessor } from './QueuePortionProcessor';
+import { QueuePortion } from './QueuePortion';
+import { QueueProcessor } from './QueueProcessor';
+import { Queue } from './Queue';
+import { Processor } from './Processor';
 
 export {
-	QueuePortionProcessorOrderService,
-	QueuePortionProcessorService,
-	QueuePortionService,
-	QueueProcessorService,
-	QueueService,
-	ProcessorService,
+	QueuePortionProcessorMethod,
+	QueuePortionProcessor,
+	QueuePortion,
+	QueueProcessor,
+	Queue,
+	Processor,
 };
