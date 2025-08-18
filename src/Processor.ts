@@ -1,6 +1,8 @@
 
 export class Processor {
 	public readonly defaultName: string;
+	public readonly timeoutCoefficient: number = 3;
+	public readonly timeoutInitial: number = 3000;
 
 	get name(): string {
 		return this.defaultName ?? this.constructor.name;
@@ -54,5 +56,20 @@ export class Processor {
 
 	isErrorMethod(method: Function): boolean {
 		return !!this.errorMethods().find((item) => item.name === method.name);
+	}
+
+	attemptsTimeout(attemptIndex: number): number {
+		const coefficient = this.timeoutCoefficient;
+		let i = 0,
+			timeout = this.timeoutInitial;
+
+		while (i < attemptIndex) {
+			timeout += (timeout * coefficient);
+			i++;
+		}
+		if (timeout === 0) {
+			timeout = this.timeoutInitial;
+		}
+		return timeout;
 	}
 }

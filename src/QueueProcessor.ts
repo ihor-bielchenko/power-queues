@@ -39,7 +39,7 @@ export class QueueProcessor extends Queue  {
 		}
 	}
 
-	async excecuteWrapper(queueName: string, attemptIndex: number, data: any): Promise<any> {
+	async excecuteWrapper(queueName: string, attemptIndex: number, data: any): Promise<void> {
 		const keyData = this.keyData(queueName);
 		const processorName = keyData.processorName;
 		const processor = this.getProcessorByName(processorName);
@@ -47,14 +47,21 @@ export class QueueProcessor extends Queue  {
 		if (!processor || !processor.excecute) {
 			return;
 		}
-		return await this.successWrapper(queueName, attemptIndex, await this.excecute(queueName, attemptIndex, await processor.excecute.call(processor, attemptIndex, data)));
+		await this.excecute(queueName, attemptIndex, await processor.excecute.call(processor, attemptIndex, data));
 	}
 
 	listen(queueName: string): void {
+		const processors = this.getProcessors();
 		let i = 0;
 
-		while (i < this.attempts) {
-			this.attempt(queueName, i);
+		while (i < processors.length) {
+			const processor = processors[i];
+			let ii = 0;
+
+			while (ii < this.attempts) {
+				this.attempt(queueName, ii);
+				ii++;
+			}
 			i++;
 		}
 	}

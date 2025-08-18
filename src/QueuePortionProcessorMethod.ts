@@ -29,6 +29,65 @@ export class QueuePortionProcessorMethod extends QueuePortionProcessor {
 		}
 	}
 
+	async excecuteWrapper(queueName: string, attemptIndex: number, data: Array<any>): Promise<void> {
+		const keyData = this.keyData(queueName);
+		const processorName = keyData.processorName;
+		const methodIndex = keyData.methodIndex;
+		const processor = this.getProcessorByName(processorName);
+
+		if (!processor 
+			|| !processor.excecute 
+			|| !Array.isArray(data)
+			|| !(methodIndex >= 0)
+			|| !(data.length > 0)) {
+			return;
+		}
+		const method = processor.getMethod(methodIndex);
+		let i = 0;
+
+		if (!method) {
+			return;
+		}
+		await (new Promise((resolve, reject) => {
+			let length = data.length,
+				ready = 0,
+				i = 0;
+
+			while (i < length) {
+				const item = data[i];
+
+				method
+					.call(processor, queueName, attemptIndex, item)
+					.then((result) => {
+						this.excecute(queueName, attemptIndex, result)
+							.then(() => {
+								if (ready >= (length - 1)) {
+									resolve(ready);
+								}
+								ready += 1;
+							})
+							.catch((err) => {
+								this.retry(queueName, attemptIndex, item, err);
+
+								if (ready >= (length - 1)) {
+									resolve(ready);
+								}
+								ready += 1;
+							});
+					})
+					.catch((err) => {
+						this.retry(queueName, attemptIndex, item, err);
+
+						if (ready >= (length - 1)) {
+							resolve(ready);
+						}
+						ready += 1;
+					});
+				i++;
+			}
+		}));
+	}
+
 	async successWrapper(queueName: string, attemptIndex: number, data: any): Promise<void> {
 		const keyData = this.keyData(queueName);
 		const processorName = keyData.processorName;
@@ -38,20 +97,24 @@ export class QueuePortionProcessorMethod extends QueuePortionProcessor {
 		if (!processor) {
 			return;
 		}
-		const nextMethodIndex = methodIndex + 1;
-		const nextMethod = processor.getMethod(nextMethodIndex);
 		const methodsLength = processor.getMethodsLength();
-
-		if (nextMethod) {
-			const queueKey = await this.queueKey(`${queueName}.${nextMethodIndex}`, attemptIndex);
-			const dataProcessed = JSON.stringify(data);
-
-			await this.redis.rpush(queueKey, dataProcessed);
-			await this.successMethod(queueName, attemptIndex, data);
-		}
-		else if (nextMethodIndex === (methodsLength - 1)) {
+		
+		if (methodIndex === (methodsLength - 1)) {
 			await super.successWrapper(queueName, attemptIndex, data);
 		}
+		else {
+			const nextMethodIndex = methodIndex + 1;
+			const nextMethod = processor.getMethod(nextMethodIndex);
+
+			if (nextMethod) {
+				const queueKey = await this.queueKey(`poll.${processorName}.${nextMethodIndex}`, 0);
+				const dataProcessed = JSON.stringify(data);
+
+				await this.redis.rpush(queueKey, dataProcessed);
+				await this.successMethod(queueName, attemptIndex, data);
+			}
+		}
+		return data;
 	}
 
 	async successMethod(queueName: string, attemptIndex: number, data: any): Promise<void> {
@@ -60,17 +123,11 @@ export class QueuePortionProcessorMethod extends QueuePortionProcessor {
 	async errorWrapper(queueName: string, attemptIndex: number, data: any, err): Promise<void> {
 		const keyData = this.keyData(queueName);
 		const processorName = keyData.processorName;
-		const methodIndex = keyData.methodIndex;
 		const processor = this.getProcessorByName(processorName);
 
 		if (!processor) {
 			return;
-		}
-		const method = processor.getMethod(methodIndex);
-		const isErrorMethod = processor.isErrorMethod(method);
-
-		if (isErrorMethod) {
-			await super.errorWrapper(queueName, attemptIndex, data, err);
-		}
+		}		
+		await super.errorWrapper(queueName, attemptIndex, data, err);
 	}
 }

@@ -6,9 +6,10 @@ export class Queue {
 	protected readonly threadId: string = uuidv4();
 	protected readonly timeout: number = 10;
 	protected readonly attempts: number = 1;
+	protected readonly displayLog: boolean = true;
 	protected readonly displayError: boolean = true;
-	protected readonly displayErrorInst: boolean = true;
-	protected readonly displayErrorData: boolean = true;
+	protected readonly displayErrorObj: boolean = false;
+	protected readonly displayErrorData: boolean = false;
 
 	timestamp(date = new Date()): string {
 		const pad = (n: number) => String(n).padStart(2, '0');
@@ -45,8 +46,8 @@ export class Queue {
 		}
 	}
 
-	async wait(): Promise<void> {
-		await new Promise((resolve) => setTimeout(resolve, this.timeout));
+	async wait(timeout?: number): Promise<void> {
+		await new Promise((resolve) => setTimeout(resolve, timeout ?? this.timeout));
 	}
 
 	async attempt(queueName: string, attemptIndex: number): Promise<void> {
@@ -84,24 +85,34 @@ export class Queue {
 
 				if (allow) {
 					try {
-						await this.successWrapper(queueName, attemptIndex, await this.excecute(queueName, attemptIndex, data));
+						await this.excecuteWrapper(queueName, attemptIndex, data);
 					}
 					catch (err) {
 						this.retry(queueName, attemptIndex, data, err);
 					}
 				}
 			}
-			await this.redis.rpush(readyKey, readyThreadId);
+			try {
+				await this.redis.rpush(readyKey, this.threadId);
+			}
+			catch (err) {
+				console.log('eeeeeeeeeeee', err);
+			}
+		}
+		else {
+			console.log('????????????????????/', readyKey, readyThreadId, Date.now());
 		}
 	}
 
 	async retry(queueName: string, attemptIndex: number, data: any, err): Promise<number> {
 		try {
-			if (attemptIndex < (this.attempts - 1)) {
-				const queueKey = this.queueKey(queueName, attemptIndex);
+			if (attemptIndex <= (this.attempts - 1)) {
+				const queueKey = this.queueKey(queueName, attemptIndex + 1);
 				const dataProcessed = JSON.stringify(data);
 
-				return await this.redis.rpush(queueKey, dataProcessed);
+				if (attemptIndex < (this.attempts - 1)) {
+					return await this.redis.rpush(queueKey, dataProcessed);
+				}
 			}
 			await this.errorWrapper(queueName, attemptIndex, data, err);
 		}
@@ -113,13 +124,16 @@ export class Queue {
 	async select(queueName: string, attemptIndex: number): Promise<any> {
 		const queueKey = this.queueKey(queueName, attemptIndex);
 		const data = await this.redis.lpop(queueKey);
+		const output = await this.selectAfter(queueName, data);
 
-		return await this.selectAfter(data);
+		return output;
 	}
 
-	async selectAfter(data: any): Promise<any> {
+	async selectAfter(queueName: string, data: any): Promise<any> {
 		try {
-			return JSON.parse(data);
+			const parsed = JSON.parse(data);
+
+			return parsed;
 		}
 		catch (err) {
 		}
@@ -130,7 +144,7 @@ export class Queue {
 		return !!data;
 	}
 
-	async excecuteWrapper(queueName: string, attemptIndex: number, data: any): Promise<any> {
+	async excecuteWrapper(queueName: string, attemptIndex: number, data: any): Promise<void> {
 		await this.excecute(queueName, attemptIndex, data);
 	}
 
@@ -139,10 +153,11 @@ export class Queue {
 	}
 
 	async successWrapper(queueName: string, attemptIndex: number, data: any): Promise<void> {
-		await this.success(queueName, attemptIndex, data);
+		return await this.success(queueName, attemptIndex, data);
 	}
 
 	async success(queueName: string, attemptIndex: number, data: any): Promise<void> {
+		return data;
 	}
 
 	async errorWrapper(queueName: string, attemptIndex: number, data: any, err): Promise<void> {
@@ -163,15 +178,46 @@ export class Queue {
 			console.error(`     `, `Результат:`, typeof data);
 			console.error(`     `, `Сообщение:`, err.message);
 
-			if (this.displayErrorInst) {
-				console.error(`     `, `Ошибка:`, err);
-			}
-			if (this.displayErrorData) {
-				console.error(`     `, `Данные:`, data);
-			}
+			// if (this.displayErrorObj) {
+			// 	console.error(`     `, `Ошибка:`, err);
+			// }
+			// if (this.displayErrorData) {
+			// 	console.error(`     `, `Данные:`, data);
+			// }
 		}
 	}
 
 	async error(queueName: string, attemptIndex: number, data: any, err): Promise<void> {
+	}
+
+	async dropKeys(pattern: string, opts?: { count?: number; batch?: number; pauseMs?: number; useUnlink?: boolean; }): Promise<number> {
+		const count = opts?.count ?? 1000;
+		const batch = opts?.batch ?? 5000;
+		const pauseMs = opts?.pauseMs ?? 0;
+		const cmd = opts?.useUnlink ?? true ? `unlink` : `del`;
+		const stream = this.redis.scanStream({ match: pattern, count });
+		let buffer: string[] = [],
+			deleted = 0;
+
+		for await (const keys of stream as AsyncIterable<string[]>) {
+			buffer.push(...keys);
+
+			while (buffer.length >= batch) {
+				const chunk = buffer.splice(0, batch);
+				const n = await (this.redis as any)[cmd](...chunk);
+
+				deleted += Number(n) || 0;
+
+				if (pauseMs) {
+					await new Promise((r) => setTimeout(r, pauseMs));
+				}
+			}
+		}
+		if (buffer.length) {
+			const n = await (this.redis as any)[cmd](...buffer);
+
+			deleted += Number(n) || 0;
+		}
+		return deleted;
 	}
 }
