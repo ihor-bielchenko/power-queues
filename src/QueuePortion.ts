@@ -11,7 +11,10 @@ export class QueuePortion extends Queue  {
 		const queueKey = this.queueKey(queueName, attemptIndex);
 		const data = await this.redis.lpop(queueKey, this.portionSize);
 
-		return await this.selectAfter(queueName, data);
+		if (Array.isArray(data) && data.length > 0) {
+			return await this.selectAfter(queueName, data);
+		}
+		return [];
 	}
 
 	async selectAfter(queueName: string, data: Array<any> = []): Promise<Array<any>> {
@@ -19,17 +22,9 @@ export class QueuePortion extends Queue  {
 			output = [];
 
 		while (i < data.length) {
-			output.push(await super.selectAfter(queueName, data));
-		}
-		return output;
-	}
-
-	async excecuteWrapper(queueName: string, attemptIndex: number, data: Array<any>): Promise<void> {
-		let i = 0;
-
-		while (i < data.length) {
-			await this.excecute(queueName, attemptIndex, data[i]);
+			output.push(await super.selectAfter(queueName, data[i]));
 			i++;
 		}
+		return output;
 	}
 }
