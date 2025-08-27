@@ -1,215 +1,155 @@
-import Redis from 'ioredis';
-import { v4 as uuidv4 } from 'uuid';
+import { 
+	isArrFilled,
+	isStrFilled,
+	isObjFilled,
+	fromJSON,
+	toJSON, 
+} from 'full-utils';
+import { RedisManager } from './RedisManager';
+import { Processor } from './Processor';
+import { TaskInterface } from './types';
 
 export class Queue {
-	protected readonly redis: Redis | null;
-	protected readonly threadId: string = uuidv4();
-	protected readonly timeout: number = 10;
-	protected readonly attempts: number = 1;
-	protected readonly displayLog: boolean = true;
-	protected readonly displayError: boolean = true;
-	protected readonly displayErrorObj: boolean = false;
-	protected readonly displayErrorData: boolean = false;
+	public readonly redisManager: RedisManager;
+	public readonly db: string;
+	public readonly attempts: number = 3;
+	public readonly portionSize: number = 1;
+	public running = false;
+	private processors: Array<Processor> = [];
 
-	timestamp(date = new Date()): string {
-		const pad = (n: number) => String(n).padStart(2, '0');
+	protected async execute(queue: string, task: TaskInterface): Promise<any> {
+		const processor = this.getProcessor(task.processor);
 
-		const year = date.getFullYear();
-		const month = pad(date.getMonth() + 1);
-		const day = pad(date.getDate());
-
-		const hours = pad(date.getHours());
-		const minutes = pad(date.getMinutes());
-		const seconds = pad(date.getSeconds());
-
-		return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-	}
-
-	queueKey(queueName: string, attemptIndex: number): string {
-		return `queue.${queueName}.${attemptIndex}`;
-	}
-
-	readyKey(queueName: string, attemptIndex: number): string {
-		return `ready.${queueName}.${attemptIndex}`;
-	}
-
-	start(queueName: string): void {
-		this.listen(queueName);
-	}
-
-	listen(queueName: string): void {
-		let i = 0;
-
-		while (i < this.attempts) {
-			this.attempt(queueName, i);
-			i++;
+		if (!processor) {
+			throw new Error('Undefined processor.');
 		}
+		return await processor.execute.call(processor, task);
 	}
 
-	async wait(timeout?: number): Promise<void> {
-		await new Promise((resolve) => setTimeout(resolve, timeout ?? this.timeout));
+	protected async beforeExecute(queue: string, task: TaskInterface): Promise<any> {
+		return task;
 	}
 
-	async attempt(queueName: string, attemptIndex: number): Promise<void> {
-		const readyKey = this.readyKey(queueName, attemptIndex);
-		const threadId = this.threadId;
-
-		await this.redis.rpush(readyKey, this.threadId);
-		await this.wait();
-
-		setImmediate(() => this.process(queueName, attemptIndex));
-		return;
+	protected async afterExecute(queue: string, task: TaskInterface, result: any): Promise<any> {
+		return result;
 	}
 
-	async process(queueName: string, attemptIndex: number): Promise<void> {
+	protected async onSuccess(queue: string, task: TaskInterface, result: any): Promise<void> {
+	}
+
+	protected async onError(queue: string, task: TaskInterface, err: any): Promise<void> {
+	}
+
+	protected async onFatal(queue: string, task: TaskInterface, err: any): Promise<void> {
+	}
+
+	protected async onStart(queue: string, task: TaskInterface): Promise<void> {
+	}
+
+	protected async onEnd(queue: string, result: any): Promise<void> {
+	}
+
+	private async process(queue: string, task: TaskInterface): Promise<void> {
+		let res: any;
+
 		try {
-			await this.processOne(queueName, attemptIndex);
+			await this.onStart(queue, task);
+			await this.onSuccess(queue, task, res = await this.afterExecute(queue, task, await this.execute(queue, await this.beforeExecute(queue, task))));
 		}
 		catch (err) {
-			await this.errorWrapper(queueName, attemptIndex, null, err);
-		}
-		await this.wait();
-
-		setImmediate(() => this.process(queueName, attemptIndex));
-		return;
-	}
-
-	async processOne(queueName: string, attemptIndex: number): Promise<void> {
-		const readyKey = this.readyKey(queueName, attemptIndex);
-		const readyThreadId = await this.redis.lpop(readyKey);
-
-		if (readyThreadId) {
-			if (readyThreadId === this.threadId) {
-				const data = await this.select(queueName, attemptIndex);
-				const allow = await this.allow(queueName, attemptIndex, data);
-
-				if (allow) {
-					try {
-						await this.excecuteWrapper(queueName, attemptIndex, data);
-					}
-					catch (err) {
-						this.retry(queueName, attemptIndex, data, err);
-					}
-				}
+			await this.onError(queue, task, err);
+			
+			if (task.attempt < this.attempts) {
+				await this.retry(queue, task);
 			}
-			await this.redis.rpush(readyKey, this.threadId);
-		}
-	}
-
-	async retry(queueName: string, attemptIndex: number, data: any, err): Promise<number> {
-		try {
-			if (attemptIndex <= (this.attempts - 1)) {
-				const queueKey = this.queueKey(queueName, attemptIndex + 1);
-				const dataProcessed = JSON.stringify(data);
-
-				if (attemptIndex < (this.attempts - 1)) {
-					return await this.redis.rpush(queueKey, dataProcessed);
-				}
-			}
-			await this.errorWrapper(queueName, attemptIndex, data, err);
-		}
-		catch (err) {
-		}
-		return 0;
-	}
-
-	async select(queueName: string, attemptIndex: number): Promise<any> {
-		const queueKey = this.queueKey(queueName, attemptIndex);
-		const data = await this.redis.lpop(queueKey);
-		const output = await this.selectAfter(queueName, data);
-
-		return output;
-	}
-
-	async selectAfter(queueName: string, data: any): Promise<any> {
-		try {
-			const parsed = JSON.parse(data);
-
-			return parsed;
-		}
-		catch (err) {
-		}
-		return null;
-	}
-
-	async allow(queueName: string, attemptIndex: number, data: any): Promise<boolean> {
-		return !!data;
-	}
-
-	async excecuteWrapper(queueName: string, attemptIndex: number, data: any): Promise<void> {
-		await this.excecute(queueName, attemptIndex, data);
-	}
-
-	async excecute(queueName: string, attemptIndex: number, data: any): Promise<any> {
-		return await this.successWrapper(queueName, attemptIndex, data);
-	}
-
-	async successWrapper(queueName: string, attemptIndex: number, data: any): Promise<void> {
-		return await this.success(queueName, attemptIndex, data);
-	}
-
-	async success(queueName: string, attemptIndex: number, data: any): Promise<void> {
-		return data;
-	}
-
-	async errorWrapper(queueName: string, attemptIndex: number, data: any, err): Promise<void> {
-		try {
-			await this.error(queueName, attemptIndex, data, err);
-		}
-		catch (err) {
-			await this.errorMessage(queueName, attemptIndex, data, err);
-		}
-	}
-
-	async errorMessage(queueName: string, attemptIndex: number, data: any, err): Promise<void> {
-		if (this.displayError) {
-			console.log(`\n-------------------------------------`);
-			console.error(`[ERR]`, this.timestamp());
-			console.error(`     `, `Очередь:`, queueName);
-			console.error(`     `, `Попытка:`, attemptIndex);
-			console.error(`     `, `Результат:`, typeof data);
-			console.error(`     `, `Сообщение:`, err.message);
-
-			// if (this.displayErrorObj) {
-			// 	console.error(`     `, `Ошибка:`, err);
-			// }
-			// if (this.displayErrorData) {
-			// 	console.error(`     `, `Данные:`, data);
-			// }
-		}
-	}
-
-	async error(queueName: string, attemptIndex: number, data: any, err): Promise<void> {
-	}
-
-	async dropKeys(pattern: string, opts?: { count?: number; batch?: number; pauseMs?: number; useUnlink?: boolean; }): Promise<number> {
-		const count = opts?.count ?? 1000;
-		const batch = opts?.batch ?? 5000;
-		const pauseMs = opts?.pauseMs ?? 0;
-		const cmd = opts?.useUnlink ?? true ? `unlink` : `del`;
-		const stream = this.redis.scanStream({ match: pattern, count });
-		let buffer: string[] = [],
-			deleted = 0;
-
-		for await (const keys of stream as AsyncIterable<string[]>) {
-			buffer.push(...keys);
-
-			while (buffer.length >= batch) {
-				const chunk = buffer.splice(0, batch);
-				const n = await (this.redis as any)[cmd](...chunk);
-
-				deleted += Number(n) || 0;
-
-				if (pauseMs) {
-					await new Promise((r) => setTimeout(r, pauseMs));
-				}
+			else {
+				await this.onFatal(queue, task, err);
 			}
 		}
-		if (buffer.length) {
-			const n = await (this.redis as any)[cmd](...buffer);
+		await this.onEnd(queue, res);
+	}
 
-			deleted += Number(n) || 0;
+	private async loop(queue: string, attempt: number) {
+		while (this.running) {
+			if (!this.redisManager.checkConnection(this.db)) {
+				await this.redisManager.wait(1000);
+				continue;
+			}
+			const tasks = await this.select(this.db, queue, attempt);
+
+			if (!isArrFilled(tasks)) {
+				await this.redisManager.wait(1000);
+				continue;
+			}
+			await Promise.all(tasks.map((task: TaskInterface) => this.process(queue, task)));
 		}
-		return deleted;
+	}
+
+	protected async retry(queue: string, task: TaskInterface): Promise<void> {
+		await this.push(this.db, queue, { ...task, attempt: (task.attempt || 1) + 1 });
+	}
+
+	setProcessors(processors: Processor[]): this {
+		this.processors = [ ...processors ];
+		return this;
+	}
+
+	getProcessors(): Processor[] {
+		return [ ...this.processors ];
+	}
+
+	getProcessor(name: string): Processor | null {
+		return this.getProcessors().find((processor: Processor) => processor.name === name) ?? null;
+	}
+
+	start(queue: string, attempt: number) {
+		if (this.running) {
+			return;
+		}
+		this.running = true;
+		this.loop(queue, attempt).catch((err) => {
+			this.running = false;
+		});
+	}
+
+	stop() { 
+		this.running = false; 
+	}
+
+	key(name: string, attempt: number): string {
+		return this.redisManager.key('queue', `${name}:${attempt}`);
+	}
+
+	async select(db: string, queue: string, attempt: number): Promise<TaskInterface[] | null> {
+		const arr = await this.redisManager.connection(db).rpop(this.key(queue, attempt), this.portionSize);
+
+		if (!isArrFilled(arr)) {
+			return null;
+		}
+		return arr
+			.map((item) => {
+				try {
+					const v: TaskInterface = fromJSON(item);
+				
+					if (!isObjFilled(v)) {
+						return null;
+					}			
+					return v;
+				}
+				catch (err) {
+				}
+				return null;
+			})
+			.filter((item) => !!item);
+	}
+
+	async push(db: string, queue: string, task: TaskInterface): Promise<void> {
+		const attempt = task.attempt || 1;
+		const payload = toJSON({ ...task, attempt, enqueuedAt: Date.now(), });
+
+		if (!isStrFilled(payload)) {
+			throw new Error('Empty payload.');
+		}
+		await this.redisManager.connection(db).rpush(this.key(queue, attempt), payload);
 	}
 }
