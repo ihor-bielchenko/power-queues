@@ -1,15 +1,13 @@
-import { QueuePortionProcessorMethod } from './QueuePortionProcessorMethod';
-import { QueuePortionProcessor } from './QueuePortionProcessor';
-import { QueuePortion } from './QueuePortion';
-import { QueueProcessor } from './QueueProcessor';
-import { Queue } from './Queue';
+import { TaskInterface } from './types';
 import { Processor } from './Processor';
+import { Queue } from './Queue';
+import { QueueMethod } from './QueueMethod';
+import { RedisManager } from './RedisManager';
 
 export {
-	QueuePortionProcessorMethod,
-	QueuePortionProcessor,
-	QueuePortion,
-	QueueProcessor,
-	Queue,
+	TaskInterface,
 	Processor,
+	Queue,
+	QueueMethod,
+	RedisManager,
 };
