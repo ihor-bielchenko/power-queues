@@ -1,12 +1,12 @@
-import { Processor } from './Processor';
-import { QueueProcessor } from './QueueProcessor';
-import { Queue } from './Queue';
+import { Processor } from './src/Processor';
+import { QueueProcessor } from './src/QueueProcessor';
+import { Queue } from './src/Queue';
 import {
 	DistLockInterface,
 	LockOptsInterface,
 	TaskOptsInterface,
 	TaskInterface,
-} from './types';
+} from './src/types';
 
 export {
 	Processor,

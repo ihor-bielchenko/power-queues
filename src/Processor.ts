@@ -1,9 +1,10 @@
+import { TaskInterface } from './types';
 
 export class Processor {
 	public readonly name: string;
 
-	async execute(queueName: string, attemptIndex: number, data: any): Promise<any> {
-		return data;
+	async execute(queueName: string, task: TaskInterface): Promise<any> {
+		return true;
 	}
 
 	methods(): Array<Function> {
