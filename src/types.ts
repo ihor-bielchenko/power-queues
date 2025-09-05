@@ -21,7 +21,7 @@ export interface TaskOptsInterface {
 }
 
 export interface TaskInterface {
-	payload: object;
+	payload: any;
 	id?: string;
 	opts?: TaskOptsInterface;
 	enqueuedAt?: number;
