@@ -11,6 +11,7 @@ import {
 import { 
 	LockOptsInterface,
 	DistLockInterface,
+	TasksInterface,
 	TaskInterface, 
 } from './types';
 
@@ -34,6 +35,7 @@ export class Queue {
 	public readonly redisService;
 	public readonly attempts: number = 2;
 	public readonly portion: number = 1;
+	public readonly timeout: number;
 	public running = false;
 
 	wait(ms: number) { 
@@ -149,6 +151,50 @@ export class Queue {
 			: await this.connection(db).set(key, payload);
 	}
 
+	async addOne(db: string, key: string, task: TaskInterface): Promise<void> {
+		if (!this.checkConnection(db)) {
+			throw new Error(`Redis connection error "${db}".`);
+		}
+		const opts = task.opts || {};
+		const id = task.id || uuid();
+
+		await this.connection(db).rpush(key, toJSON({
+			...task,
+			opts: {
+				...opts,
+				attempt: opts.attempt || 0,
+			},
+			id,
+			enqueuedAt: Date.now(),
+		}));
+	}
+
+	async addMany(db: string, key: string, data: TasksInterface): Promise<void> {
+		if (!this.checkConnection(db)) {
+			throw new Error(`Redis connection error "${db}".`);
+		}
+		const opts = data.opts || {};
+		const id = data.id || uuid();
+
+		if (opts.progress) {
+			await this.write(db, this.key(id, 'ready'), 0, 300000);
+			await this.write(db, this.key(id, 'total'), data.payloads.length, 300000);
+		}
+		await this.connection(db).rpush(key, ...data
+			.payloads
+			.map((payload) => {
+				return toJSON({ 
+					payload,
+					opts: {
+						...opts,
+						attempt: opts.attempt || 0,
+					},
+					id,
+					enqueuedAt: Date.now(),
+				});
+			}));
+	}
+
 	protected async onStart(queue: string, portion: Array<TaskInterface>): Promise<void> {
 	}
 
@@ -254,6 +300,10 @@ export class Queue {
 			}
 			await this.onStart(queue, tasks);
 			await this.afterExecute(queue, tasks, await Promise.all(tasks.map((task: TaskInterface) => this.process(db, queue, task))));
+			
+			if (this.timeout > 0) {
+				await this.wait(this.timeout);
+			}
 		}
 	}
 }
