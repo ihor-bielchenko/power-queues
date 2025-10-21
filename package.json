@@ -26,10 +26,6 @@
 	"files": [
 		"dist"
 	],
-	"scripts": {
-		"build": "tsup src/index.ts --format esm,cjs --dts",
-		"clean": "rimraf dist docs"
-	},
 	"engines": {
 		"node": ">=14"
 	},
@@ -83,15 +79,5 @@
 		"chunked-operations",
 		"safe-redis",
 		"power-redis"
-	],
-	"devDependencies": {
-		"@types/node": "^24.8.1",
-		"tsup": "^8.5.0",
-		"typescript": "^5.9.3"
-	},
-	"dependencies": {
-		"full-utils": "^2.0.0",
-		"power-redis": "^2.0.2",
-		"uuid": "^13.0.0"
-	}
+	]
 }
