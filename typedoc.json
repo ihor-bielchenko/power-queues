@@ -1,0 +1,66 @@
+{
+	"$schema": "https://typedoc.org/schema.json",
+	"entryPoints": [ "src/index.ts" ],
+	"tsconfig": "tsconfig.json",
+
+	"out": "docs",
+	"name": "power-queues API Docs",
+	"readme": "README.md",
+	"includeVersion": true,
+
+	"exclude": [ "**/*.spec.ts", "**/dist/**", "**/*.js" ],
+	"excludeExternals": true,
+	"excludeInternal": true,
+	"excludePrivate": true,
+	"excludeNotDocumented": false,
+
+	"categorizeByGroup": true,
+	"searchInComments": true,
+
+	"plugin": [],
+	"githubPages": false,
+
+	"externalSymbolLinkMappings": {
+		"typescript": {
+			"Error": "#"
+		},
+		"power-redis": {
+			"Jsonish": "#",
+			"PowerRedis.toKeyString": "#",
+			"PowerRedis.toPayload": "#"
+		},
+		"power-queues": {
+			"PowerQueue.readyKey": "#",
+			"PowerQueue.processingKey": "#",
+			"PowerQueue.ensureReserveScript": "#",
+			"PowerQueue.moveOneToProcessing": "#",
+			"PowerQueue.getReserveScriptLMOVE": "#",
+			"PowerQueue.getReserveScriptRPOPLPUSH": "#",
+			"PowerQueue.fail": "#",
+			"PowerQueue.retry": "#",
+			"PowerQueue.success": "#",
+			"PowerQueue.ack": "#",
+			"PowerQueue.processingVtKey": "#",
+			"PowerQueue.getRequeueScript": "#",
+			"PowerQueue.evalshaWithReload": "#",
+			"PowerQueue.nowSec": "#",
+			"PowerQueue.evalshaWithReload": "#",
+			"PowerQueue.getPromoteScript": "#",
+			"PowerQueue.nowSec": "#",
+			"PowerQueue.delayedKey": "#",
+			"PowerQueue.zaddCompatXXCH": "#",
+			"PowerQueue.startHeartbeat": "#",
+			"PowerQueue.processingVtKey": "#",
+			"PowerQueue.startHeartbeat": "#",
+			"PowerQueue.loop": "#",
+			"PowerQueue.runners": "#",
+			"PowerQueue.startHeartbeat": "#",
+			"PowerQueue.logic": "#",
+			"PowerQueue.jitteredBackoffSec": "#",
+			"PowerQueue.data": "#",
+			"PowerQueue.error": "#"
+		},
+	},
+
+	"highlightLanguages": [ "ts", "js", "json", "bash", "regex" ]
+}
