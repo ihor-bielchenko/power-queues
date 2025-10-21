@@ -1,6 +1,6 @@
 {
 	"name": "power-queues",
-	"version": "1.0.9",
+	"version": "2.0.0",
 	"description": "Base classes for implementing custom queues in redis under high load conditions based on nestjs.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
@@ -12,23 +12,86 @@
 		"url": "https://github.com/ihor-bielchenko/power-queues/issues"
 	},
 	"homepage": "https://github.com/ihor-bielchenko/power-queues#readme",
-	"main": "dist/index.js",
+	"type": "module",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs",
+			"default": "./dist/index.js"
+		}
+	},
 	"files": [
 		"dist"
 	],
+	"scripts": {
+		"build": "tsup src/index.ts --format esm,cjs --dts",
+		"clean": "rimraf dist docs"
+	},
+	"engines": {
+		"node": ">=14"
+	},
 	"keywords": [
-		"nestjs",
-		"ioredis",
-		"queue",
 		"redis",
-		"custom",
-		"portions",
-		"order"
+		"redis-client",
+		"redis-wrapper",
+		"redis-abstraction",
+		"redis-utility",
+		"redis-helper",
+		"redis-queue",
+		"redis-list",
+		"redis-bulk",
+		"redis-scan",
+		"redis-mget",
+		"redis-ttl",
+		"redis-expire",
+		"redis-delete",
+		"redis-keys",
+		"redis-pattern",
+		"redis-pipeline",
+		"redis-multi",
+		"redis-atomic",
+		"json-serialization",
+		"safe-serialization",
+		"key-schema",
+		"key-builder",
+		"pattern-validation",
+		"key-validation",
+		"list-iterator",
+		"lpop-count",
+		"mget-chunked",
+		"nodejs",
+		"node",
+		"typescript",
+		"ts",
+		"esm",
+		"cjs",
+		"async",
+		"await",
+		"queue",
+		"cache",
+		"key-value",
+		"data-store",
+		"lightweight",
+		"abstraction-layer",
+		"typed-client",
+		"high-performance",
+		"atomic-operations",
+		"transactional",
+		"chunked-operations",
+		"safe-redis",
+		"power-redis"
 	],
+	"devDependencies": {
+		"@types/node": "^24.8.1",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.3"
+	},
 	"dependencies": {
-		"crypto": "^1.0.1",
-		"full-utils": "^1.0.9",
-		"uuid": "^11.1.0"
+		"full-utils": "^2.0.0",
+		"power-redis": "^2.0.2",
+		"uuid": "^13.0.0"
 	}
 }
