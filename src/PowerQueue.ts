@@ -61,81 +61,6 @@ import { PowerRedis } from 'power-redis';
  * @since 2.0.0
  */
 export abstract class PowerQueue extends PowerRedis {
-	/**
-	 * @section
-	 * @summary
-	 * Core internal state and configuration parameters that control
-	 * the runtime behavior of the `PowerQueue` engine.
-	 *
-	 * @remarks
-	 * These properties define both **cached Lua script references** (SHA hashes)
-	 * and **runtime constants** governing iteration speed, retry behavior,
-	 * concurrency, and visibility logic.
-	 *
-	 * They are initialized once per `PowerQueue` instance and remain immutable
-	 * (except for script SHAs that are populated dynamically via
-	 * {@link ensureReserveScript}, {@link ensureRequeueScript},
-	 * and {@link ensurePromoteScript}).
-	 *
-	 * ---
-	 * ### 🔹 Script SHA caches
-	 * These fields store SHA1 hashes returned by Redis after
-	 * {@link https://redis.io/commands/script-load | SCRIPT LOAD} calls.
-	 * They are used later with `EVALSHA` for efficient atomic execution:
-	 *
-	 * | Property | Lua Script | Description |
-	 * |-----------|-------------|-------------|
-	 * | `reserveSha` | {@link getReserveScriptLMOVE} | Main reservation logic (Redis ≥ 6.2). |
-	 * | `reserveShaRpoplpush` | {@link getReserveScriptRPOPLPUSH} | Fallback reservation script for Redis < 6.2. |
-	 * | `requeueSha` | {@link getRequeueScript} | Moves expired jobs back to ready. |
-	 * | `promoteSha` | {@link getPromoteScript} | Promotes delayed jobs to ready. |
-	 *
-	 * These SHAs are loaded lazily on demand by the corresponding `ensure*Script()` methods.
-	 *
-	 * ---
-	 * ### 🔹 Queue runtime configuration
-	 * These constants control queue behavior, iteration cadence, and retry logic:
-	 *
-	 * | Property | Type | Default | Description |
-	 * |-----------|------|----------|-------------|
-	 * | `iterationTimeout` | `number` | `1000` | Delay (ms) between idle iterations when no jobs are available. |
-	 * | `portionLength` | `number` | `1000` | Max number of jobs fetched per iteration (`reserveMany` batch size). |
-	 * | `expireStatusSec` | `number` | `300` | TTL (sec) for per-iteration status counters in Redis. |
-	 * | `maxAttempts` | `number` | `1` | Default maximum retry attempts per task. |
-	 * | `concurrency` | `number` | `32` | Max number of tasks processed concurrently per iteration. |
-	 * | `visibilityTimeoutSec` | `number` | `60` | Default visibility timeout before unacknowledged jobs are requeued. |
-	 * | `retryBaseSec` | `number` | `1` | Base delay (sec) for exponential backoff retries. |
-	 * | `retryMaxSec` | `number` | `3600` | Upper limit (sec) for backoff delay between retries. |
-	 *
-	 * Together these values define the performance envelope and fault-tolerance
-	 * characteristics of a `PowerQueue` worker loop.
-	 *
-	 * ---
-	 * ### 🔹 Internal runtime maps
-	 * These maps track queue execution state and per-task visibility:
-	 *
-	 * | Property | Type | Description |
-	 * |-----------|------|-------------|
-	 * | `runners` | `Map<string, { running: boolean }>` | Tracks which queues are currently active (`run()` loop status). |
-	 * | `processingRaw` | `Map<string, string>` | Maps task IDs → raw Redis payload strings currently in processing. |
-	 * | `heartbeatTimers` | `Map<string, NodeJS.Timeout>` | Active timers used by {@link startHeartbeat} to extend task visibility periodically. |
-	 *
-	 * ---
-	 * ### Design notes
-	 * - Script SHA fields are optional (`string | undefined`) and assigned after `SCRIPT LOAD`.
-	 * - Runtime constants are marked `readonly` to prevent accidental mutation.
-	 * - Internal maps (`runners`, `processingRaw`, `heartbeatTimers`) are private by design,
-	 *   ensuring thread-safe control of worker state.
-	 *
-	 * @since 2.0.0
-	 * @category Core Properties
-	 * @see {@link ensureReserveScript} - Loads reservation scripts and populates `reserveSha` / `reserveShaRpoplpush`.
-	 * @see {@link ensureRequeueScript} - Loads the requeue Lua script and caches its SHA.
-	 * @see {@link ensurePromoteScript} - Loads the delayed promotion Lua script and caches its SHA.
-	 * @see {@link loop} - Main iteration loop using `iterationTimeout` and `portionLength`.
-	 * @see {@link retry} - Uses `retryBaseSec` / `retryMaxSec` for exponential backoff.
-	 * @see {@link startHeartbeat} - Uses `heartbeatTimers` to maintain task visibility.
-	 */
 	private reserveSha?: string;
 	private reserveShaRpoplpush?: string;
 	private requeueSha?: string;
@@ -1816,9 +1741,9 @@ export abstract class PowerQueue extends PowerRedis {
 	 * @param processingVt - Redis **ZSET** key that stores visibility deadlines (score = UNIX seconds).
 	 * @param ready - Redis **LIST** key to which expired items are requeued for retry.
 	 * @param nowTs - Optional UNIX timestamp (seconds) used as the “current time” cutoff.
-	 *   If omitted, the method uses {@link nowSec}. {@link @defaultValue | Default: current time}
+	 *   If omitted, the method uses {@link nowSec}. {Default: current time}
 	 * @param chunk - Maximum number of expired items to move in this batch.  
-	 *   {@link @defaultValue | Default: 1000}
+	 *   {Default: 1000}
 	 *
 	 * @returns
 	 * Resolves to the **number of items requeued** (0 if none were due).
@@ -1945,9 +1870,9 @@ export abstract class PowerQueue extends PowerRedis {
 	 * @param delayed - Redis **ZSET** key storing delayed members (`score = readyAt UNIX seconds`).
 	 * @param ready - Redis **LIST** key where due items are appended for immediate processing.
 	 * @param nowTs - Optional UNIX timestamp (seconds) used as the cutoff for “due”.  
-	 *   {@link @defaultValue | Default: current time (via nowSec)}
+	 *   {Default: current time (via nowSec)}
 	 * @param chunk - Maximum number of items to promote in this batch.  
-	 *   {@link @defaultValue | Default: 1000}
+	 *   {Default: 1000}
 	 *
 	 * @returns
 	 * Resolves to the **number of delayed items promoted** into the ready list (0 if none).
@@ -2078,7 +2003,7 @@ export abstract class PowerQueue extends PowerRedis {
 	 *   It can be any JSON-compatible object; internally converted to string.
 	 * @param delaySec - Optional delay (in **seconds**) before the job becomes active.  
 	 *   If > 0, the job goes to `delayed`; otherwise to `ready`.  
-	 *   {@link @defaultValue | Default: 0 (immediate enqueue)}
+	 *   {Default: 0 (immediate enqueue)}
 	 *
 	 * @returns
 	 * A promise resolving to the result of the Redis write operation:
@@ -2601,7 +2526,7 @@ export abstract class PowerQueue extends PowerRedis {
 	 *
 	 * @param data - Partial task description. Must contain a valid `queueName`; the rest is defaulted by {@link buildTask}.
 	 * @param delaySec - Optional delay in **seconds** before the task is eligible to run. If not a positive number, the task is enqueued immediately.  
-	 *   {@link @defaultValue | Default: 0 (immediate)}
+	 *   {Default: 0 (immediate)}
 	 *
 	 * @returns
 	 * A promise resolving to the numeric result of the underlying Redis write:  
@@ -3895,14 +3820,14 @@ export abstract class PowerQueue extends PowerRedis {
 	 * | **Alerting** | Notify administrators about repeated iteration-level faults. |
 	 * | **Diagnostics** | Save stack traces to disk for forensic analysis. |
 	 *
-	 * @performance
+	 * Performance:
 	 * - Triggered rarely (only when an entire iteration fails).  
 	 * - Safe for moderate I/O operations such as writing to logs or Redis.
 	 *
-	 * @complexity
+	 * Complexity:
 	 * - O(1) default; depends on the complexity of your custom diagnostics logic.
 	 *
-	 * @security
+	 * Security:
 	 * - Sanitize stack traces before logging externally.  
 	 * - Avoid exposing internal implementation details in public channels.
 	 *
@@ -4803,7 +4728,7 @@ export abstract class PowerQueue extends PowerRedis {
 	 * @param task - The {@link Task} whose iteration counters should be updated.
 	 *   Uses `task.queueName` and `task.iterationId` to namespace the keys.
 	 * @param category - Logical outcome category for this event (e.g., `"success"`, `"fail"`, `"error"`, `"fatal"`).  
-	 *   {@link @defaultValue | Default: `"success"`}
+	 *   {Default: `"success"`}
 	 *
 	 * @returns
 	 * A `Promise<void>` that resolves after counters are incremented and expirations set.
@@ -4925,7 +4850,7 @@ export abstract class PowerQueue extends PowerRedis {
 	 *   is requeued by {@link requeueExpired}.  
 	 * - Heartbeats (started in {@link data}) keep long-running tasks invisible by extending VT.
 	 *
-	 * @security
+	 * Security:
 	 * - No direct payload modifications here; processing happens in {@link iteration}/{@link execute}.  
 	 * - Keys are derived using safe builders: {@link readyKey}, {@link processingKey}, {@link processingVtKey}, {@link delayedKey}.
 	 *
