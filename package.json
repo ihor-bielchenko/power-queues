@@ -79,5 +79,10 @@
 		"chunked-operations",
 		"safe-redis",
 		"power-redis"
-	]
+	],
+	"dependencies": {
+		"full-utils": "^2.0.2",
+		"power-redis": "^2.0.2",
+		"uuid": "^13.0.0"
+	}
 }
