@@ -55,6 +55,10 @@ export abstract class PowerQueue extends PowerRedis {
 		return this.toKeyString(queueName, 'delayed');
 	}
 
+	private totalKey(queueName: string): string {
+		return this.toKeyString(queueName, 'total');
+	}
+
 	toKeyString(...parts: Array<string | number>): string {
 		return super.toKeyString('queue', ...parts);
 	}
@@ -441,18 +445,27 @@ export abstract class PowerQueue extends PowerRedis {
 		}
 	}
 
-	async enqueue(ready: string, delayed: string, payload: any, delaySec?: number): Promise<number> {
+	async enqueue(total: string, ready: string, delayed: string, payload: any, delaySec?: number): Promise<number> {
 		if (!this.checkConnection()) {
 			throw new Error('Redis connection error.');
 		}
 		const raw = this.toPayload(payload);
+
+		await (this.redis as any)?.incr(total);
+		await (this.redis as any)?.expire(total, this.expireStatusSec);
 
 		if (isNumP(delaySec) && delaySec > 0) {
 			const score = this.nowSec() + delaySec;
 
 			return await (this.redis as any)?.zadd(delayed, score, raw);
 		}
-		return await (this.redis as any)?.rpush(ready, raw);
+		const done = await (this.redis as any)?.rpush(ready, raw);
+
+		if (isNumP(done)) {
+			await (this.redis as any)?.incr(total);
+			await (this.redis as any)?.expire(total, this.expireStatusSec);
+		}
+		return done;
 	}
 
 	async extendVisibility(processingVt: string, raw: string, visibilitySec: number): Promise<void> {
@@ -481,6 +494,7 @@ export abstract class PowerQueue extends PowerRedis {
 
 		if (r) {
 			r.running = false;
+			
 			this.runners.delete(queueName);
 		}
 	}
@@ -539,8 +553,9 @@ export abstract class PowerQueue extends PowerRedis {
 	async addTask(data: Partial<Task>, delaySec?: number): Promise<number> {
 		const ready = this.readyKey(String(data.queueName));
 		const delayed = this.delayedKey(String(data.queueName));
+		const total = this.totalKey(String(data.queueName));
 
-		return await this.enqueue(ready, delayed, this.buildTask(data), isNumP(delaySec) ? delaySec : 0);
+		return await this.enqueue(total, ready, delayed, this.buildTask(data), isNumP(delaySec) ? delaySec : 0);
 	}
 
 	async addTasks(data: {
@@ -560,12 +575,13 @@ export abstract class PowerQueue extends PowerRedis {
 		const queueName = String(data.queueName);
 		const ready = this.readyKey(queueName);
 		const delayed = this.delayedKey(queueName);
+		const total = this.totalKey(queueName);
 		const now = this.nowSec();
 		const uniformDelay = isNumP(data.delaySec) ? Math.max(0, Number(data.delaySec)) : undefined;
 		const perItemDelays = isArr(data.delaySec) ? (data.delaySec as number[]).map((v) => Math.max(0, Number(v || 0))) : undefined;
 		const batchSize = Math.max(1, Math.min(this.portionLength, 1000));
 		let idx = 0,
-			total = 0;
+			done = 0;
 
 		while (idx < data.payloads.length) {
 			const end = Math.min(idx + batchSize, data.payloads.length);
@@ -597,12 +613,15 @@ export abstract class PowerQueue extends PowerRedis {
 				else {
 					tx.rpush(ready, raw);
 				}
-				total++;
+				done++;
 			}
-			await tx.exec();
+			tx.set(total, done);
+			tx.expire(total, this.expireStatusSec);
 			idx = end;
+			
+			await tx.exec();
 		}
-		return total;
+		return done;
 	}
 
 	async iteration(tasks: Array<Task>): Promise<void> {
