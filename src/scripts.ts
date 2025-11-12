@@ -1,203 +1,7 @@
 
-export enum names {
-	AckAndMaybeDeleteBatch = 'ackAndMaybeDeleteBatch',
-	ReservePendingOrNewEntries = 'reservePendingOrNewEntries',
-	TryAcquireEntryLock = 'tryAcquireEntryLock',
-	MarkEntryStarted = 'markEntryStarted',
-	CompleteEntryAndReleaseLock = 'completeEntryAndReleaseLock',
-	ReleaseEntryLockIfToken = 'releaseEntryLockIfToken',
-	Heartbeat = 'heartbeat',
-};
+export const XAddBulk = `
+	local UNPACK = table and table.unpack or unpack
 
-/**
- * Подтверждение обработки сообщений (ACK) в Redis Stream и удаление обработанные сообщения из стрима.
- * Параметры:
- * 	- KEYS[1] - имя стрима (очереди), например "queue:tasks".
- *  - ARGV[1] - имя группы потребителей (consumer group), например "workers".
- *  - ARGV[2] - флаг удаления (1 = удалить сообщения после подтверждения).
- *  - ARGV[3...] - список messageId (идентификаторов сообщений).
- * Логика:
- * 	- Подтверждает (ACK) сообщения в группе (Redis помечает эти сообщения как обработанные).
- *  - Если delFlag == 1:
- * 		- Пытается удалить те же сообщения из стрима (XDEL).
- * 		- Если удаление всех сразу не удалось (ошибка pcall), тогда  в цикле удаляется каждое сообщение по одному.
- *  - Возвращает количество сообщений, которые удалось подтвердить (acked).
- */
-export const ackAndMaybeDeleteBatchScript = `
-	local stream  = KEYS[1]
-	local group   = ARGV[1]
-	local delFlag = tonumber(ARGV[2]) == 1
-
-	local acked = 0
-	local nids = #ARGV - 2
-	if nids > 0 then
-		acked = tonumber(redis.call('XACK', stream, group, unpack(ARGV, 3))) or 0
-		if delFlag and nids > 0 then
-			local ok, deln = pcall(redis.call, 'XDEL', stream, unpack(ARGV, 3))
-			if not ok then
-				deln = 0
-				for i = 3, #ARGV do
-					deln = deln + (tonumber(redis.call('XDEL', stream, ARGV[i])) or 0)
-				end
-			end
-		end
-	end
-	return acked
-`;
-
-export const reservePendingOrNewEntriesScript = `
-	local stream        = KEYS[1]
-	local group         = ARGV[1]
-	local consumer      = ARGV[2]
-	local pendingIdleMs = tonumber(ARGV[3])
-	local count         = tonumber(ARGV[4]) or 0
-	if count < 1 then count = 1 end
-
-	local timeBudgetMs  = tonumber(ARGV[5]) or 15
-	local t0            = redis.call('TIME')
-	local start_ms      = (tonumber(t0[1]) * 1000) + math.floor(tonumber(t0[2]) / 1000)
-
-	local results   = {}
-	local collected = 0
-	local start_id  = '0-0'
-	local iters     = 0
-	local max_iters = math.max(16, math.ceil(count / 100))
-
-	local function time_exceeded()
-		local t1 = redis.call('TIME')
-		local now_ms = (tonumber(t1[1]) * 1000) + math.floor(tonumber(t1[2]) / 1000)
-		return (now_ms - start_ms) >= timeBudgetMs
-	end
-
-	while (collected < count) and (iters < max_iters) do
-		local to_claim = count - collected
-		if to_claim < 1 then break end
-
-		local claim = redis.call('XAUTOCLAIM', stream, group, consumer, pendingIdleMs, start_id, 'COUNT', to_claim)
-		iters = iters + 1
-
-		local bucket = nil
-		if claim then
-			bucket = claim[2]
-		end
-		if bucket and #bucket > 0 then
-			for i = 1, #bucket do
-				results[#results+1] = bucket[i]
-			end
-			collected = #results
-		end
-
-		local next_id = claim and claim[1] or start_id
-		if next_id == start_id then
-			local s, seq = string.match(start_id, '^(%d+)%-(%d+)$')
-			if s and seq then
-				start_id = s .. '-' .. tostring(tonumber(seq) + 1)
-			else
-				start_id = '0-1'
-			end
-		else
-			start_id = next_id
-		end
-
-		if time_exceeded() then
-			break
-		end
-	end
-
-	local left = count - collected
-	if left > 0 then
-		local xr = redis.call('XREADGROUP', 'GROUP', group, consumer, 'COUNT', left, 'STREAMS', stream, '>')
-		if xr and xr[1] and xr[1][2] then
-			local entries = xr[1][2]
-			for i = 1, #entries do
-				results[#results+1] = entries[i]
-			end
-		end
-	end
-
-	return results
-`;
-
-export const tryAcquireEntryLockScript = `
-	local doneKey  = KEYS[1]
-	local lockKey  = KEYS[2]
-	local startKey = KEYS[3]
-
-	if redis.call('EXISTS', doneKey) == 1 then
-		return 1
-	end
-
-	local ttl = tonumber(ARGV[1]) or 0
-	if ttl <= 0 then return 0 end
-
-	local ok = redis.call('SET', lockKey, ARGV[2], 'NX', 'PX', ttl)
-	if ok then
-		if startKey and startKey ~= '' then
-			redis.call('SET', startKey, 1, 'PX', ttl)
-		end
-		return 2
-	else
-		return 0
-	end
-`;
-
-export const completeEntryAndReleaseLockScript = `
-	local doneKey  = KEYS[1]
-	local lockKey  = KEYS[2]
-	local startKey = KEYS[3]
-	redis.call('SET', doneKey, 1)
-	local ttlSec = tonumber(ARGV[1]) or 0
-	if ttlSec > 0 then redis.call('EXPIRE', doneKey, ttlSec) end
-	if redis.call('GET', lockKey) == ARGV[2] then
-		redis.call('DEL', lockKey)
-		if startKey then redis.call('DEL', startKey) end
-	end
-	return 1
-`;
-
-export const releaseEntryLockIfTokenScript = `
-	local lockKey  = KEYS[1]
-	local startKey = KEYS[2]
-	if redis.call('GET', lockKey) == ARGV[1] then
-		redis.call('DEL', lockKey)
-		if startKey then redis.call('DEL', startKey) end
-		return 1
-	end
-	return 0
-`;
-
-export const markEntryStartedScript = `
-	local lockKey  = KEYS[1]
-	local startKey = KEYS[2]
-	if redis.call('GET', lockKey) == ARGV[1] then
-		local ttl = tonumber(ARGV[2]) or 0
-		if ttl > 0 then
-			redis.call('SET', startKey, 1, 'PX', ttl)
-			redis.call('PEXPIRE', lockKey, ttl)
-		else
-			redis.call('SET', startKey, 1)
-		end
-		return 1
-	end
-	return 0
-`;
-
-export const heartbeatScript = `
-	local lockKey  = KEYS[1]
-	local startKey = KEYS[2]
-	if redis.call('GET', lockKey) == ARGV[1] then
-		local ttl = tonumber(ARGV[2]) or 0
-		local r1 = redis.call('PEXPIRE', lockKey, ttl)
-		local r2 = 0
-		if startKey then
-			r2 = redis.call('PEXPIRE', startKey, ttl)
-		end
-		return math.max(tonumber(r1 or 0), tonumber(r2 or 0))
-	end
-	return 0
-`;
-
-export const xaddBulkScript = `
 	local stream = KEYS[1]
 	local maxlen = tonumber(ARGV[1])
 	local approxFlag = tonumber(ARGV[2]) == 1
@@ -260,9 +64,168 @@ export const xaddBulkScript = `
 			a_len = a_len + 1; a[a_len] = ARGV[idx]; idx = idx + 1
 		end
 
-		local addedId = redis.call('XADD', stream, table.unpack(a))
+		local addedId = redis.call('XADD', stream, UNPACK(a))
 		out[#out+1] = addedId or ''
 	end
 
 	return out
+`;
+
+export const Approve = `
+	local stream = KEYS[1]
+	local group = ARGV[1]
+	local delFlag = tonumber(ARGV[2]) == 1
+
+	local acked = 0
+	local nids = #ARGV - 2
+	if nids > 0 then
+		acked = tonumber(redis.call('XACK', stream, group, unpack(ARGV, 3))) or 0
+		if delFlag and nids > 0 then
+			local ok, deln = pcall(redis.call, 'XDEL', stream, unpack(ARGV, 3))
+			if not ok then
+				deln = 0
+				for i = 3, #ARGV do
+					deln = deln + (tonumber(redis.call('XDEL', stream, ARGV[i])) or 0)
+				end
+			end
+		end
+	end
+	return acked
+`;
+
+export const IdempotencyAllow = `
+	local doneKey = KEYS[1]
+	local lockKey = KEYS[2]
+	local startKey = KEYS[3]
+
+	if redis.call('EXISTS', doneKey) == 1 then
+		return 1
+	end
+
+	local ttl = tonumber(ARGV[1]) or 0
+	if ttl <= 0 then return 0 end
+
+	local ok = redis.call('SET', lockKey, ARGV[2], 'NX', 'PX', ttl)
+	if ok then
+		if startKey and startKey ~= '' then
+			redis.call('SET', startKey, 1, 'PX', ttl)
+		end
+		return 2
+	else
+		return 0
+	end
+`;
+
+export const IdempotencyStart = `
+	local lockKey = KEYS[1]
+	local startKey = KEYS[2]
+	if redis.call('GET', lockKey) == ARGV[1] then
+		local ttl = tonumber(ARGV[2]) or 0
+		if ttl > 0 then
+			redis.call('SET', startKey, 1, 'PX', ttl)
+			redis.call('PEXPIRE', lockKey, ttl)
+		else
+			redis.call('SET', startKey, 1)
+		end
+		return 1
+	end
+	return 0
+`;
+
+export const IdempotencyDone = `
+	local doneKey  = KEYS[1]
+	local lockKey  = KEYS[2]
+	local startKey = KEYS[3]
+	redis.call('SET', doneKey, 1)
+	local ttlSec = tonumber(ARGV[1]) or 0
+	if ttlSec > 0 then redis.call('EXPIRE', doneKey, ttlSec) end
+	if redis.call('GET', lockKey) == ARGV[2] then
+		redis.call('DEL', lockKey)
+		if startKey then redis.call('DEL', startKey) end
+	end
+	return 1
+`;
+
+export const IdempotencyFree = `
+	local lockKey  = KEYS[1]
+	local startKey = KEYS[2]
+	if redis.call('GET', lockKey) == ARGV[1] then
+		redis.call('DEL', lockKey)
+		if startKey then redis.call('DEL', startKey) end
+		return 1
+	end
+	return 0
+`;
+
+export const SelectStuck = `
+	local stream = KEYS[1]
+	local group = ARGV[1]
+	local consumer = ARGV[2]
+	local pendingIdleMs = tonumber(ARGV[3])
+	local count = tonumber(ARGV[4]) or 0
+	if count < 1 then count = 1 end
+
+	local timeBudgetMs = tonumber(ARGV[5]) or 15
+	local t0 = redis.call('TIME')
+	local start_ms = (tonumber(t0[1]) * 1000) + math.floor(tonumber(t0[2]) / 1000)
+
+	local results = {}
+	local collected = 0
+	local start_id = '0-0'
+	local iters = 0
+	local max_iters = math.max(16, math.ceil(count / 100))
+
+	local function time_exceeded()
+		local t1 = redis.call('TIME')
+		local now_ms = (tonumber(t1[1]) * 1000) + math.floor(tonumber(t1[2]) / 1000)
+		return (now_ms - start_ms) >= timeBudgetMs
+	end
+
+	while (collected < count) and (iters < max_iters) do
+		local to_claim = count - collected
+		if to_claim < 1 then break end
+
+		local claim = redis.call('XAUTOCLAIM', stream, group, consumer, pendingIdleMs, start_id, 'COUNT', to_claim)
+		iters = iters + 1
+
+		local bucket = nil
+		if claim then
+			bucket = claim[2]
+		end
+		if bucket and #bucket > 0 then
+			for i = 1, #bucket do
+				results[#results+1] = bucket[i]
+			end
+			collected = #results
+		end
+
+		local next_id = claim and claim[1] or start_id
+		if next_id == start_id then
+			local s, seq = string.match(start_id, '^(%d+)%-(%d+)$')
+			if s and seq then
+				start_id = s .. '-' .. tostring(tonumber(seq) + 1)
+			else
+				start_id = '0-1'
+			end
+		else
+			start_id = next_id
+		end
+
+		if time_exceeded() then
+			break
+		end
+	end
+
+	local left = count - collected
+	if left > 0 then
+		local xr = redis.call('XREADGROUP', 'GROUP', group, consumer, 'COUNT', left, 'STREAMS', stream, '>')
+		if xr and xr[1] and xr[1][2] then
+			local entries = xr[1][2]
+			for i = 1, #entries do
+				results[#results+1] = entries[i]
+			end
+		end
+	end
+
+	return results
 `;

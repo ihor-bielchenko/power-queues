@@ -1,26 +1,24 @@
+import type { JsonPrimitiveOrUndefined } from 'power-redis';
 
-export type Field = string | number | boolean | null | undefined;
-export type Fields = Record<string, Field>;
+export type Constructor<T = {}> = new (...args: any[]) => T;
 
 export type SavedScript = { 
-	sha?: string; 
-	source: string; 
+	codeReady?: string; 
+	codeBody: string; 
 };
 
-export type LoopOpts = {
-	consumer: string;
-	abort?: AbortSignal;
-	tasksCountPerIteration: number;
-	pendingKeyTimeoutMs: number;
-	processingLockTimeoutMs: number;
-	heartbeatIntervalMs: number;
-	streamReadTimeoutMs: number;
-	scriptExecutionTimeLimitMs: number;
-	idempotencyKeyTimeoutSec: number;
-	deleteOnAck: boolean | number;
+export type AddTasksOptions = {
+	nomkstream?: boolean;
+	maxlen?: number;
+	minidWindowMs?: number;
+	minidExact?: boolean;
+	approx?: boolean;
+	exact?: boolean;
+	trimLimit?: number;
+	id?: string;
 };
 
-export type EntryKeys = {
+export type IdempotencyKeys = {
 	prefix: string; 
 	doneKey: string; 
 	lockKey: string; 
@@ -28,18 +26,6 @@ export type EntryKeys = {
 	token: string;
 };
 
-export type AddTasksOpts = {
-	maxlen?: number;
-	minidWindowMs?: number;
-	approx?: boolean;
-	exact?: boolean;
-	nomkstream?: boolean;
-	chunkSize?: number;
-	parallel?: number;
-	trimLimit?: number;
-	minidExact?: boolean;
-}
-
 export type Task =
-	| { id?: string; fields: Fields; }
-	| { id?: string; flat: Field[]; };
+	| { job: string; id?: string; createdAt?: number; payload: any; idemKey?: string; }
+	| { job: string; id?: string; createdAt?: number; flat: JsonPrimitiveOrUndefined[]; idemKey?: string; };
