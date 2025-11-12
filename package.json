@@ -81,8 +81,11 @@
 		"power-redis"
 	],
 	"dependencies": {
+		"@nestjs-labs/nestjs-ioredis": "^11.0.4",
+		"@nestjs/common": "^11.1.8",
 		"full-utils": "^2.0.3",
-		"power-redis": "^2.0.2",
+		"ioredis": "^5.8.2",
+		"power-redis": "^2.0.4",
 		"uuid": "^13.0.0"
 	}
 }
