@@ -16,6 +16,8 @@ export type AddTasksOptions = {
 	exact?: boolean;
 	trimLimit?: number;
 	id?: string;
+	status?: boolean;
+	idem?: boolean;
 };
 
 export type IdempotencyKeys = {

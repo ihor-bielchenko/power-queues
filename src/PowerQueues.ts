@@ -31,8 +31,6 @@ export class PowerQueues extends PowerRedis {
 	public readonly scripts: Record<string, SavedScript> = {};
 	public readonly addingBatchTasksCount: number = 800;
 	public readonly addingBatchKeysLimit: number = 10000;
-	public readonly idemOn: boolean = true;
-	public readonly idemKey: string = '';
 	public readonly workerExecuteLockTimeoutMs: number = 180000;
 	public readonly workerCacheTaskTimeoutMs: number = 60;
 	public readonly approveBatchTasksCount: number = 2000;
@@ -47,12 +45,15 @@ export class PowerQueues extends PowerRedis {
 	public readonly recoveryStuckTasksTimeoutMs: number = 60000;
 	public readonly workerLoopIntervalMs: number = 5000;
 	public readonly workerSelectionTimeoutMs: number = 80;
+	public readonly workerMaxRetries: number = 5;
+	public readonly workerClearAttemptsTimeoutMs: number = 86400000;
+	public readonly workerStatusTimeoutMs: number = 86400000;
 
 	async onSelected(data: Array<[ string, any[], number, string, string ]>) {
 		return data;
 	}
 
-	async onExecute(id: string, payload: any, createdAt: number, job: string, key: string) {
+	async onExecute(id: string, payload: any, createdAt: number, job: string, key: string, attempt: number) {
 	}
 
 	async onExecuted(data: Array<[ string, any[], number, string, string ]>) {
@@ -85,6 +86,7 @@ export class PowerQueues extends PowerRedis {
 				}
 			}
 			catch (err: any) {
+				await this.batchError(err);
 				await wait(600);
 			}
 		}
@@ -97,7 +99,8 @@ export class PowerQueues extends PowerRedis {
 		if (typeof queueName !== 'string' || !(queueName.length > 0)) {
 			throw new Error('Queue name is required.');
 		}
-		const batches = this.buildBatches(data);
+		const job = uuid();
+		const batches = this.buildBatches(data, job, opts.idem);
 		const result: string[] = new Array(data.length);
 		const promises: Array<() => Promise<void>> = [];
 		let cursor = 0;
@@ -125,6 +128,17 @@ export class PowerQueues extends PowerRedis {
 			}
 		});
 
+		if (opts.status) {
+			await (this.redis as any).set(`${queueName}:${job}:total`, data.length);
+			await (this.redis as any).set(`${queueName}:${job}:ready`, 0);
+			await (this.redis as any).set(`${queueName}:${job}:err`, 0);
+			await (this.redis as any).set(`${queueName}:${job}:ok`, 0);
+
+			await (this.redis as any).pexpire(`${queueName}:${job}:total`, this.workerStatusTimeoutMs);
+			await (this.redis as any).pexpire(`${queueName}:${job}:ready`, this.workerStatusTimeoutMs);
+			await (this.redis as any).pexpire(`${queueName}:${job}:err`, this.workerStatusTimeoutMs);
+			await (this.redis as any).pexpire(`${queueName}:${job}:ok`, this.workerStatusTimeoutMs);
+		}
 		await Promise.all(runners);
 		return result;
 	}
@@ -260,40 +274,38 @@ export class PowerQueues extends PowerRedis {
 		return argv;
 	}
 
-	private buildBatches(tasks: Task[]): Task[][] {
-		const job = uuid();
+	private buildBatches(tasks: Task[], job: string, idem?: boolean): Task[][] {
 		const batches: Task[][] = [];
 		let batch: Task[] = [],
 			realKeysLength = 0;
 
 		for (let task of tasks) {
+			const createdAt = task?.createdAt || Date.now();
 			let entry: any = task;
 
-			if (this.idemOn) {
-				const createdAt = entry?.createdAt || Date.now();
-				let idemKey = entry?.idemKey || uuid();
+			if (typeof entry.payload === 'object') {
+				entry = { 
+					...entry, 
+					payload: { 
+						payload: JSON.stringify(entry.payload),  
+						createdAt,
+						job,
+					}, 
+				};
 
-				if (typeof entry.payload === 'object') {
-					if (this.idemKey && typeof entry.payload[this.idemKey] === 'string' && entry.payload[this.idemKey].length > 0) {
-						idemKey = entry.payload[this.idemKey];	
-					}
-					entry = { 
-						...entry, 
-						payload: { 
-							payload: JSON.stringify(entry.payload),  
-							createdAt,
-							job,
-							idemKey,
-						}, 
-					};
+				if (idem) {
+					entry.payload['idemKey'] = entry?.idemKey || uuid();
 				}
-				else if (Array.isArray(entry.flat)) {
-					entry.flat.push('createdAt');
-					entry.flat.push(String(createdAt));
-					entry.flat.push('job');
-					entry.flat.push(job);
+			}
+			else if (Array.isArray(entry.flat)) {
+				entry.flat.push('createdAt');
+				entry.flat.push(String(createdAt));
+				entry.flat.push('job');
+				entry.flat.push(job);
+
+				if (idem) {
 					entry.flat.push('idemKey');
-					entry.flat.push(idemKey);
+					entry.flat.push(entry?.idemKey || uuid());
 				}
 			}
 			const reqKeysLength = this.keysLength(entry);
@@ -316,6 +328,43 @@ export class PowerQueues extends PowerRedis {
 		return 2 + (('flat' in task && Array.isArray(task.flat) && task.flat.length) ? task.flat.length : Object.keys(task).length * 2);
 	}
 
+	private attemptsKey(id: string): string {
+		const safeStream = this.stream.replace(/[^\w:\-]/g, '_');
+		const safeId = id.replace(/[^\w:\-]/g, '_');
+
+		return `q:${safeStream}:attempts:${safeId}`;
+	}
+
+	private async incrAttempts(id: string): Promise<number> {
+		try {
+			const key = this.attemptsKey(id);
+			const attempts = await (this.redis as any).incr(key);
+
+			await (this.redis as any).pexpire(key, this.workerClearAttemptsTimeoutMs);
+			return attempts;
+		}
+		catch (err) {
+		}
+		return 0;
+	}
+
+	private async getAttempts(id: string): Promise<number> {
+		const key = this.attemptsKey(id);
+		const v = await (this.redis as any).get(key);
+
+		return Number(v || 0);
+	}
+
+	private async clearAttempts(id: string): Promise<void> {
+		const key = this.attemptsKey(id);
+
+		try {
+			await (this.redis as any).del(key);
+		}
+		catch (e) {
+		}
+	}
+
 	private async success(id: string, payload: any, createdAt: number, job: string, key: string) {
 		if (this.executeJobStatus) {
 			await this.status(id, payload, createdAt, job, key);
@@ -329,7 +378,24 @@ export class PowerQueues extends PowerRedis {
 			
 		await this.setMany([{ key: `${prefix}ready`, value: ready + 1 }, { key: `${prefix}ok`, value: ok + 1 }], this.executeJobStatusTtlSec);
 	}
-		
+
+	private async batchError(err: any, tasks?: Array<[ string, any[], number, string, string ]>) {
+	}
+
+	private async error(err: any, id: string, payload: any, createdAt: number, job: string, key: string) {
+		await this.onError(err, id, payload, createdAt, job, key);
+	}
+
+	async onError(err: any, id: string, payload: any, createdAt: number, job: string, key: string) {
+	}
+
+	private async attempt(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempts: number) {
+		await this.onRetry(err, id, payload, createdAt, job, key, attempts);
+	}
+
+	async onRetry(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempts: number) {
+	}
+
 	private async execute(tasks: Array<[ string, any[], number, string, string ]>): Promise<string[]> {
 		const result: string[] = [];
 		let contended = 0,
@@ -370,6 +436,7 @@ export class PowerQueues extends PowerRedis {
 			}
 		}
 		catch (err) {
+			await this.batchError(err, tasks);
 		}
 		return result;
 	}
@@ -380,11 +447,32 @@ export class PowerQueues extends PowerRedis {
 		}
 		else {
 			try {
-				await this.onExecute(id, payload, createdAt, job, key);
+				await this.onExecute(id, payload, createdAt, job, key, await this.getAttempts(id));
 				await this.success(id, payload, createdAt, job, key);
+
 				return { id };
 			}
-			catch (err) {
+			catch (err: any) {
+				const attempts = await this.incrAttempts(id);
+
+				await this.attempt(err, id, payload, createdAt, job, key, attempts);
+				await this.error(err, id, payload, createdAt, job, key);
+
+				if (attempts >= this.workerMaxRetries) {
+					await this.addTasks(`${this.stream}:dlq`, [{
+						payload: {
+							...payload,
+							error: String(err?.message || err),
+							createdAt,
+							job,
+							id,
+							attempts,
+						},
+					}]);
+					await this.clearAttempts(id);
+					
+					return { id };
+				}
 			}
 		}
 		return {};
@@ -432,13 +520,33 @@ export class PowerQueues extends PowerRedis {
 		const heartbeat = this.heartbeat(keys) || (() => {});
 
 		try {
-			await this.onExecute(id, payload, createdAt, job, key);
+			await this.onExecute(id, payload, createdAt, job, key, await this.getAttempts(id));
 			await this.idempotencyDone(keys);
 			await this.success(id, payload, createdAt, job, key);
 			return { id };
 		}
 		catch (err: any) {
+			const attempts = await this.incrAttempts(id);
+
 			try {
+				await this.attempt(err, id, payload, createdAt, job, key, attempts);
+				await this.error(err, id, payload, createdAt, job, key);
+
+				if (attempts >= this.workerMaxRetries) {
+					await this.addTasks(`${this.stream}:dlq`, [{
+						payload: {
+							...payload,
+							error: String(err?.message || err),
+							createdAt,
+							job,
+							id,
+						},
+					}]);
+					await this.clearAttempts(id);
+					await this.idempotencyFree(keys);
+						
+					return { id };
+				}
 				await this.idempotencyFree(keys);
 			}
 			catch (err2: any) {
@@ -637,19 +745,18 @@ export class PowerQueues extends PowerRedis {
 				const id = Buffer.isBuffer(e?.[0]) ? e[0].toString() : e?.[0];
 				const kvRaw = e?.[1] ?? [];
 				const kv = Array.isArray(kvRaw) ? kvRaw.map((x: any) => (Buffer.isBuffer(x) ? x.toString() : x)) : [];
-				
-				return [ id as string, kv, 0, '', '' ] as [ string, any[], number, string, string ];
+	
+				return [ id as string, kv ] as [ string, any[] ];
 			})
 			.filter(([ id, kv ]) => typeof id === 'string' && id.length > 0 && Array.isArray(kv) && (kv.length & 1) === 0)
 			.map(([ id, kv ]) => {
-				const values = this.values(kv);
-				const { idemKey = '', createdAt, job, ...data } = this.payload(values);
+				const { idemKey = '', job, createdAt, payload } = this.values(kv);
 
-				return [ id, data, createdAt, job, idemKey ];
+				return [ id, this.payload(payload), createdAt, job, idemKey ];
 			});
 	}
 
-	private values(value: any[]): Task {
+	private values(value: any[]) {
 		const result: any = {};
 
 		for (let i = 0; i < value.length; i += 2) {
@@ -658,7 +765,7 @@ export class PowerQueues extends PowerRedis {
 		return result;
 	}
 
-	private payload(data: Task): any {
+	private payload(data: any): any {
 		try {
 			return JSON.parse((data as any)?.payload);
 		}
