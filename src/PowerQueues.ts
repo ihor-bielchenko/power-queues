@@ -47,7 +47,6 @@ export class PowerQueues extends PowerRedis {
 	public readonly workerSelectionTimeoutMs: number = 80;
 	public readonly workerMaxRetries: number = 5;
 	public readonly workerClearAttemptsTimeoutMs: number = 86400000;
-	public readonly workerStatusTimeoutMs: number = 86400000;
 
 	async onSelected(data: Array<[ string, any[], number, string, string ]>) {
 		return data;
@@ -134,10 +133,10 @@ export class PowerQueues extends PowerRedis {
 			await (this.redis as any).set(`${queueName}:${job}:err`, 0);
 			await (this.redis as any).set(`${queueName}:${job}:ok`, 0);
 
-			await (this.redis as any).pexpire(`${queueName}:${job}:total`, this.workerStatusTimeoutMs);
-			await (this.redis as any).pexpire(`${queueName}:${job}:ready`, this.workerStatusTimeoutMs);
-			await (this.redis as any).pexpire(`${queueName}:${job}:err`, this.workerStatusTimeoutMs);
-			await (this.redis as any).pexpire(`${queueName}:${job}:ok`, this.workerStatusTimeoutMs);
+			await (this.redis as any).pexpire(`${queueName}:${job}:total`, opts.statusTimeoutMs || 86400000);
+			await (this.redis as any).pexpire(`${queueName}:${job}:ready`, opts.statusTimeoutMs || 86400000);
+			await (this.redis as any).pexpire(`${queueName}:${job}:err`, opts.statusTimeoutMs || 86400000);
+			await (this.redis as any).pexpire(`${queueName}:${job}:ok`, opts.statusTimeoutMs || 86400000);
 		}
 		await Promise.all(runners);
 		return result;

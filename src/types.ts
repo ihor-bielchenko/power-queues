@@ -17,6 +17,7 @@ export type AddTasksOptions = {
 	trimLimit?: number;
 	id?: string;
 	status?: boolean;
+	statusTimeoutMs?: number;
 	idem?: boolean;
 };
 
