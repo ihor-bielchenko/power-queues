@@ -1,6 +1,6 @@
 {
 	"name": "power-queues",
-	"version": "2.0.7",
+	"version": "2.0.8",
 	"description": "Base classes for implementing custom queues in redis under high load conditions based on nestjs.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
