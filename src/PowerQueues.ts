@@ -61,6 +61,15 @@ export class PowerQueues extends PowerRedis {
 	async onSuccess(id: string, payload: any, createdAt: number, job: string, key: string) {
 	}
 
+	async onBatchError(err: any, tasks?: Array<[ string, any[], number, string, string ]>) {
+	}
+
+	async onError(err: any, id: string, payload: any, createdAt: number, job: string, key: string) {
+	}
+
+	async onRetry(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempts: number) {
+	}
+
 	async runQueue() {
 		await this.createGroup('0-0');
 		await this.consumerLoop();
@@ -366,33 +375,30 @@ export class PowerQueues extends PowerRedis {
 
 	private async success(id: string, payload: any, createdAt: number, job: string, key: string) {
 		if (this.executeJobStatus) {
-			await this.status(id, payload, createdAt, job, key);
+			const prefix = `${this.stream}:${job}:`;
+			const { ready = 0, ok = 0 } = (await this.getMany(prefix) as any);
+
+			await this.setMany([{ key: `${prefix}ready`, value: ready + 1 }, { key: `${prefix}ok`, value: ok + 1 }], this.executeJobStatusTtlSec);
 		}
 		await this.onSuccess(id, payload, createdAt, job, key);
 	}
 
-	private async status(id: string, payload: any, createdAt: number, job: string, key: string) {
-		const prefix = `s:${this.stream}:`;
-		const { ready = 0, ok = 0 } = (await this.getMany(prefix) as any);
-			
-		await this.setMany([{ key: `${prefix}ready`, value: ready + 1 }, { key: `${prefix}ok`, value: ok + 1 }], this.executeJobStatusTtlSec);
-	}
-
 	private async batchError(err: any, tasks?: Array<[ string, any[], number, string, string ]>) {
+		await this.onBatchError(err, tasks);
 	}
 
-	private async error(err: any, id: string, payload: any, createdAt: number, job: string, key: string) {
+	private async error(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempt: number) {
+		if (this.executeJobStatus && attempt >= this.workerMaxRetries) {
+			const prefix = `${this.stream}:${job}:`;
+			const { ready = 0, err = 0 } = (await this.getMany(prefix) as any);
+
+			await this.setMany([{ key: `${prefix}ready`, value: ready + 1 }, { key: `${prefix}err`, value: err + 1 }], this.executeJobStatusTtlSec);
+		}
 		await this.onError(err, id, payload, createdAt, job, key);
 	}
 
-	async onError(err: any, id: string, payload: any, createdAt: number, job: string, key: string) {
-	}
-
-	private async attempt(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempts: number) {
-		await this.onRetry(err, id, payload, createdAt, job, key, attempts);
-	}
-
-	async onRetry(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempts: number) {
+	private async attempt(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempt: number) {
+		await this.onRetry(err, id, payload, createdAt, job, key, attempt);
 	}
 
 	private async execute(tasks: Array<[ string, any[], number, string, string ]>): Promise<string[]> {
@@ -452,12 +458,12 @@ export class PowerQueues extends PowerRedis {
 				return { id };
 			}
 			catch (err: any) {
-				const attempts = await this.incrAttempts(id);
+				const attempt = await this.incrAttempts(id);
 
-				await this.attempt(err, id, payload, createdAt, job, key, attempts);
-				await this.error(err, id, payload, createdAt, job, key);
+				await this.attempt(err, id, payload, createdAt, job, key, attempt);
+				await this.error(err, id, payload, createdAt, job, key, attempt);
 
-				if (attempts >= this.workerMaxRetries) {
+				if (attempt >= this.workerMaxRetries) {
 					await this.addTasks(`${this.stream}:dlq`, [{
 						payload: {
 							...payload,
@@ -465,7 +471,7 @@ export class PowerQueues extends PowerRedis {
 							createdAt,
 							job,
 							id,
-							attempts,
+							attempt,
 						},
 					}]);
 					await this.clearAttempts(id);
@@ -525,13 +531,13 @@ export class PowerQueues extends PowerRedis {
 			return { id };
 		}
 		catch (err: any) {
-			const attempts = await this.incrAttempts(id);
+			const attempt = await this.incrAttempts(id);
 
 			try {
-				await this.attempt(err, id, payload, createdAt, job, key, attempts);
-				await this.error(err, id, payload, createdAt, job, key);
+				await this.attempt(err, id, payload, createdAt, job, key, attempt);
+				await this.error(err, id, payload, createdAt, job, key, attempt);
 
-				if (attempts >= this.workerMaxRetries) {
+				if (attempt >= this.workerMaxRetries) {
 					await this.addTasks(`${this.stream}:dlq`, [{
 						payload: {
 							...payload,
