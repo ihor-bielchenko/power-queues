@@ -376,7 +376,7 @@ export class PowerQueues extends PowerRedis {
 	private async success(id: string, payload: any, createdAt: number, job: string, key: string) {
 		if (this.executeJobStatus) {
 			const prefix = `${this.stream}:${job}:`;
-			const { ready = 0, ok = 0 } = (await this.getMany(prefix) as any);
+			const { ready = 0, ok = 0 } = (await this.getMany(`${prefix}*`) as any);
 
 			await this.setMany([{ key: `${prefix}ready`, value: ready + 1 }, { key: `${prefix}ok`, value: ok + 1 }], this.executeJobStatusTtlSec);
 		}
@@ -390,7 +390,7 @@ export class PowerQueues extends PowerRedis {
 	private async error(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempt: number) {
 		if (this.executeJobStatus && attempt >= this.workerMaxRetries) {
 			const prefix = `${this.stream}:${job}:`;
-			const { ready = 0, err = 0 } = (await this.getMany(prefix) as any);
+			const { ready = 0, err = 0 } = (await this.getMany(`${prefix}*`) as any);
 
 			await this.setMany([{ key: `${prefix}ready`, value: ready + 1 }, { key: `${prefix}err`, value: err + 1 }], this.executeJobStatusTtlSec);
 		}
