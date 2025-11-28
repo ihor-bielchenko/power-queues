@@ -46,7 +46,7 @@ export class PowerQueues extends PowerRedis {
 	public readonly removeOnExecuted: boolean = false;
 	public readonly executeBatchAtOnce: boolean = false;
 	public readonly executeJobStatus: boolean = false;
-	public readonly executeJobStatusTtlMs: number = 300;
+	public readonly executeJobStatusTtlMs: number = 300000;
 	public readonly consumerHost: string = 'host';
 	public readonly stream: string = 'stream';
 	public readonly group: string = 'group';
