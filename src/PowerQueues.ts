@@ -9,7 +9,16 @@ import type {
 	IdempotencyKeys,
 } from './types';
 import { PowerRedis } from 'power-redis';
-import { wait } from 'full-utils';
+import { 
+	isObjFilled,
+	isObj,
+	isArrFilled, 
+	isArr,
+	isStrFilled,
+	isNumNZ,
+	jsonDecode,
+	wait,
+} from 'full-utils';
 import { v4 as uuid } from 'uuid';
 import {
 	XAddBulk,
@@ -37,7 +46,7 @@ export class PowerQueues extends PowerRedis {
 	public readonly removeOnExecuted: boolean = false;
 	public readonly executeBatchAtOnce: boolean = false;
 	public readonly executeJobStatus: boolean = false;
-	public readonly executeJobStatusTtlSec: number = 300;
+	public readonly executeJobStatusTtlMs: number = 300;
 	public readonly consumerHost: string = 'host';
 	public readonly stream: string = 'stream';
 	public readonly group: string = 'group';
@@ -82,14 +91,14 @@ export class PowerQueues extends PowerRedis {
 			try {
 				const tasks = await this.select();
 
-				if (!Array.isArray(tasks) || !(tasks.length > 0)) {
+				if (!isArrFilled(tasks)) {
 					await wait(600);
 					continue;
 				}
 				const tasksP = await this.onSelected(tasks);
-				const ids = await this.execute((Array.isArray(tasksP) && tasksP.length > 0) ? tasksP : tasks);
+				const ids = await this.execute(isArrFilled(tasksP) ? tasksP : tasks);
 
-				if (Array.isArray(ids) && ids.length > 0) {
+				if (isArrFilled(tasks)) {
 					await this.approve(ids);
 				}
 			}
@@ -101,10 +110,10 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	async addTasks(queueName: string, data: any[], opts: AddTasksOptions = {}): Promise<string[]> {
-		if (!Array.isArray(data) || !(data.length > 0)) {
+		if (!isArrFilled(data)) {
 			throw new Error('Tasks is not filled.');
 		}
-		if (typeof queueName !== 'string' || !(queueName.length > 0)) {
+		if (!isStrFilled(queueName)) {
 			throw new Error('Queue name is required.');
 		}
 		const job = uuid();
@@ -138,14 +147,7 @@ export class PowerQueues extends PowerRedis {
 
 		if (opts.status) {
 			await (this.redis as any).set(`${queueName}:${job}:total`, data.length);
-			await (this.redis as any).set(`${queueName}:${job}:ready`, 0);
-			await (this.redis as any).set(`${queueName}:${job}:err`, 0);
-			await (this.redis as any).set(`${queueName}:${job}:ok`, 0);
-
-			await (this.redis as any).pexpire(`${queueName}:${job}:total`, opts.statusTimeoutMs || 86400000);
-			await (this.redis as any).pexpire(`${queueName}:${job}:ready`, opts.statusTimeoutMs || 86400000);
-			await (this.redis as any).pexpire(`${queueName}:${job}:err`, opts.statusTimeoutMs || 86400000);
-			await (this.redis as any).pexpire(`${queueName}:${job}:ok`, opts.statusTimeoutMs || 86400000);
+			await (this.redis as any).pexpire(`${queueName}:${job}:total`, opts.statusTimeoutMs || 300000);
 		}
 		await Promise.all(runners);
 		return result;
@@ -187,7 +189,7 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	private saveScript(name: string, codeBody: string): string {
-		if (typeof codeBody !== 'string' || !(codeBody.length > 0)) {
+		if (!isStrFilled(codeBody)) {
 			throw new Error('Script body is empty.');
 		}
 		this.scripts[name] = { codeBody };
@@ -197,7 +199,7 @@ export class PowerQueues extends PowerRedis {
 
 	private async runScript(name: string, keys: string[], args: (string|number)[], defaultCode?: string) {
 		if (!this.scripts[name]) {
-			if (typeof defaultCode !== 'string' || !(defaultCode.length > 0)) {
+			if (!isStrFilled(defaultCode)) {
 				throw new Error(`Undefined script "${name}". Save it before executing.`);
 			}
 			this.saveScript(name, defaultCode);
@@ -246,14 +248,14 @@ export class PowerQueues extends PowerRedis {
 			const id = entry.id ?? '*';
 			let flat: JsonPrimitiveOrUndefined[];
 
-			if ('flat' in entry && Array.isArray(entry.flat) && entry.flat.length > 0) {
+			if ('flat' in entry && isArrFilled(entry.flat)) {
 				flat = entry.flat;
 					
 				if (flat.length % 2 !== 0) {
 					throw new Error('Property "flat" must contain an even number of realKeysLength (field/value pairs).');
 				}
 			}
-			else if ('payload' in entry && typeof entry.payload === 'object' && Object.keys(entry.payload || {}).length > 0) {
+			else if ('payload' in entry && isObjFilled(entry.payload)) {
 				flat = [];
 		
 				for (const [ k, v ] of Object.entries(entry.payload)) {
@@ -265,7 +267,7 @@ export class PowerQueues extends PowerRedis {
 			}
 			const pairs = flat.length / 2;
 
-			if (pairs <= 0) {
+			if (isNumNZ(pairs)) {
 				throw new Error('Task must have "payload" or "flat".');
 			}
 			argv.push(String(id));
@@ -274,7 +276,7 @@ export class PowerQueues extends PowerRedis {
 			for (const token of flat) {
 				argv.push(!token
 					? ''
-					: (typeof token === 'string' && token.length > 0)
+					: isStrFilled(token)
 						? token
 						: String(token));
 			}
@@ -291,7 +293,7 @@ export class PowerQueues extends PowerRedis {
 			const createdAt = task?.createdAt || Date.now();
 			let entry: any = task;
 
-			if (typeof entry.payload === 'object') {
+			if (isObj(entry.payload)) {
 				entry = { 
 					...entry, 
 					payload: { 
@@ -376,9 +378,9 @@ export class PowerQueues extends PowerRedis {
 	private async success(id: string, payload: any, createdAt: number, job: string, key: string) {
 		if (this.executeJobStatus) {
 			const prefix = `${this.stream}:${job}:`;
-			const { ready = 0, ok = 0 } = (await this.getMany(`${prefix}*`) as any);
 
-			await this.setMany([{ key: `${prefix}ready`, value: ready + 1 }, { key: `${prefix}ok`, value: ok + 1 }], this.executeJobStatusTtlSec);
+			await this.incr(`${prefix}ok`, this.executeJobStatusTtlMs);
+			await this.incr(`${prefix}ready`, this.executeJobStatusTtlMs);
 		}
 		await this.onSuccess(id, payload, createdAt, job, key);
 	}
@@ -390,9 +392,9 @@ export class PowerQueues extends PowerRedis {
 	private async error(err: any, id: string, payload: any, createdAt: number, job: string, key: string, attempt: number) {
 		if (this.executeJobStatus && attempt >= this.workerMaxRetries) {
 			const prefix = `${this.stream}:${job}:`;
-			const { ready = 0, err = 0 } = (await this.getMany(`${prefix}*`) as any);
 
-			await this.setMany([{ key: `${prefix}ready`, value: ready + 1 }, { key: `${prefix}err`, value: err + 1 }], this.executeJobStatusTtlSec);
+			await this.incr(`${prefix}err`, this.executeJobStatusTtlMs);
+			await this.incr(`${prefix}ready`, this.executeJobStatusTtlMs);
 		}
 		await this.onError(err, id, payload, createdAt, job, key);
 	}
@@ -436,7 +438,7 @@ export class PowerQueues extends PowerRedis {
 			}
 			await this.onExecuted(tasks);
 
-			if ((!Array.isArray(result) || !(result.length > 0)) && contended > (tasks.length >> 1)) {
+			if (!isArrFilled(result) && contended > (tasks.length >> 1)) {
 				await this.waitAbortable((15 + Math.floor(Math.random() * 35)) + Math.min(250, 15 * contended + Math.floor(Math.random() * 40)));
 			}
 		}
@@ -615,7 +617,7 @@ export class PowerQueues extends PowerRedis {
 	private async select(): Promise<Array<[ string, any[], number, string, string ]>> {
 		let entries: Array<[ string, any[], number, string, string ]> = await this.selectStuck();
 
-		if (!entries?.length) {
+		if (!isArrFilled(entries)) {
 			entries = await this.selectFresh();
 		}
 		return this.normalizeEntries(entries);
@@ -625,7 +627,7 @@ export class PowerQueues extends PowerRedis {
 		try {
 			const res = await this.runScript('SelectStuck', [ this.stream ], [ this.group, this.consumer(), String(this.recoveryStuckTasksTimeoutMs), String(this.workerBatchTasksCount), String(this.workerSelectionTimeoutMs) ], SelectStuck);
 
-			return (Array.isArray(res) ? res : []) as any[];
+			return (isArr(res) ? res : []) as any[];
 		}
 		catch (err: any) {
 			if (String(err?.message || '').includes('NOGROUP')) {
@@ -646,12 +648,9 @@ export class PowerQueues extends PowerRedis {
 				'STREAMS', this.stream, '>',
 			);
 
-			if (!res?.[0]?.[1]?.length) {
-				return [];
-			}
 			entries = res?.[0]?.[1] ?? [];
 
-			if (!entries?.length) {
+			if (!isArrFilled(entries)) {
 				return [];
 			}
 		}
@@ -749,11 +748,11 @@ export class PowerQueues extends PowerRedis {
 			.map((e) => {
 				const id = Buffer.isBuffer(e?.[0]) ? e[0].toString() : e?.[0];
 				const kvRaw = e?.[1] ?? [];
-				const kv = Array.isArray(kvRaw) ? kvRaw.map((x: any) => (Buffer.isBuffer(x) ? x.toString() : x)) : [];
+				const kv = isArr(kvRaw) ? kvRaw.map((x: any) => (Buffer.isBuffer(x) ? x.toString() : x)) : [];
 	
 				return [ id as string, kv ] as [ string, any[] ];
 			})
-			.filter(([ id, kv ]) => typeof id === 'string' && id.length > 0 && Array.isArray(kv) && (kv.length & 1) === 0)
+			.filter(([ id, kv ]) => isStrFilled(id) && isArr(kv) && (kv.length & 1) === 0)
 			.map(([ id, kv ]) => {
 				const { idemKey = '', job, createdAt, payload } = this.values(kv);
 
@@ -772,7 +771,7 @@ export class PowerQueues extends PowerRedis {
 
 	private payload(data: any): any {
 		try {
-			return JSON.parse((data as any)?.payload);
+			return jsonDecode(data);
 		}
 		catch (err) {
 		}
