@@ -54,7 +54,7 @@ export class PowerQueues extends PowerRedis {
 	public readonly recoveryStuckTasksTimeoutMs: number = 60000;
 	public readonly workerLoopIntervalMs: number = 5000;
 	public readonly workerSelectionTimeoutMs: number = 80;
-	public readonly workerMaxRetries: number = 5;
+	public readonly workerMaxRetries: number = 1;
 	public readonly workerClearAttemptsTimeoutMs: number = 86400000;
 
 	async onSelected(data: Array<[ string, any[], number, string, string ]>) {
@@ -64,7 +64,7 @@ export class PowerQueues extends PowerRedis {
 	async onExecute(id: string, payload: any, createdAt: number, job: string, key: string, attempt: number) {
 	}
 
-	async onExecuted(data: Array<[ string, any[], number, string, string ]>) {
+	async onReady(data: Array<[ string, any[], number, string, string ]>) {
 	}
 
 	async onSuccess(id: string, payload: any, createdAt: number, job: string, key: string) {
@@ -436,7 +436,7 @@ export class PowerQueues extends PowerRedis {
 			if (this.executeBatchAtOnce && promises.length > 0) {
 				await Promise.all(promises);
 			}
-			await this.onExecuted(tasks);
+			await this.onReady(tasks);
 
 			if (!isArrFilled(result) && contended > (tasks.length >> 1)) {
 				await this.waitAbortable((15 + Math.floor(Math.random() * 35)) + Math.min(250, 15 * contended + Math.floor(Math.random() * 40)));
