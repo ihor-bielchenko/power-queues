@@ -16,6 +16,13 @@ Designed for large-scale microservices, telemetry pipelines, and high-load syste
 
 ---
 
+## 📚 Documentation
+
+Full documentation is available here:  
+👉 **https://power-queues.docs.ihor.bielchenko.com**
+
+---
+
 ## 🚀 Features
 
 - ⚡ **Bulk XADD** — send thousands of tasks in a single Redis call  
