@@ -22,12 +22,14 @@
 
 	"externalSymbolLinkMappings": {
 		"typescript": {
-			"Error": "#"
+			"Error": "#",
+			"AbortController": "#"
 		},
 		"power-redis": {
 			"Jsonish": "#",
 			"PowerRedis.toKeyString": "#",
-			"PowerRedis.toPayload": "#"
+			"PowerRedis.toPayload": "#",
+			"IORedisLike": "#"
 		},
 		"power-queues": {
 			"PowerQueue.readyKey": "#",
@@ -58,7 +60,16 @@
 			"PowerQueue.logic": "#",
 			"PowerQueue.jitteredBackoffSec": "#",
 			"PowerQueue.data": "#",
-			"PowerQueue.error": "#"
+			"PowerQueue.error": "#",
+			"PowerQueues.saveScript": "#",
+			"PowerQueues.runScript": "#",
+			"PowerQueues.idempotencyAllow": "#",
+			"PowerQueues.idempotencyStart": "#",
+			"PowerQueues.sendHeartbeat": "#",
+			"PowerQueues.heartbeat": "#",
+			"PowerQueues.approve": "#",
+			"SelectStuck": "#",
+			"PowerQueues.attemptsKey": "#"
 		},
 	},
 

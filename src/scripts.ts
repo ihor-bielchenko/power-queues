@@ -136,15 +136,24 @@ export const IdempotencyDone = `
 	local doneKey  = KEYS[1]
 	local lockKey  = KEYS[2]
 	local startKey = KEYS[3]
+
 	redis.call('SET', doneKey, 1)
-	local ttlSec = tonumber(ARGV[1]) or 0
-	if ttlSec > 0 then redis.call('EXPIRE', doneKey, ttlSec) end
+
+	local ttlMs = tonumber(ARGV[1]) or 0
+	if ttlMs > 0 then
+		redis.call('PEXPIRE', doneKey, ttlMs)
+	end
+
 	if redis.call('GET', lockKey) == ARGV[2] then
 		redis.call('DEL', lockKey)
-		if startKey then redis.call('DEL', startKey) end
+		if startKey then
+			redis.call('DEL', startKey)
+		end
 	end
+
 	return 1
 `;
+
 
 export const IdempotencyFree = `
 	local lockKey  = KEYS[1]

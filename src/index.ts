@@ -2,6 +2,7 @@ import { PowerQueues } from './PowerQueues';
 import type{
 	AddTasksOptions,
 	Task,
+	SavedScript,
 } from './types';
 
 export {
@@ -10,4 +11,5 @@ export {
 export type {
 	AddTasksOptions,
 	Task,
+	SavedScript,
 };

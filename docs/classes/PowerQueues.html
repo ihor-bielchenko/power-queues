@@ -1,0 +1,1265 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>PowerQueues | power-queues API Docs - v2.0.15</title><meta name="description" content="Documentation for power-queues API Docs"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="../index.html" class="title">power-queues API Docs - v2.0.15</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb" aria-label="Breadcrumb"><li><a href="" aria-current="page">PowerQueues</a></li></ul><h1>Class PowerQueues</h1></div><section class="tsd-panel tsd-hierarchy" data-refl="1"><h4>Hierarchy</h4><ul class="tsd-hierarchy"><li class="tsd-hierarchy-item"><span class="tsd-signature-type">PowerRedis</span><ul class="tsd-hierarchy"><li class="tsd-hierarchy-item"><span class="tsd-hierarchy-target">PowerQueues</span></li></ul></li></ul></section><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L36">PowerQueues.ts:36</a></li></ul></aside><section class="tsd-panel-group tsd-index-group"><section class="tsd-panel tsd-index-panel"><details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h5 class="tsd-index-heading uppercase">Index</h5></summary><div class="tsd-accordion-details"><section class="tsd-index-section"><h3 class="tsd-index-heading">Constructors</h3><div class="tsd-index-list"><a href="#constructor" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a>
+</div></section><section class="tsd-index-section"><h3 class="tsd-index-heading">Properties</h3><div class="tsd-index-list"><a href="#abort" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>abort</span></a>
+<a href="#addingbatchkeyslimit" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>adding<wbr/>Batch<wbr/>Keys<wbr/>Limit</span></a>
+<a href="#addingbatchtaskscount" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>adding<wbr/>Batch<wbr/>Tasks<wbr/>Count</span></a>
+<a href="#approvebatchtaskscount" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>approve<wbr/>Batch<wbr/>Tasks<wbr/>Count</span></a>
+<a href="#consumerhost" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>consumer<wbr/>Host</span></a>
+<a href="#executebatchatonce" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>execute<wbr/>Batch<wbr/>At<wbr/>Once</span></a>
+<a href="#executejobstatus" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>execute<wbr/>Job<wbr/>Status</span></a>
+<a href="#executejobstatusttlms" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>execute<wbr/>Job<wbr/>Status<wbr/>Ttl<wbr/>Ms</span></a>
+<a href="#group" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>group</span></a>
+<a href="#recoverystucktaskstimeoutms" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>recovery<wbr/>Stuck<wbr/>Tasks<wbr/>Timeout<wbr/>Ms</span></a>
+<a href="#redis" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>redis</span></a>
+<a href="#removeonexecuted" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>remove<wbr/>On<wbr/>Executed</span></a>
+<a href="#scripts" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>scripts</span></a>
+<a href="#stream" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>stream</span></a>
+<a href="#workerbatchtaskscount" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Batch<wbr/>Tasks<wbr/>Count</span></a>
+<a href="#workercachetasktimeoutms" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Cache<wbr/>Task<wbr/>Timeout<wbr/>Ms</span></a>
+<a href="#workerclearattemptstimeoutms" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Clear<wbr/>Attempts<wbr/>Timeout<wbr/>Ms</span></a>
+<a href="#workerexecutelocktimeoutms" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Execute<wbr/>Lock<wbr/>Timeout<wbr/>Ms</span></a>
+<a href="#workerloopintervalms" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Loop<wbr/>Interval<wbr/>Ms</span></a>
+<a href="#workermaxretries" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Max<wbr/>Retries</span></a>
+<a href="#workerselectiontimeoutms" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Selection<wbr/>Timeout<wbr/>Ms</span></a>
+</div></section><section class="tsd-index-section"><h3 class="tsd-index-heading">Methods</h3><div class="tsd-index-list"><a href="#addtasks" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Tasks</span></a>
+<a href="#consumerloop" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>consumer<wbr/>Loop</span></a>
+<a href="#loadscripts" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>load<wbr/>Scripts</span></a>
+<a href="#onbatcherror" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Batch<wbr/>Error</span></a>
+<a href="#onerror" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Error</span></a>
+<a href="#onexecute" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Execute</span></a>
+<a href="#onready" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Ready</span></a>
+<a href="#onretry" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Retry</span></a>
+<a href="#onselected" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Selected</span></a>
+<a href="#onsuccess" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Success</span></a>
+<a href="#runqueue" class="tsd-index-link"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>run<wbr/>Queue</span></a>
+</div></section></div></details></section></section><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h2>Constructors</h2></summary><section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="constructor"><span>constructor</span><a href="#constructor" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="constructorpowerqueues"><span class="tsd-signature-keyword">new</span> <span class="tsd-kind-constructor-signature">PowerQueues</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <a href="" class="tsd-signature-type tsd-kind-class">PowerQueues</a><a href="#constructorpowerqueues" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><h4 class="tsd-returns-title">Returns <a href="" class="tsd-signature-type tsd-kind-class">PowerQueues</a></h4><aside class="tsd-sources"><p>Inherited from PowerRedis.constructor</p></aside></div></li></ul></section></section></details><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h2>Properties</h2></summary><section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="abort"><span>abort</span><a href="#abort" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">abort</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type external">AbortController</span><span class="tsd-signature-symbol"> = ...</span></div><div class="tsd-comment tsd-typography"><p>A controller used to manage cancellation signals inside the queue worker.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks">Remarks<a href="#remarks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>PowerQueues uses an internal AbortController to safely stop
+long-running operations (such as waiting, heartbeats, or worker loops)
+without forcing the process to crash.</p>
+<p>When <code>abort()</code> is triggered:</p>
+<ul>
+<li>all functions that listen to <code>abort.signal</code> will stop as soon as possible</li>
+<li>pending delays (in <code>waitAbortable</code>) are cleared</li>
+<li>background loops (like <code>consumerLoop</code>) exit gracefully</li>
+</ul>
+<p>This provides a clean and predictable shutdown mechanism for the worker.</p>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example">Example<a href="#example" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Stop the queue worker from outside</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">abort</span><span class="hl-1">.</span><span class="hl-0">abort</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+</div><div class="tsd-tag-see"><h4 class="tsd-anchor-link" id="see">See<a href="#see" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><ul>
+<li>AbortController</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/API/AbortController">https://developer.mozilla.org/en-US/docs/Web/API/AbortController</a></li>
+</ul>
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L65">PowerQueues.ts:65</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="addingbatchkeyslimit"><code class="tsd-tag">Readonly</code><span>adding<wbr/>Batch<wbr/>Keys<wbr/>Limit</span><a href="#addingbatchkeyslimit" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">addingBatchKeysLimit</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 10000</span></div><div class="tsd-comment tsd-typography"><p>Maximum total number of Redis field/value pairs allowed in a single batch.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-1">Remarks<a href="#remarks-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When PowerQueues builds XADD batches, it must ensure that the final Redis
+command does not become too large. Every task contributes multiple
+field/value pairs (for example: <code>payload</code>, <code>createdAt</code>, <code>job</code>, <code>idemKey</code>, etc.).</p>
+<p><code>addingBatchKeysLimit</code> defines the <strong>hard limit</strong> for how many
+total key/value tokens may be included in one batch before the batch
+is split into smaller ones.</p>
+<p>This prevents:</p>
+<ul>
+<li>oversized XADD commands,</li>
+<li>excessive memory usage,</li>
+<li>Redis &quot;argument list too long&quot; / &quot;command too large&quot; issues,</li>
+<li>network frame fragmentation.</li>
+</ul>
+<p>Combined with <a href="#addingbatchtaskscount" class="tsd-kind-property">addingBatchTasksCount</a>, this creates a dual safety
+mechanism: limit by number of tasks <strong>and</strong> limit by number of fields.</p>
+<p>Default value <code>10000</code> is optimized for:</p>
+<ul>
+<li>stable high-throughput ingestion,</li>
+<li>minimal risk of large-packet bottlenecks,</li>
+<li>predictable batch sizing under varied payloads.</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-1">Example<a href="#example-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Reduce batch size for very large payloads</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">addingBatchKeysLimit</span><span class="hl-1"> = </span><span class="hl-7">3000</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L196">PowerQueues.ts:196</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="addingbatchtaskscount"><code class="tsd-tag">Readonly</code><span>adding<wbr/>Batch<wbr/>Tasks<wbr/>Count</span><a href="#addingbatchtaskscount" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">addingBatchTasksCount</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 800</span></div><div class="tsd-comment tsd-typography"><p>Maximum number of tasks allowed in a single XADD batch.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-2">Remarks<a href="#remarks-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When adding many tasks at once, PowerQueues groups them into batches
+before sending them to Redis. This improves throughput and reduces
+network overhead while preventing oversized Redis commands.</p>
+<p><code>addingBatchTasksCount</code> defines the <strong>upper limit</strong> of how many tasks
+can be bundled into one batch during <code>addTasks()</code> → <code>xaddBatch()</code> calls.</p>
+<p>A lower value = safer for memory and network stability.<br>
+A higher value = fewer XADD calls, higher throughput, but larger payloads.</p>
+<p>Default value <code>800</code> is tuned for:</p>
+<ul>
+<li>high-performance ingestion</li>
+<li>safe XADD command size</li>
+<li>good balance between speed and memory usage</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-2">Example<a href="#example-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Allow larger batches when inserting many tasks at once</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">addingBatchTasksCount</span><span class="hl-1"> = </span><span class="hl-7">2000</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L159">PowerQueues.ts:159</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="approvebatchtaskscount"><code class="tsd-tag">Readonly</code><span>approve<wbr/>Batch<wbr/>Tasks<wbr/>Count</span><a href="#approvebatchtaskscount" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">approveBatchTasksCount</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 2000</span></div><div class="tsd-comment tsd-typography"><p>Maximum number of task IDs acknowledged (XACK) in a single approval batch.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-3">Remarks<a href="#remarks-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>After tasks are processed successfully, PowerQueues must acknowledge them
+in Redis using <code>XACK</code>, and optionally delete them via <code>XDEL</code>.</p>
+<p>To avoid sending extremely large XACK/XDEL commands, the IDs are processed
+in batches. <code>approveBatchTasksCount</code> defines the maximum number of IDs
+included in one batch when calling approve.</p>
+<p>Why batching matters:</p>
+<ul>
+<li>prevents Redis from receiving oversized argument lists</li>
+<li>improves throughput when approving many tasks at once</li>
+<li>reduces memory spikes in the Redis command parser</li>
+</ul>
+<p>Internally, the value is clamped to:</p>
+<ul>
+<li><strong>minimum:</strong> 500</li>
+<li><strong>maximum:</strong> 4000</li>
+</ul>
+<p>This ensures safe, stable performance even if the user sets unusual values.</p>
+<p>Default value <code>2000</code> provides:</p>
+<ul>
+<li>fast acknowledgements</li>
+<li>safe command sizes</li>
+<li>good balance for high-volume queues</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-3">Example<a href="#example-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// For very large task flows, increase the approval batch size</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">approveBatchTasksCount</span><span class="hl-1"> = </span><span class="hl-7">3500</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L301">PowerQueues.ts:301</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="consumerhost"><code class="tsd-tag">Readonly</code><span>consumer<wbr/>Host</span><a href="#consumerhost" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">consumerHost</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#39;host&#39;</span></div><div class="tsd-comment tsd-typography"><p>Logical identifier of the machine or environment running this consumer.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-4">Remarks<a href="#remarks-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>PowerQueues includes the consumer identity in the Redis consumer name,
+which is formatted as:</p>
+<pre><code><span class="hl-1">{</span><span class="hl-5">consumerHost</span><span class="hl-1">}:{process.</span><span class="hl-5">pid</span><span class="hl-1">}</span>
+</code><button>Copy</button></pre>
+
+<p>This helps distinguish between different workers in Redis Stream groups,
+especially when multiple machines or Docker containers process the same queue.</p>
+<p><code>consumerHost</code> does <strong>not</strong> need to be the real hostname.<br>
+It can be any identifier meaningful to your infrastructure:</p>
+<ul>
+<li><code>'api-server-1'</code></li>
+<li><code>'worker-eu-west'</code></li>
+<li><code>'node-A'</code></li>
+<li><code>process.env.HOSTNAME</code></li>
+</ul>
+<p>A good value improves:</p>
+<ul>
+<li>debugging (which worker processed what)</li>
+<li>monitoring of worker activity</li>
+<li>load-balancing visibility</li>
+</ul>
+<p>Default value <code>'host'</code> ensures a valid fallback, but in production you
+should override it with an actual machine/service identifier.</p>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-4">Example<a href="#example-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">consumerHost</span><span class="hl-1"> = </span><span class="hl-5">process</span><span class="hl-1">.</span><span class="hl-5">env</span><span class="hl-1">.</span><span class="hl-4">HOSTNAME</span><span class="hl-1"> || </span><span class="hl-2">&#39;worker-1&#39;</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L499">PowerQueues.ts:499</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="executebatchatonce"><code class="tsd-tag">Readonly</code><span>execute<wbr/>Batch<wbr/>At<wbr/>Once</span><a href="#executebatchatonce" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">executeBatchAtOnce</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div><div class="tsd-comment tsd-typography"><p>Enables parallel (batched) execution of tasks instead of processing them one-by-one.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-5">Remarks<a href="#remarks-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>By default, PowerQueues processes tasks <strong>sequentially</strong> inside <code>execute()</code>.
+This ensures predictable behavior and simpler idempotency handling.</p>
+<p>When <code>executeBatchAtOnce</code> is set to <code>true</code>, each task in the batch is executed
+<strong>concurrently</strong> using <code>Promise.all</code>, which can significantly increase throughput
+for CPU-light or I/O-heavy workloads.</p>
+<p><strong>However, enabling this requires caution:</strong></p>
+<ul>
+<li>Task handlers (<code>onExecute</code>) must be thread-safe and free of shared mutable state.</li>
+<li>Heavy concurrency may increase contention during idempotency checks.</li>
+<li>Error handling remains per-task, but failures may occur in parallel.</li>
+</ul>
+<p>Recommended when:</p>
+<ul>
+<li>workers perform non-blocking async operations (DB queries, HTTP calls, etc.)</li>
+<li>your environment benefits from parallelism (Node.js event loop + await)</li>
+</ul>
+<p>Not recommended when:</p>
+<ul>
+<li>tasks modify shared external resources</li>
+<li>tasks rely on strict ordering</li>
+<li>workers perform heavy CPU tasks (event loop stall risk)</li>
+</ul>
+<p>Default value <code>false</code> ensures:</p>
+<ul>
+<li>safe and predictable execution flow</li>
+<li>simpler debugging</li>
+<li>minimal race conditions</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-5">Example<a href="#example-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Enable concurrent execution of a batch of tasks</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">executeBatchAtOnce</span><span class="hl-1"> = </span><span class="hl-3">true</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L377">PowerQueues.ts:377</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="executejobstatus"><code class="tsd-tag">Readonly</code><span>execute<wbr/>Job<wbr/>Status</span><a href="#executejobstatus" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">executeJobStatus</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div><div class="tsd-comment tsd-typography"><p>Enables storing execution statistics for each job in Redis.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-6">Remarks<a href="#remarks-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When this option is <code>true</code>, PowerQueues records simple counters in Redis
+that reflect the status of tasks belonging to the same logical job
+(identified by the auto-generated <code>job</code> ID added during <code>addTasks()</code>).</p>
+<p>These counters are updated during execution:</p>
+<ul>
+<li><code>ok</code>   → incremented when a task finishes successfully</li>
+<li><code>err</code>  → incremented when a task exhausts all retries and fails</li>
+<li><code>ready</code> → incremented for every processed task (success or fail)</li>
+</ul>
+<p>This creates a lightweight job-level progress tracking mechanism.
+Counters are automatically expired using <code>executeJobStatusTtlMs</code>.</p>
+<p>Useful for:</p>
+<ul>
+<li>tracking large batch imports</li>
+<li>showing job progress in dashboards</li>
+<li>monitoring worker throughput</li>
+<li>debugging stuck or failing tasks</li>
+</ul>
+<p>Not recommended when:</p>
+<ul>
+<li>you do not need job-level metrics</li>
+<li>Redis key count must remain minimal</li>
+<li>you have extremely high throughput and prefer zero-overhead writes</li>
+</ul>
+<p>Default value <code>false</code> disables status tracking entirely.</p>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-6">Example<a href="#example-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Enable job progress tracking</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">executeJobStatus</span><span class="hl-1"> = </span><span class="hl-3">true</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L418">PowerQueues.ts:418</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="executejobstatusttlms"><code class="tsd-tag">Readonly</code><span>execute<wbr/>Job<wbr/>Status<wbr/>Ttl<wbr/>Ms</span><a href="#executejobstatusttlms" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">executeJobStatusTtlMs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 300000</span></div><div class="tsd-comment tsd-typography"><p>Time-to-live (in milliseconds) for job-level execution status counters.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-7">Remarks<a href="#remarks-7" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When <a href="#executejobstatus" class="tsd-kind-property">executeJobStatus</a> is enabled, PowerQueues creates small Redis
+counters for each job:</p>
+<ul>
+<li><code>...:ok</code>    — number of successfully executed tasks</li>
+<li><code>...:err</code>   — number of tasks that failed after all retries</li>
+<li><code>...:ready</code> — number of tasks processed (success + fail)</li>
+</ul>
+<p>These counters should not stay in Redis forever, so each increment call
+also sets a TTL. <code>executeJobStatusTtlMs</code> defines how long the job metrics
+remain available before they expire automatically.</p>
+<p>Why a TTL?</p>
+<ul>
+<li>prevents Redis key buildup</li>
+<li>keeps monitoring data fresh</li>
+<li>avoids manual cleanup</li>
+<li>ensures dashboards always reflect recent jobs</li>
+</ul>
+<p>Default value <code>300000</code> (5 minutes) is suitable for:</p>
+<ul>
+<li>short-lived jobs</li>
+<li>quick diagnostics after ingestion</li>
+<li>lightweight progress tracking</li>
+</ul>
+<p>Increase the TTL if:</p>
+<ul>
+<li>jobs take longer to complete</li>
+<li>you need to inspect job history over time</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-7">Example<a href="#example-7" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Keep job progress data for 30 minutes</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">executeJobStatusTtlMs</span><span class="hl-1"> = </span><span class="hl-7">1800000</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L459">PowerQueues.ts:459</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="group"><code class="tsd-tag">Readonly</code><span>group</span><a href="#group" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">group</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#39;group&#39;</span></div><div class="tsd-comment tsd-typography"><p>The Redis consumer group name used by this worker.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-8">Remarks<a href="#remarks-8" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>Redis Streams require consumers to join a <em>consumer group</em> in order to use
+features like:</p>
+<ul>
+<li><code>XREADGROUP</code> (reading pending + new messages)</li>
+<li><code>XAUTOCLAIM</code> (claiming stuck tasks)</li>
+<li><code>XACK</code> (acknowledging processed tasks)</li>
+</ul>
+<p>The <code>group</code> value defines the name of that consumer group.</p>
+<p>All workers that share the same:</p>
+<ul>
+<li><a href="#stream" class="tsd-kind-property">stream</a></li>
+<li><a href="#group" class="tsd-kind-property">group</a></li>
+</ul>
+<p>will cooperatively process tasks from the same queue, while Redis ensures:</p>
+<ul>
+<li>no task is delivered to more than one worker at the same time</li>
+<li>pending messages can be recovered if a worker dies</li>
+</ul>
+<p><strong>You must ensure that each queue has a unique group name per stream.</strong></p>
+<p>PowerQueues automatically creates the group (via <code>XGROUP CREATE</code>)
+during <code>runQueue()</code>, if it does not already exist.</p>
+<p>Default value <code>'group'</code> is only a placeholder and should be replaced
+with something meaningful in production.</p>
+<p>Common naming examples:</p>
+<ul>
+<li><code>'workers'</code></li>
+<li><code>'payments'</code></li>
+<li><code>'image-processors'</code></li>
+<li><code>'api-service-A'</code></li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-8">Example<a href="#example-8" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">group</span><span class="hl-1"> = </span><span class="hl-2">&#39;email-workers&#39;</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L580">PowerQueues.ts:580</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="recoverystucktaskstimeoutms"><code class="tsd-tag">Readonly</code><span>recovery<wbr/>Stuck<wbr/>Tasks<wbr/>Timeout<wbr/>Ms</span><a href="#recoverystucktaskstimeoutms" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">recoveryStuckTasksTimeoutMs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 60000</span></div><div class="tsd-comment tsd-typography"><p>Time (in milliseconds) after which a pending task is considered “stuck”.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-9">Remarks<a href="#remarks-9" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>PowerQueues uses Redis Streams’ pending entries list (PEL) to detect tasks
+that were delivered to a worker but never acknowledged—usually because the
+worker crashed, froze, or disconnected.</p>
+<p><code>recoveryStuckTasksTimeoutMs</code> defines how long a task must remain idle
+(unacknowledged) before it is treated as &quot;stuck&quot; and eligible for recovery
+using <code>XAUTOCLAIM</code>.</p>
+<p>The logic is handled inside the SelectStuck Lua script, where
+this value becomes the <code>min-idle-time</code> parameter:</p>
+<ul>
+<li>If a task's idle time ≥ <code>recoveryStuckTasksTimeoutMs</code>,<br>
+PowerQueues attempts to claim it for the current worker.</li>
+</ul>
+<p>Why this matters:</p>
+<ul>
+<li>prevents orphaned tasks</li>
+<li>ensures reliable failover</li>
+<li>avoids task starvation</li>
+<li>keeps queues healthy even when workers die unexpectedly</li>
+</ul>
+<p>Default value <code>60000</code> (60 seconds) is balanced for:</p>
+<ul>
+<li>typical async worker workloads</li>
+<li>ensuring fast recovery without aggressive contention</li>
+</ul>
+<p>Increase this if:</p>
+<ul>
+<li>tasks normally run for a long time</li>
+<li>slow workers are expected</li>
+</ul>
+<p>Decrease this if:</p>
+<ul>
+<li>you want very fast failover</li>
+<li>workers are extremely lightweight</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-9">Example<a href="#example-9" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Treat tasks as stuck if not acknowledged for 2 minutes</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">recoveryStuckTasksTimeoutMs</span><span class="hl-1"> = </span><span class="hl-7">120000</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L669">PowerQueues.ts:669</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="redis"><span>redis</span><a href="#redis" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">redis</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type external">IORedisLike</span></div><div class="tsd-comment tsd-typography"><p>The underlying Redis client instance used by PowerQueues.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-10">Remarks<a href="#remarks-10" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>This property must be assigned by the user before running any queue
+operations. It provides the low-level Redis commands that all internal
+features rely on: XADD, XREADGROUP, XACK, Lua scripts, key operations,
+TTL updates, etc.</p>
+<p>PowerQueues does <strong>not</strong> create its own Redis connection.<br>
+Instead, it expects an external instance (e.g., from <code>ioredis</code>,
+<code>@nestjs-labs/nestjs-ioredis</code>, or any custom wrapper) that implements
+the IORedisLike interface.</p>
+<p>If <code>redis</code> is not set or is disconnected, the queue worker will not be
+able to read or write tasks.</p>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-10">Example<a href="#example-10" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">queues</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">MyQueueClass</span><span class="hl-1">();</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">redis</span><span class="hl-1"> = </span><span class="hl-5">redisService</span><span class="hl-1">.</span><span class="hl-0">getClient</span><span class="hl-1">(); </span><span class="hl-9">// must assign before use</span><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-0">runQueue</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><p>Overrides PowerRedis.redis</p><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L95">PowerQueues.ts:95</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="removeonexecuted"><code class="tsd-tag">Readonly</code><span>remove<wbr/>On<wbr/>Executed</span><a href="#removeonexecuted" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">removeOnExecuted</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div><div class="tsd-comment tsd-typography"><p>Whether successfully executed tasks should be removed from the Redis stream.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-11">Remarks<a href="#remarks-11" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>By default, PowerQueues does <strong>not</strong> delete processed tasks from the stream.
+Redis Streams can act as an immutable log, which is useful for debugging,
+auditing, replaying, or monitoring.</p>
+<p>When <code>removeOnExecuted</code> is set to <code>true</code>, PowerQueues will delete each
+acknowledged entry using <code>XDEL</code> immediately after <code>XACK</code>.</p>
+<p>Benefits of keeping tasks (default: <code>false</code>):</p>
+<ul>
+<li>historical visibility into what tasks were processed</li>
+<li>easier debugging and replay</li>
+<li>safer in multi-worker environments</li>
+</ul>
+<p>Benefits of removing tasks (<code>true</code>):</p>
+<ul>
+<li>smaller Redis memory footprint</li>
+<li>faster XREADGROUP / XAUTCLAIM operations</li>
+<li>prevents streams from growing indefinitely</li>
+</ul>
+<p>This setting affects only <strong>successfully executed</strong> tasks.
+Failed tasks may still go to the DLQ depending on retries.</p>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-11">Example<a href="#example-11" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Enable automatic deletion of executed tasks:</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">removeOnExecuted</span><span class="hl-1"> = </span><span class="hl-3">true</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L336">PowerQueues.ts:336</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="scripts"><code class="tsd-tag">Readonly</code><span>scripts</span><a href="#scripts" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">scripts</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <a href="../types/SavedScript.html" class="tsd-signature-type tsd-kind-type-alias">SavedScript</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = {}</span></div><div class="tsd-comment tsd-typography"><p>In-memory registry of Lua scripts used by PowerQueues.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-12">Remarks<a href="#remarks-12" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>PowerQueues loads its Lua scripts (XAddBulk, Approve, idempotency helpers,
+SelectStuck, etc.) into Redis and keeps their metadata in this map.</p>
+<p>Each entry is stored under a human-readable key (for example <code>&quot;XAddBulk&quot;</code>)
+and contains a <a href="../types/SavedScript.html" class="tsd-kind-type-alias">SavedScript</a> object:</p>
+<ul>
+<li><code>codeBody</code>  – the original Lua source code</li>
+<li><code>codeReady</code> – the SHA1 returned by <code>SCRIPT LOAD</code> (used with <code>EVALSHA</code>)</li>
+</ul>
+<p>This allows the queue to:</p>
+<ul>
+<li>load scripts only once per process,</li>
+<li>reuse <code>EVALSHA</code> for better performance,</li>
+<li>automatically reload scripts if Redis loses them (e.g. after restart).</li>
+</ul>
+<p>You normally do not modify this map directly.<br>
+It is managed internally by methods like <a href="#loadscripts" class="tsd-kind-method">loadScripts</a>,
+saveScript, and runScript.</p>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-12">Example<a href="#example-12" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// After loadScripts() is called:</span><br/><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-5">Object</span><span class="hl-1">.</span><span class="hl-0">keys</span><span class="hl-1">(</span><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">scripts</span><span class="hl-1">));</span><br/><span class="hl-9">// -&gt; [&quot;XAddBulk&quot;, &quot;Approve&quot;, &quot;IdempotencyAllow&quot;, ...]</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L129">PowerQueues.ts:129</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="stream"><code class="tsd-tag">Readonly</code><span>stream</span><a href="#stream" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">stream</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#39;stream&#39;</span></div><div class="tsd-comment tsd-typography"><p>The Redis Stream key used as the main task queue.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-13">Remarks<a href="#remarks-13" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>All tasks added through <code>addTasks()</code> are ultimately written into this Redis
+Stream. Workers read from it using <code>XREADGROUP</code>, <code>XAUTOCLAIM</code>, and other
+stream-related commands.</p>
+<p>You should treat <code>stream</code> as the &quot;queue name&quot;—it uniquely identifies
+where tasks for this worker group are stored in Redis.</p>
+<p>Common examples:</p>
+<ul>
+<li><code>'emails'</code></li>
+<li><code>'jobs:process'</code></li>
+<li><code>'telemetry:ingest'</code></li>
+<li><code>'queue:payments'</code></li>
+</ul>
+<p>Changing <code>stream</code> changes the entire queue channel for this worker.</p>
+<p><strong>Important notes:</strong></p>
+<ul>
+<li>The stream is created automatically if it does not exist (via <code>MKSTREAM</code>)</li>
+<li>Worker groups are associated with this stream via <a href="#group" class="tsd-kind-property">group</a></li>
+<li>DLQ (dead-letter queue) is based on <code>stream + ':dlq'</code></li>
+</ul>
+<p>Default value <code>'stream'</code> is a placeholder and should be replaced
+in real applications.</p>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-13">Example<a href="#example-13" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">stream</span><span class="hl-1"> = </span><span class="hl-2">&#39;jobs:image-processing&#39;</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L536">PowerQueues.ts:536</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="workerbatchtaskscount"><code class="tsd-tag">Readonly</code><span>worker<wbr/>Batch<wbr/>Tasks<wbr/>Count</span><a href="#workerbatchtaskscount" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">workerBatchTasksCount</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 200</span></div><div class="tsd-comment tsd-typography"><p>Maximum number of tasks a worker attempts to fetch in a single read cycle.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-14">Remarks<a href="#remarks-14" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>PowerQueues reads tasks from Redis Streams in batches to improve throughput
+and reduce the number of network round-trips.<br>
+<code>workerBatchTasksCount</code> defines how many tasks the worker tries to pull
+from Redis at once using:</p>
+<ul>
+<li><code>XREADGROUP</code> for fresh tasks</li>
+<li><code>XAUTOCLAIM</code> for stuck/pending tasks</li>
+</ul>
+<p>A higher value increases throughput but may:</p>
+<ul>
+<li>increase memory usage per iteration</li>
+<li>delay acknowledgements for long batches</li>
+<li>increase execution latency per task</li>
+</ul>
+<p>A lower value:</p>
+<ul>
+<li>decreases memory usage</li>
+<li>improves responsiveness</li>
+<li>reduces risk of long-running batch execution</li>
+</ul>
+<p>Default value <code>200</code> is tuned to balance:</p>
+<ul>
+<li>fast message consumption</li>
+<li>low event-loop blocking</li>
+<li>efficient recovery of stuck tasks</li>
+</ul>
+<p>Adjust depending on worker workload:</p>
+<ul>
+<li><strong>Increase</strong> if your tasks are light or mostly I/O bound</li>
+<li><strong>Decrease</strong> if tasks are heavy or your system is resource-limited</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-14">Example<a href="#example-14" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Process up to 500 tasks in each fetch cycle</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">workerBatchTasksCount</span><span class="hl-1"> = </span><span class="hl-7">500</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L622">PowerQueues.ts:622</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="workercachetasktimeoutms"><code class="tsd-tag">Readonly</code><span>worker<wbr/>Cache<wbr/>Task<wbr/>Timeout<wbr/>Ms</span><a href="#workercachetasktimeoutms" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">workerCacheTaskTimeoutMs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 60000</span></div><div class="tsd-comment tsd-typography"><p>The time (in <strong>milliseconds</strong>) to keep the <em>idempotency completion marker</em> (<code>doneKey</code>)
+alive after a task has successfully finished.</p>
+<h3 id="what-this-timeout-does" class="tsd-anchor-link">What this timeout does<a href="#what-this-timeout-does" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>When a task with an idempotency key finishes, Redis stores a small “done” flag
+so that repeated executions of the same task can be skipped immediately.</p>
+<p><code>workerCacheTaskTimeoutMs</code> defines <strong>how long this flag remains valid</strong>.</p>
+<p>After the timeout expires:</p>
+<ul>
+<li>the task is considered “not completed” again,</li>
+<li>a future worker may reprocess the same idempotency key,</li>
+<li>this allows long-running or retried tasks to be re-executed if needed.</li>
+</ul>
+<h3 id="why-it-exists" class="tsd-anchor-link">Why it exists<a href="#why-it-exists" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>In distributed systems multiple workers may attempt to process the same
+task. This timeout creates a small <strong>safety cache window</strong> that prevents
+duplicate work while still allowing re-execution in controlled scenarios.</p>
+<h3 id="best-practices" class="tsd-anchor-link">Best practices<a href="#best-practices" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Use values between <strong>30s–5min</strong> depending on how often retries or
+duplicate messages naturally happen in your system.</li>
+<li>Too small → might allow premature reprocessing.</li>
+<li>Too large → may block legitimate re-execution for too long.</li>
+</ul>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-default"><h4 class="tsd-anchor-link" id="default">Default<a href="#default" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-7">60000</span><span class="hl-1"> (</span><span class="hl-7">1</span><span class="hl-1"> </span><span class="hl-5">minute</span><span class="hl-1">)</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L263">PowerQueues.ts:263</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="workerclearattemptstimeoutms"><code class="tsd-tag">Readonly</code><span>worker<wbr/>Clear<wbr/>Attempts<wbr/>Timeout<wbr/>Ms</span><a href="#workerclearattemptstimeoutms" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">workerClearAttemptsTimeoutMs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 86400000</span></div><div class="tsd-comment tsd-typography"><p>Time-to-live (in milliseconds) for the retry-attempt counter of each task.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-15">Remarks<a href="#remarks-15" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>Every time a task fails, PowerQueues stores its retry count in Redis under a
+per-task key (generated by attemptsKey).<br>
+This counter allows the worker to determine:</p>
+<ul>
+<li>how many times the task has already failed</li>
+<li>whether it should retry or send the task to the DLQ</li>
+</ul>
+<p><code>workerClearAttemptsTimeoutMs</code> specifies how long this retry counter should
+remain in Redis before it expires automatically.</p>
+<p>Why this matters:</p>
+<ul>
+<li>prevents retry counters from building up indefinitely</li>
+<li>ensures memory is cleaned for tasks long after completion</li>
+<li>avoids stale retry state affecting future tasks with the same ID</li>
+</ul>
+<p>Default value <code>86400000</code> (24 hours) works well for most workloads because:</p>
+<ul>
+<li>it keeps retry info long enough for debugging</li>
+<li>it automatically cleans up old state overnight</li>
+</ul>
+<p>You may want to <strong>reduce</strong> this value if:</p>
+<ul>
+<li>you process millions of tasks daily</li>
+<li>strict memory efficiency is required</li>
+</ul>
+<p>Or <strong>increase</strong> it if:</p>
+<ul>
+<li>you run long-lived jobs</li>
+<li>you need extended visibility into retry behavior</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-15">Example<a href="#example-15" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Keep retry counters for 6 hours instead of 24</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">workerClearAttemptsTimeoutMs</span><span class="hl-1"> = </span><span class="hl-7">21600000</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L834">PowerQueues.ts:834</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="workerexecutelocktimeoutms"><code class="tsd-tag">Readonly</code><span>worker<wbr/>Execute<wbr/>Lock<wbr/>Timeout<wbr/>Ms</span><a href="#workerexecutelocktimeoutms" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">workerExecuteLockTimeoutMs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 180000</span></div><div class="tsd-comment tsd-typography"><p>Time (in milliseconds) that an idempotent task lock remains valid.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-16">Remarks<a href="#remarks-16" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When a worker starts executing a task that uses idempotency (<code>idemKey</code>),
+PowerQueues creates a short-lived &quot;execution lock&quot; in Redis.<br>
+This lock prevents multiple workers from processing the same logical task
+at the same time.</p>
+<p><code>workerExecuteLockTimeoutMs</code> defines how long this lock stays active
+unless refreshed by the heartbeat mechanism.</p>
+<p>Internally it is used in:</p>
+<ul>
+<li>idempotencyAllow</li>
+<li>idempotencyStart</li>
+<li>sendHeartbeat</li>
+<li>heartbeat</li>
+</ul>
+<p>If the worker crashes, disconnects, or hangs, the lock expires
+automatically, allowing another worker to take over safely.</p>
+<p>Default value <code>180000</code> (3 minutes) provides:</p>
+<ul>
+<li>enough time to complete typical async work,</li>
+<li>automatic recovery without manual cleanup,</li>
+<li>protection against double-processing.</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-16">Example<a href="#example-16" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// For very long-running jobs (e.g. external API pipelines)</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">workerExecuteLockTimeoutMs</span><span class="hl-1"> = </span><span class="hl-7">600000</span><span class="hl-1">; </span><span class="hl-9">// 10 minutes</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L233">PowerQueues.ts:233</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="workerloopintervalms"><code class="tsd-tag">Readonly</code><span>worker<wbr/>Loop<wbr/>Interval<wbr/>Ms</span><a href="#workerloopintervalms" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">workerLoopIntervalMs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 5000</span></div><div class="tsd-comment tsd-typography"><p>Delay (in milliseconds) between worker polling cycles when no tasks are available.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-17">Remarks<a href="#remarks-17" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When the worker calls <code>select()</code> and finds <strong>no tasks</strong> (neither stuck nor fresh),
+it waits before checking Redis again.<br>
+<code>workerLoopIntervalMs</code> defines how long the worker should pause between polls.</p>
+<p>This applies only when the queue is idle.<br>
+When tasks are available, the loop runs continuously without this delay.</p>
+<p>Why this interval exists:</p>
+<ul>
+<li>reduces unnecessary Redis calls during idle periods</li>
+<li>prevents CPU spin-loops</li>
+<li>stabilizes load in low-traffic queues</li>
+</ul>
+<p>Default value <code>5000</code> (5 seconds) provides a good balance between:</p>
+<ul>
+<li>responsiveness (fast enough to detect new tasks)</li>
+<li>efficiency (low overhead during quiet periods)</li>
+</ul>
+<p>Recommended adjustments:</p>
+<ul>
+<li><strong>Lower</strong> (500–1500 ms) for real-time or high-frequency task ingestion</li>
+<li><strong>Higher</strong> (5–15 seconds) for slow background jobs or cost-sensitive systems</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-17">Example<a href="#example-17" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Make the worker more responsive in a busy system</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">workerLoopIntervalMs</span><span class="hl-1"> = </span><span class="hl-7">1000</span><span class="hl-1">; </span><span class="hl-9">// 1 second</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L704">PowerQueues.ts:704</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="workermaxretries"><code class="tsd-tag">Readonly</code><span>worker<wbr/>Max<wbr/>Retries</span><a href="#workermaxretries" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">workerMaxRetries</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 1</span></div><div class="tsd-comment tsd-typography"><p>Maximum number of retry attempts allowed for a failing task.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-18">Remarks<a href="#remarks-18" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>When a task throws an error inside <code>onExecute</code>, PowerQueues:</p>
+<ol>
+<li>increments the task's retry counter using <code>incrAttempts()</code></li>
+<li>calls user-defined hooks (<code>onRetry</code>, then <code>onError</code>)</li>
+<li>decides whether to retry or send the task to the DLQ</li>
+</ol>
+<p><code>workerMaxRetries</code> defines how many times a task may be retried before it
+is considered permanently failed.</p>
+<p>Behaviour summary:</p>
+<ul>
+<li><code>attempt &lt; workerMaxRetries</code> → task is retried</li>
+<li><code>attempt &gt;= workerMaxRetries</code> → task is moved to DLQ</li>
+</ul>
+<p><strong>Note:</strong><br>
+Retries happen immediately within the same worker cycle (no delay),
+unless the user chooses to reinsert tasks manually.</p>
+<p>Default value <code>1</code> means:</p>
+<ul>
+<li>one initial attempt</li>
+<li>one retry on failure</li>
+<li>next failure → DLQ</li>
+</ul>
+<p>Increase this if:</p>
+<ul>
+<li>tasks frequently fail due to external API timeouts</li>
+<li>retrying often resolves transient issues</li>
+</ul>
+<p>Decrease this if:</p>
+<ul>
+<li>retries are expensive</li>
+<li>failing fast is more desirable</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-18">Example<a href="#example-18" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Allow tasks to retry up to 5 times before going to DLQ</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">workerMaxRetries</span><span class="hl-1"> = </span><span class="hl-7">5</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L792">PowerQueues.ts:792</a></li></ul></aside></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="workerselectiontimeoutms"><code class="tsd-tag">Readonly</code><span>worker<wbr/>Selection<wbr/>Timeout<wbr/>Ms</span><a href="#workerselectiontimeoutms" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><div class="tsd-signature"><span class="tsd-kind-property">workerSelectionTimeoutMs</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 80</span></div><div class="tsd-comment tsd-typography"><p>Maximum time (in milliseconds) the worker is allowed to spend searching
+for stuck tasks during a single recovery cycle.</p>
+</div><div class="tsd-comment tsd-typography"><div class="tsd-tag-remarks"><h4 class="tsd-anchor-link" id="remarks-19">Remarks<a href="#remarks-19" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><p>Before reading fresh tasks, PowerQueues first tries to recover “stuck”
+tasks using the SelectStuck Lua script.<br>
+This script scans the pending entries list (PEL) and may perform several
+iterations of <code>XAUTOCLAIM</code>.</p>
+<p><code>workerSelectionTimeoutMs</code> limits how long this recovery step is allowed
+to run before giving up and moving on.</p>
+<p>Why this matters:</p>
+<ul>
+<li>prevents long blocking calls during heavy recovery situations</li>
+<li>ensures the worker stays responsive even with large queues</li>
+<li>avoids event-loop stalls caused by large PEL scans</li>
+</ul>
+<p>The timeout is soft: the Lua script checks elapsed time and
+voluntarily exits when this limit is reached.</p>
+<p>Default value <code>80</code> ms is tuned to:</p>
+<ul>
+<li>allow enough time to reclaim stuck messages</li>
+<li>prevent noticeable delays in normal task processing</li>
+</ul>
+<p>Increase this if:</p>
+<ul>
+<li>you expect many stuck tasks (unstable workers)</li>
+<li>your Redis instance handles large streams</li>
+</ul>
+<p>Decrease this if:</p>
+<ul>
+<li>minimal latency is critical</li>
+<li>your environment is extremely CPU-sensitive</li>
+</ul>
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-19">Example<a href="#example-19" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Allow up to 150 ms for stuck-task recovery</span><br/><span class="hl-5">queues</span><span class="hl-1">.</span><span class="hl-5">workerSelectionTimeoutMs</span><span class="hl-1"> = </span><span class="hl-7">150</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L748">PowerQueues.ts:748</a></li></ul></aside></section></section></details><details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h2>Methods</h2></summary><section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="addtasks"><span>add<wbr/>Tasks</span><a href="#addtasks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="addtasks-1"><span class="tsd-kind-call-signature">addTasks</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">queueName</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">opts</span><span class="tsd-signature-symbol">?:</span> <a href="../types/AddTasksOptions.html" class="tsd-signature-type tsd-kind-type-alias">AddTasksOptions</a><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#addtasks-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Adds a list of tasks to a Redis Stream in <strong>batches</strong>, using the <code>XAddBulk</code> Lua script.</p>
+<p>This is the main entry point for <strong>producing</strong> tasks into the queue.
+It:</p>
+<ul>
+<li>wraps raw items into internal <code>Task</code> structures,</li>
+<li>splits them into batches based on:
+<ul>
+<li><code>addingBatchTasksCount</code> (max tasks per batch),</li>
+<li><code>addingBatchKeysLimit</code> (max total field/value pairs per batch),</li>
+</ul>
+</li>
+<li>sends each batch to Redis with a single <code>EVALSHA XAddBulk ...</code> call,</li>
+<li>returns all created Stream IDs in the <strong>same order</strong> as input <code>data</code>.</li>
+</ul>
+<h3 id="input-data-format" class="tsd-anchor-link">Input data format<a href="#input-data-format" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Each item in <code>data</code> is treated as a <code>Task</code>:</p>
+<ul>
+<li>
+<p><strong>Object payload (most common case)</strong></p>
+<pre><code class="ts"><span class="hl-1">{ </span><span class="hl-10">payload</span><span class="hl-1">: { ...</span><span class="hl-5">businessFields</span><span class="hl-1"> } }</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Internally it becomes:</p>
+<ul>
+<li><code>payload</code> is <strong>JSON-serialized</strong> and stored under <code>&quot;payload&quot;</code> field,</li>
+<li><code>createdAt</code> (ms) is added,</li>
+<li><code>job</code> (batch ID) is added,</li>
+<li><code>idemKey</code> is added if <code>opts.idem === true</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Flat array of field/value pairs</strong></p>
+<pre><code class="ts"><span class="hl-1">{ </span><span class="hl-10">flat</span><span class="hl-1">: [</span><span class="hl-2">&#39;field1&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;value1&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;field2&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;value2&#39;</span><span class="hl-1">, ...] }</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Internally it appends:</p>
+<ul>
+<li><code>&quot;createdAt&quot;</code>, <code>&quot;job&quot;</code>,</li>
+<li><code>&quot;idemKey&quot;</code> if <code>opts.idem === true</code>.</li>
+</ul>
+</li>
+</ul>
+<p>If neither <code>payload</code> nor <code>flat</code> is present, an error is thrown.</p>
+<h3 id="trimming-stream-options-" class="tsd-anchor-link">Trimming &amp; stream options (<code>opts</code>)<a href="#trimming-stream-options-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>These options are passed to the Lua <code>XAddBulk</code> script:</p>
+<ul>
+<li><code>maxlen?: number</code> – soft or exact limit for stream length:
+<ul>
+<li>combined with <code>approx</code> / <code>exact</code> to build <code>XADD ... MAXLEN [~|=] &lt;maxlen&gt;</code>.</li>
+</ul>
+</li>
+<li><code>approx?: boolean</code> – use approximate trimming (<code>~</code>, default if <code>exact</code> is not set).</li>
+<li><code>exact?: boolean</code> – use exact trimming (<code>=</code>). If <code>true</code>, <code>approx</code> is ignored.</li>
+<li><code>trimLimit?: number</code> – optional <code>LIMIT &lt;n&gt;</code> for trimming.</li>
+<li><code>nomkstream?: boolean</code> – if <code>true</code>, adds <code>NOMKSTREAM</code> so the stream
+is <strong>not</strong> created automatically when it does not exist.</li>
+<li><code>minidWindowMs?: number</code> – use <code>MINID</code> trimming instead of <code>MAXLEN</code>:
+<ul>
+<li>compute <code>now - minidWindowMs</code> and trim entries older than that ID.</li>
+</ul>
+</li>
+<li><code>minidExact?: boolean</code> – when using <code>MINID</code>, choose exact (<code>=</code>) vs approx (<code>~</code>) mode.</li>
+</ul>
+<h3 id="status-tracking-" class="tsd-anchor-link">Status tracking (<code>opts.status</code>)<a href="#status-tracking-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>When <code>opts.status === true</code>:</p>
+<ul>
+<li>a unique <code>job</code> ID is generated (UUID),</li>
+<li>a Redis key <code>&lt;queueName&gt;:&lt;job&gt;:total</code> is set to <code>data.length</code>,</li>
+<li>TTL for this key is <code>opts.statusTimeoutMs</code> (default <code>300000</code> ms = 5 minutes).</li>
+</ul>
+<p>This allows external systems to track:</p>
+<ul>
+<li>how many tasks were enqueued for this job,</li>
+<li>how many were later processed (via job-level counters in <code>success()</code>).</li>
+</ul>
+<h3 id="idempotency-helper-" class="tsd-anchor-link">Idempotency helper (<code>opts.idem</code>)<a href="#idempotency-helper-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>When <code>opts.idem === true</code>:</p>
+<ul>
+<li>each task gets an <code>idemKey</code> field if not already set:
+<ul>
+<li>either using <code>entry.idemKey</code> or a generated UUID,</li>
+</ul>
+</li>
+<li>this key is later used in the worker’s idempotency flow.</li>
+</ul>
+<p>Validation &amp; Errors:</p>
+<ul>
+<li>If <code>data</code> is empty, it throws: <code>&quot;Tasks is not filled.&quot;</code>.</li>
+<li>If <code>queueName</code> is empty, it throws: <code>&quot;Queue name is required.&quot;</code>.</li>
+</ul>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">queueName</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Name of the Redis Stream (queue) to push tasks into.</p>
+</div></li><li><span><span class="tsd-kind-parameter">data</span>: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></span><div class="tsd-comment tsd-typography"><p>Array of task-like objects:</p>
+<ul>
+<li><code>{ payload: object }</code> or <code>{ flat: JsonPrimitiveOrUndefined[] }</code>.</li>
+</ul>
+</div></li><li><span><span class="tsd-kind-parameter">opts</span>: <a href="../types/AddTasksOptions.html" class="tsd-signature-type tsd-kind-type-alias">AddTasksOptions</a><span class="tsd-signature-symbol"> = {}</span></span><div class="tsd-comment tsd-typography"><p>Additional options for stream trimming, status tracking and idempotency.</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><p>Promise that resolves to an array of Stream entry IDs (<code>XADD</code> IDs),
+in the same order as the input <code>data</code> array.</p>
+<div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-20">Example<a href="#example-20" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example 1: push simple JSON payloads</span><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">addTasks</span><span class="hl-1">(</span><span class="hl-2">&#39;events:email&#39;</span><span class="hl-1">, [</span><br/><span class="hl-1">  { </span><span class="hl-5">payload:</span><span class="hl-1"> { </span><span class="hl-5">type:</span><span class="hl-1"> </span><span class="hl-2">&#39;welcome&#39;</span><span class="hl-1">, </span><span class="hl-5">userId:</span><span class="hl-1"> </span><span class="hl-2">&#39;u1&#39;</span><span class="hl-1"> } },</span><br/><span class="hl-1">  { </span><span class="hl-5">payload:</span><span class="hl-1"> { </span><span class="hl-5">type:</span><span class="hl-1"> </span><span class="hl-2">&#39;password_reset&#39;</span><span class="hl-1">, </span><span class="hl-5">userId:</span><span class="hl-1"> </span><span class="hl-2">&#39;u2&#39;</span><span class="hl-1"> } },</span><br/><span class="hl-1">]);</span>
+</code><button type="button">Copy</button></pre>
+
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-21">Example<a href="#example-21" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example 2: enable job status tracking and idempotency</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">ids</span><span class="hl-1"> = </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">addTasks</span><span class="hl-1">(</span><span class="hl-2">&#39;billing:charges&#39;</span><span class="hl-1">, [</span><br/><span class="hl-1">  { </span><span class="hl-5">payload:</span><span class="hl-1"> { </span><span class="hl-5">userId:</span><span class="hl-1"> </span><span class="hl-2">&#39;u1&#39;</span><span class="hl-1">, </span><span class="hl-5">amount:</span><span class="hl-1"> </span><span class="hl-7">100</span><span class="hl-1"> } },</span><br/><span class="hl-1">  { </span><span class="hl-5">payload:</span><span class="hl-1"> { </span><span class="hl-5">userId:</span><span class="hl-1"> </span><span class="hl-2">&#39;u2&#39;</span><span class="hl-1">, </span><span class="hl-5">amount:</span><span class="hl-1"> </span><span class="hl-7">250</span><span class="hl-1"> } },</span><br/><span class="hl-1">], {</span><br/><span class="hl-1">  </span><span class="hl-5">status:</span><span class="hl-1"> </span><span class="hl-3">true</span><span class="hl-1">,          </span><span class="hl-9">// set &lt;queueName&gt;:&lt;job&gt;:total</span><br/><span class="hl-1">  </span><span class="hl-5">statusTimeoutMs:</span><span class="hl-1"> </span><span class="hl-7">600000</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">idem:</span><span class="hl-1"> </span><span class="hl-3">true</span><span class="hl-1">,            </span><span class="hl-9">// auto attach idemKey to each task</span><br/><span class="hl-1">  </span><span class="hl-5">maxlen:</span><span class="hl-1"> </span><span class="hl-7">1_000_000</span><span class="hl-1">,     </span><span class="hl-9">// keep last 1M entries</span><br/><span class="hl-1">  </span><span class="hl-5">approx:</span><span class="hl-1"> </span><span class="hl-3">true</span><span class="hl-1">,          </span><span class="hl-9">// use MAXLEN ~</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-9">// &quot;ids&quot; now contains the Redis stream IDs for each enqueued task</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1567">PowerQueues.ts:1567</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="consumerloop"><span>consumer<wbr/>Loop</span><a href="#consumerloop" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="consumerloop-1"><span class="tsd-kind-call-signature">consumerLoop</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#consumerloop-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Main infinite worker loop responsible for:</p>
+<ul>
+<li>selecting tasks from Redis,</li>
+<li>running all lifecycle hooks,</li>
+<li>executing tasks with retry/idempotency,</li>
+<li>acknowledging completed messages.</li>
+</ul>
+<p>This loop continues running <strong>until the worker is aborted</strong>
+via <code>this.abort.abort()</code>.</p>
+<p>Execution Flow (per iteration):</p>
+<ol>
+<li>
+<p><strong>Check abort signal</strong><br>
+If the worker has been stopped, exit the loop gracefully.</p>
+</li>
+<li>
+<p><strong>Select tasks</strong> via <code>select()</code></p>
+<ul>
+<li>First tries to claim <em>stuck</em> tasks (<code>selectStuck()</code>),</li>
+<li>Otherwise reads fresh messages (<code>selectFresh()</code>),</li>
+<li>Normalizes entries into tuples:
+<code>[id, payload, createdAt, job, idemKey]</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>onSelected() hook</strong><br>
+Allows filtering, reordering, or modifying the selected tasks.</p>
+<ul>
+<li>If it returns a non-empty array → use that one.</li>
+<li>Otherwise → use the original tasks.</li>
+</ul>
+</li>
+<li>
+<p><strong>Execute tasks</strong> via <code>execute()</code><br>
+Handles:</p>
+<ul>
+<li>retries,</li>
+<li>DLQ logic,</li>
+<li>idempotency flow,</li>
+<li>onExecute / onRetry / onError / onSuccess,</li>
+<li>batching execution behavior.</li>
+</ul>
+</li>
+<li>
+<p><strong>ACK completed tasks</strong></p>
+<ul>
+<li>Uses Lua script <code>Approve</code> to XACK (+ optionally XDEL).</li>
+<li>Runs in batches for high throughput.</li>
+</ul>
+</li>
+<li>
+<p><strong>Error handling</strong><br>
+If anything inside the loop throws:</p>
+<ul>
+<li>error is passed to <code>onBatchError()</code>,</li>
+<li>worker waits briefly and continues.</li>
+</ul>
+</li>
+</ol>
+<p>Behavior:</p>
+<ul>
+<li>The loop uses very small waits (<code>wait(600)</code> ms) when no tasks are available.</li>
+<li>Designed to be <strong>lightweight</strong>, <strong>efficient</strong>, and <strong>fault-tolerant</strong>.</li>
+<li>Does not block the event loop thanks to async/await.</li>
+</ul>
+<p>Stopping the loop:</p>
+<ul>
+<li>Call <code>this.abort.abort()</code>.</li>
+<li>The loop checks for <code>signal.aborted</code> on each iteration and stops cleanly.</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>You normally never override this method.<br>
+Use hooks (<code>onSelected</code>, <code>onExecute</code>, <code>onReady</code>, etc.) instead.</li>
+<li>If the queue encounters unexpected Redis failures,
+the loop will continue after logging via <code>onBatchError()</code>.</li>
+<li>Safe to run in process managers (PM2, Docker, Kubernetes) as a long-running worker.</li>
+</ul>
+</div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-22">Example<a href="#example-22" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Typical worker startup</span><br/><span class="hl-3">async</span><span class="hl-1"> </span><span class="hl-3">function</span><span class="hl-1"> </span><span class="hl-0">start</span><span class="hl-1">() {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">worker</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">MyQueue</span><span class="hl-1">(</span><span class="hl-5">redis</span><span class="hl-1">);</span><br/><span class="hl-1">  </span><span class="hl-5">worker</span><span class="hl-1">.</span><span class="hl-5">stream</span><span class="hl-1"> = </span><span class="hl-2">&#39;orders&#39;</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-5">worker</span><span class="hl-1">.</span><span class="hl-5">group</span><span class="hl-1"> = </span><span class="hl-2">&#39;billing&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-1">  </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">worker</span><span class="hl-1">.</span><span class="hl-0">runQueue</span><span class="hl-1">(); </span><span class="hl-9">// begins consumerLoop()</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1443">PowerQueues.ts:1443</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="loadscripts"><span>load<wbr/>Scripts</span><a href="#loadscripts" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="loadscripts-1"><span class="tsd-kind-call-signature">loadScripts</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">full</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#loadscripts-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Preloads Lua scripts into Redis and caches their SHA1 hashes for later use.</p>
+<p>This method should be called <strong>before you start using the queue</strong>, usually
+during application startup or worker initialization.</p>
+<p>Behaviour:</p>
+<ul>
+<li>Converts each script name + body into an internal <code>SavedScript</code> entry
+via <code>saveScript(name, code)</code>.</li>
+<li>Sends the script body to Redis using <code>SCRIPT LOAD</code> inside <code>loadScript(...)</code>.</li>
+<li>Stores the returned SHA1 hash in <code>scripts[name].codeReady</code>.</li>
+<li>Later, all queue operations call scripts by SHA using <code>EVALSHA</code>, which is
+faster and more efficient.</li>
+</ul>
+<p>Scripts loaded:</p>
+<ul>
+<li>
+<p>When <code>full === false</code> (default):</p>
+<ul>
+<li>Loads only:
+<ul>
+<li><code>&quot;XAddBulk&quot;</code> – high-throughput bulk <code>XADD</code> with trimming options (<code>MAXLEN</code>, <code>MINID</code>, etc.).</li>
+</ul>
+</li>
+<li>This is enough if you only use <code>addTasks()</code> as a <strong>producer</strong> and do not
+run workers in this process.</li>
+</ul>
+</li>
+<li>
+<p>When <code>full === true</code>:</p>
+<ul>
+<li>Loads all queue-related scripts:
+<ul>
+<li><code>&quot;XAddBulk&quot;</code> – bulk enqueue of tasks to a stream.</li>
+<li><code>&quot;Approve&quot;</code> – ACK + optional delete logic for processed entries.</li>
+<li><code>&quot;IdempotencyAllow&quot;</code> – checks if a task with the same idempotency key
+can start, based on done/lock/start keys.</li>
+<li><code>&quot;IdempotencyStart&quot;</code> – marks a task as started and refreshes lock TTL.</li>
+<li><code>&quot;IdempotencyDone&quot;</code> – marks a task as done and clears idempotency lock.</li>
+<li><code>&quot;IdempotencyFree&quot;</code> – releases idempotency lock without marking as done.</li>
+<li><code>&quot;SelectStuck&quot;</code> – finds and claims &quot;stuck&quot; tasks using <code>XAUTOCLAIM</code>
+with a time budget and fallback to <code>XREADGROUP</code>.</li>
+</ul>
+</li>
+<li>Use this in <strong>worker processes</strong> that execute tasks.</li>
+</ul>
+</li>
+</ul>
+<p>Idempotency and safety:</p>
+<ul>
+<li>Safe to call multiple times: scripts are cached in <code>this.scripts</code> and Redis
+will return the same SHA for identical script bodies.</li>
+<li>If Redis is temporarily unavailable, <code>loadScript()</code> retries a few times
+before throwing.</li>
+</ul>
+<p>Requirements:</p>
+<ul>
+<li><code>this.redis</code> must be a connected Redis client that supports:
+<ul>
+<li><code>SCRIPT LOAD</code></li>
+<li><code>EVALSHA</code></li>
+</ul>
+</li>
+<li>Call this method <strong>before</strong> you start calling operations that use scripts:
+<ul>
+<li><code>addTasks()</code> → <code>XAddBulk</code></li>
+<li>worker internals → <code>Approve</code>, <code>Idempotency*</code>, <code>SelectStuck</code></li>
+</ul>
+</li>
+</ul>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">full</span>: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></span><div class="tsd-comment tsd-typography"><p>If <code>true</code>, loads <strong>all</strong> Lua scripts used by the queue
+(producer + worker). If <code>false</code>, loads only <code>XAddBulk</code>.</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-23">Example<a href="#example-23" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Producer-only service (just enqueues tasks)</span><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">loadScripts</span><span class="hl-1">(</span><span class="hl-3">false</span><span class="hl-1">); </span><span class="hl-9">// or simply: await queue.loadScripts();</span>
+</code><button type="button">Copy</button></pre>
+
+</div><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-24">Example<a href="#example-24" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Full worker service (enqueues + processes tasks)</span><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">loadScripts</span><span class="hl-1">(</span><span class="hl-3">true</span><span class="hl-1">);</span><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">runQueue</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1672">PowerQueues.ts:1672</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="onbatcherror"><span>on<wbr/>Batch<wbr/>Error</span><a href="#onbatcherror" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="onbatcherror-1"><span class="tsd-kind-call-signature">onBatchError</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">err</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">tasks</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#onbatcherror-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Batch-level error hook.</p>
+<p>This method is called when <strong>something goes wrong on the batch level</strong>, for example:</p>
+<ul>
+<li>an error is thrown inside <code>execute()</code> while processing a batch,</li>
+<li>an error happens in <code>onReady()</code> (post-batch hook),</li>
+<li>an unexpected error is thrown inside the main consumer loop.</li>
+</ul>
+<p>It is a good place to:</p>
+<ul>
+<li>log unexpected errors in one central place,</li>
+<li>send alerts/notifications to monitoring,</li>
+<li>decide whether to stop the worker (<code>this.abort.abort()</code>),</li>
+<li>inspect which tasks were affected (when <code>tasks</code> is provided).</li>
+</ul>
+<p>Parameters:</p>
+<ul>
+<li><code>err</code> – the error object that was thrown (can be anything: Error, string, etc.).</li>
+<li><code>tasks</code> – <strong>optional</strong> array of task tuples from the current batch:
+<ul>
+<li>Only passed when the error is related to a specific batch
+(e.g. during <code>execute()</code> or <code>onReady()</code>).</li>
+<li>May be <code>undefined</code> when the error happens before tasks are selected.</li>
+</ul>
+</li>
+</ul>
+<p>When present, each item in <code>tasks</code> has the structure:</p>
+<ul>
+<li><code>[0] id: string</code> – Redis stream entry ID.</li>
+<li><code>[1] payload: any[]</code> – decoded payload passed later to <code>onExecute()</code>.</li>
+<li><code>[2] createdAt: number</code> – creation time in ms since UNIX epoch.</li>
+<li><code>[3] job: string</code> – job identifier for the batch.</li>
+<li><code>[4] idemKey: string</code> – idempotency key (can be empty string).</li>
+</ul>
+<p>Important:</p>
+<ul>
+<li><strong>Do not rethrow</strong> from this method – the error is already caught.
+If you throw again, it will only add noise and not help recovery.</li>
+<li>Tasks from the batch may be in different states:
+<ul>
+<li>some may already be processed and ACKed,</li>
+<li>some may still be pending in the stream and will be picked up later.</li>
+</ul>
+</li>
+<li>Use this hook only for <strong>side effects</strong> (logging, metrics, alerts),
+not for low-level queue control.</li>
+</ul>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">err</span>: <span class="tsd-signature-type">any</span></span><div class="tsd-comment tsd-typography"><p>The error that occurred during batch processing.</p>
+</div></li><li><span><code class="tsd-tag">Optional</code><span class="tsd-kind-parameter">tasks</span>: <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span></span><div class="tsd-comment tsd-typography"><p>Optional list of tasks related to this error (if available).</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-25">Example<a href="#example-25" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example: log batch error and stop worker on critical failures</span><br/><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">onBatchError</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">err</span><span class="hl-1">: </span><span class="hl-5">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">tasks</span><span class="hl-1">?: </span><span class="hl-5">Array</span><span class="hl-1">&lt;[</span><span class="hl-5">string</span><span class="hl-1">, </span><span class="hl-5">any</span><span class="hl-1">[], </span><span class="hl-5">number</span><span class="hl-1">, </span><span class="hl-5">string</span><span class="hl-1">, </span><span class="hl-5">string</span><span class="hl-1">]&gt;,</span><br/><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">message</span><span class="hl-1"> = </span><span class="hl-5">err</span><span class="hl-1"> </span><span class="hl-3">instanceof</span><span class="hl-1"> </span><span class="hl-8">Error</span><span class="hl-1"> ? </span><span class="hl-5">err</span><span class="hl-1">.</span><span class="hl-5">message</span><span class="hl-1"> : </span><span class="hl-0">String</span><span class="hl-1">(</span><span class="hl-5">err</span><span class="hl-1">);</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 1. Basic logging</span><br/><span class="hl-1">  </span><span class="hl-9">// console.error(&#39;[queue] batch error&#39;, { message, tasksCount: tasks?.length ?? 0 });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 2. Send error to monitoring/alerting system</span><br/><span class="hl-1">  </span><span class="hl-9">// await this.alerts.notify(&#39;queue.batch_error&#39;, {</span><br/><span class="hl-1">  </span><span class="hl-9">//   message,</span><br/><span class="hl-1">  </span><span class="hl-9">//   tasksCount: tasks?.length ?? 0,</span><br/><span class="hl-1">  </span><span class="hl-9">// });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 3. Optional: stop worker on very serious errors</span><br/><span class="hl-1">  </span><span class="hl-9">// if (message.includes(&#39;OutOfMemory&#39;)) {</span><br/><span class="hl-1">  </span><span class="hl-9">//   this.abort.abort();</span><br/><span class="hl-1">  </span><span class="hl-9">// }</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1163">PowerQueues.ts:1163</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="onerror"><span>on<wbr/>Error</span><a href="#onerror" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="onerror-1"><span class="tsd-kind-call-signature">onError</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">err</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">payload</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">createdAt</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">job</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#onerror-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Hook that runs when a <strong>single task fails</strong> during execution.</p>
+<p>This method is called <strong>after</strong>:</p>
+<ul>
+<li><code>onExecute()</code> throws an error,</li>
+<li>the attempt counter is increased,</li>
+<li><code>onRetry()</code> is called,</li>
+<li><strong>but before</strong> the queue decides whether the task will be retried again
+or moved to DLQ (dead-letter queue).</li>
+</ul>
+<p>You can use this hook for:</p>
+<ul>
+<li>logging a failure of an individual task,</li>
+<li>sending alerts/metrics for failed attempts,</li>
+<li>storing error details in your system,</li>
+<li>instrumenting monitoring dashboards,</li>
+<li>collecting statistics for debugging or analytics.</li>
+</ul>
+<p>Parameters:</p>
+<ul>
+<li><code>err</code> – Error thrown from <code>onExecute()</code> (may be any type: Error instance, string, etc.).</li>
+<li><code>id</code> – Redis stream entry ID of the failed task.</li>
+<li><code>payload</code> – Decoded payload object used in <code>onExecute()</code>.</li>
+<li><code>createdAt</code> – Creation timestamp of the task in milliseconds.</li>
+<li><code>job</code> – Job identifier that groups tasks added in the same batch.</li>
+<li><code>key</code> – Idempotency key (empty if not used).</li>
+<li><code>attempt</code> – Attempt number <strong>after incrementing</strong>, so:
+<ul>
+<li><code>1</code> = first retry,</li>
+<li><code>2</code> = second retry, etc.</li>
+</ul>
+</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>Do <strong>not</strong> rethrow errors from this method — the queue has already handled the failure.</li>
+<li>The task may still be retried after this hook if <code>attempt &lt; workerMaxRetries</code>.</li>
+<li>When <code>attempt &gt;= workerMaxRetries</code>:
+<ul>
+<li>The queue moves the task to DLQ (<code>&lt;stream&gt;:dlq</code>),</li>
+<li><code>onError()</code> is still called before that happens.</li>
+</ul>
+</li>
+<li>Do <strong>not</strong> ACK/Delete or requeue messages here — the queue will handle that.</li>
+</ul>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">err</span>: <span class="tsd-signature-type">any</span></span><div class="tsd-comment tsd-typography"><p>The error that occurred during execution.</p>
+</div></li><li><span><span class="tsd-kind-parameter">id</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Redis stream entry ID.</p>
+</div></li><li><span><span class="tsd-kind-parameter">payload</span>: <span class="tsd-signature-type">any</span></span><div class="tsd-comment tsd-typography"><p>Decoded payload originally passed to <code>onExecute()</code>.</p>
+</div></li><li><span><span class="tsd-kind-parameter">createdAt</span>: <span class="tsd-signature-type">number</span></span><div class="tsd-comment tsd-typography"><p>Task creation time in milliseconds.</p>
+</div></li><li><span><span class="tsd-kind-parameter">job</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Batch/job identifier for the task.</p>
+</div></li><li><span><span class="tsd-kind-parameter">key</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Idempotency key (or empty string).</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-26">Example<a href="#example-26" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example: basic logging + metrics</span><br/><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">onError</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">err</span><span class="hl-1">: </span><span class="hl-5">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">id</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">payload</span><span class="hl-1">: </span><span class="hl-5">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">createdAt</span><span class="hl-1">: </span><span class="hl-5">number</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">job</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">key</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">attempt</span><span class="hl-1">: </span><span class="hl-5">number</span><span class="hl-1">,</span><br/><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">msg</span><span class="hl-1"> = </span><span class="hl-5">err</span><span class="hl-1"> </span><span class="hl-3">instanceof</span><span class="hl-1"> </span><span class="hl-8">Error</span><span class="hl-1"> ? </span><span class="hl-5">err</span><span class="hl-1">.</span><span class="hl-5">message</span><span class="hl-1"> : </span><span class="hl-0">String</span><span class="hl-1">(</span><span class="hl-5">err</span><span class="hl-1">);</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 1. Log failure</span><br/><span class="hl-1">  </span><span class="hl-9">// console.warn(&#39;[queue] task failed&#39;, {</span><br/><span class="hl-1">  </span><span class="hl-9">//   id, job, key, attempt, error: msg, payload,</span><br/><span class="hl-1">  </span><span class="hl-9">// });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 2. Send failure metric</span><br/><span class="hl-1">  </span><span class="hl-9">// await this.metrics.inc(&#39;queue_task_fail_total&#39;, { job, attempt });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 3. Optional: store failure details for debugging</span><br/><span class="hl-1">  </span><span class="hl-9">// await this.audit.save({</span><br/><span class="hl-1">  </span><span class="hl-9">//   id, job, attempt, error: msg, payload, createdAt,</span><br/><span class="hl-1">  </span><span class="hl-9">// });</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1236">PowerQueues.ts:1236</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="onexecute"><span>on<wbr/>Execute</span><a href="#onexecute" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="onexecute-1"><span class="tsd-kind-call-signature">onExecute</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">payload</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">createdAt</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">job</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">attempt</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#onexecute-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Main <strong>task handler</strong> – this is where you put your business logic.</p>
+<p>The worker calls <code>onExecute()</code> <strong>for every task that should be processed</strong>:</p>
+<ul>
+<li>For normal tasks (without idempotency key) it is invoked directly from <code>executeProcess()</code>.</li>
+<li>For idempotent tasks it is invoked inside the idempotency flow (<code>idempotency()</code>).</li>
+</ul>
+<p>If this method:</p>
+<ul>
+<li><strong>resolves successfully</strong> (no error thrown) – the task is considered <strong>done</strong>:
+<ul>
+<li><code>onSuccess()</code> will be called,</li>
+<li>the task will be <strong>ACKed</strong> and optionally <strong>removed</strong> from the stream,</li>
+<li>attempts counter is <strong>not</strong> increased.</li>
+</ul>
+</li>
+<li><strong>throws an error</strong> – the task is considered <strong>failed</strong>:
+<ul>
+<li>the attempts counter is incremented,</li>
+<li><code>onRetry()</code> and <code>onError()</code> are called,</li>
+<li>if attempts exceed <code>workerMaxRetries</code>, the task is moved to <strong>DLQ</strong> (<code>&lt;stream&gt;:dlq</code>).</li>
+</ul>
+</li>
+</ul>
+<p>Parameters:</p>
+<ul>
+<li><code>id</code> – Redis stream ID of this entry (e.g. <code>&quot;1719935620000-0&quot;</code>).</li>
+<li><code>payload</code> – task payload already decoded by the queue:
+<ul>
+<li>If you pushed an object <code>{ foo: 'bar' }</code> – here you usually get the same object.</li>
+<li>If JSON decode failed, you may get a raw string or other value.</li>
+</ul>
+</li>
+<li><code>createdAt</code> – UNIX timestamp in milliseconds when the task was originally created.</li>
+<li><code>job</code> – job identifier for the batch this task was added with (used for grouping/statistics).</li>
+<li><code>key</code> – idempotency key (empty string if idempotency is not used for this task).</li>
+<li><code>attempt</code> – current attempt number <strong>before</strong> this execution:
+<ul>
+<li><code>0</code> – first try,</li>
+<li><code>1</code> – second try, etc.</li>
+</ul>
+</li>
+</ul>
+<p>Important:</p>
+<ul>
+<li>Always treat this method as <strong>async and potentially retried</strong>:
+<ul>
+<li>Write idempotent business logic where possible (safe to run twice).</li>
+<li>Use <code>key</code> + <code>id</code> if you need extra deduplication on your side.</li>
+</ul>
+</li>
+<li>Do <strong>not</strong> manually ACK or delete messages in Redis here – the queue
+does this for you via <code>Approve</code> script.</li>
+<li>Long-running tasks are supported – the worker periodically updates
+lock/start keys via the heartbeat mechanism while this method runs.</li>
+</ul>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">id</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Redis stream entry ID of the task.</p>
+</div></li><li><span><span class="tsd-kind-parameter">payload</span>: <span class="tsd-signature-type">any</span></span><div class="tsd-comment tsd-typography"><p>Decoded task payload (business data to process).</p>
+</div></li><li><span><span class="tsd-kind-parameter">createdAt</span>: <span class="tsd-signature-type">number</span></span><div class="tsd-comment tsd-typography"><p>Task creation time in milliseconds since UNIX epoch.</p>
+</div></li><li><span><span class="tsd-kind-parameter">job</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Job identifier used to group tasks added in one batch.</p>
+</div></li><li><span><span class="tsd-kind-parameter">key</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Idempotency key for this task (empty string if not used).</p>
+</div></li><li><span><span class="tsd-kind-parameter">attempt</span>: <span class="tsd-signature-type">number</span></span><div class="tsd-comment tsd-typography"><p>Current attempt number (0 for first execution).</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-27">Example<a href="#example-27" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example: simple HTTP call with retry-friendly error handling</span><br/><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">onExecute</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">id</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">payload</span><span class="hl-1">: </span><span class="hl-5">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">createdAt</span><span class="hl-1">: </span><span class="hl-5">number</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">job</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">key</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">attempt</span><span class="hl-1">: </span><span class="hl-5">number</span><span class="hl-1">,</span><br/><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-9">// 1. Validate payload shape</span><br/><span class="hl-1">  </span><span class="hl-6">if</span><span class="hl-1"> (!</span><span class="hl-5">payload</span><span class="hl-1"> || </span><span class="hl-3">typeof</span><span class="hl-1"> </span><span class="hl-5">payload</span><span class="hl-1">.</span><span class="hl-5">url</span><span class="hl-1"> !== </span><span class="hl-2">&#39;string&#39;</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-9">// Throwing will mark this attempt as failed and trigger retry/DLQ logic</span><br/><span class="hl-1">    </span><span class="hl-6">throw</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">Error</span><span class="hl-1">(</span><span class="hl-2">&#39;Invalid payload: &quot;url&quot; is required&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 2. Add some logging/metrics (optional)</span><br/><span class="hl-1">  </span><span class="hl-9">// console.log(&#39;[queue] executing task&#39;, { id, job, attempt, url: payload.url });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 3. Execute business logic (can be any async operation)</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">response</span><span class="hl-1"> = </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">fetch</span><span class="hl-1">(</span><span class="hl-5">payload</span><span class="hl-1">.</span><span class="hl-5">url</span><span class="hl-1">, {</span><br/><span class="hl-1">    </span><span class="hl-5">method:</span><span class="hl-1"> </span><span class="hl-2">&#39;POST&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-5">body:</span><span class="hl-1"> </span><span class="hl-4">JSON</span><span class="hl-1">.</span><span class="hl-0">stringify</span><span class="hl-1">(</span><span class="hl-5">payload</span><span class="hl-1">.</span><span class="hl-5">body</span><span class="hl-1"> ?? {}),</span><br/><span class="hl-1">    </span><span class="hl-5">headers:</span><span class="hl-1"> { </span><span class="hl-2">&#39;Content-Type&#39;</span><span class="hl-5">:</span><span class="hl-1"> </span><span class="hl-2">&#39;application/json&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">  });</span><br/><br/><span class="hl-1">  </span><span class="hl-6">if</span><span class="hl-1"> (!</span><span class="hl-5">response</span><span class="hl-1">.</span><span class="hl-5">ok</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-9">// Non-2xx status: let the queue retry this task</span><br/><span class="hl-1">    </span><span class="hl-6">throw</span><span class="hl-1"> </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">Error</span><span class="hl-1">(</span><span class="hl-2">`Request failed with status </span><span class="hl-3">${</span><span class="hl-5">response</span><span class="hl-11">.</span><span class="hl-5">status</span><span class="hl-3">}</span><span class="hl-2">`</span><span class="hl-1">);</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 4. Optionally process response or update other systems</span><br/><span class="hl-1">  </span><span class="hl-9">// const data = await response.json();</span><br/><span class="hl-1">  </span><span class="hl-9">// await this.someService.saveResult(id, data);</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// No return value is required – resolving without error means &quot;success&quot;.</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L979">PowerQueues.ts:979</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="onready"><span>on<wbr/>Ready</span><a href="#onready" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="onready-1"><span class="tsd-kind-call-signature">onReady</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#onready-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Hook that runs <strong>after the batch of tasks has been executed</strong>, but <strong>before ACK</strong>.</p>
+<p>Call order inside the worker loop:</p>
+<ol>
+<li>Tasks are selected from Redis (<code>select()</code> / <code>selectStuck()</code> / <code>selectFresh()</code>).</li>
+<li><code>onSelected()</code> is called (you can filter/reorder tasks there).</li>
+<li>Each task is processed via <code>executeProcess()</code> → <code>onExecute()</code>, idempotency, retries, DLQ, etc.</li>
+<li><strong><code>onReady()</code> is called with the same <code>tasks</code> array used for execution.</strong></li>
+<li>Successfully processed task IDs are ACKed via <code>approve()</code> (XACK + optional XDEL).</li>
+</ol>
+<p>Use this method for <strong>post-batch actions</strong>, for example:</p>
+<ul>
+<li>logging summary of the batch,</li>
+<li>updating metrics (processed count, errors, latency),</li>
+<li>emitting events/notifications,</li>
+<li>flushing any in-memory buffers used during <code>onExecute()</code>.</li>
+</ul>
+<p>Each item in <code>data</code> is a tuple with this structure:</p>
+<ul>
+<li><code>[0] id: string</code> – Redis stream entry ID (e.g. <code>&quot;1719935620000-0&quot;</code>).</li>
+<li><code>[1] payload: any[]</code> – decoded and normalized payload used by <code>onExecute()</code>.</li>
+<li><code>[2] createdAt: number</code> – UNIX timestamp in milliseconds when the task was created.</li>
+<li><code>[3] job: string</code> – job identifier that groups tasks added in one batch.</li>
+<li><code>[4] idemKey: string</code> – idempotency key (can be an empty string).</li>
+</ul>
+<p>Important:</p>
+<ul>
+<li>This method is called <strong>even if some tasks failed</strong> inside the batch:
+<ul>
+<li>failures are already handled (retries, DLQ) by the time <code>onReady()</code> runs.</li>
+</ul>
+</li>
+<li>If <code>onReady()</code> throws, the error is caught and passed to <code>onBatchError()</code>.</li>
+<li>Do <strong>not</strong> modify Redis stream directly here (no manual XACK/XDEL) –
+the queue will ACK successful IDs right after this hook.</li>
+</ul>
+<p>Keep this method <strong>fast and side-effect friendly</strong>: it should not block
+the worker for a long time, but it is a good place for final &quot;batch-level&quot;
+operations.</p>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">data</span>: <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span></span><div class="tsd-comment tsd-typography"><p>Array of task tuples that were just processed in this batch.</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-28">Example<a href="#example-28" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example: simple batch logging</span><br/><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">onReady</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">data</span><span class="hl-1">: </span><span class="hl-5">Array</span><span class="hl-1">&lt;[</span><span class="hl-5">string</span><span class="hl-1">, </span><span class="hl-5">any</span><span class="hl-1">[], </span><span class="hl-5">number</span><span class="hl-1">, </span><span class="hl-5">string</span><span class="hl-1">, </span><span class="hl-5">string</span><span class="hl-1">]&gt;,</span><br/><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">total</span><span class="hl-1"> = </span><span class="hl-5">data</span><span class="hl-1">.</span><span class="hl-5">length</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">jobs</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">Set</span><span class="hl-1">&lt;</span><span class="hl-8">string</span><span class="hl-1">&gt;();</span><br/><br/><span class="hl-1">  </span><span class="hl-6">for</span><span class="hl-1"> (</span><span class="hl-3">const</span><span class="hl-1"> [, , , </span><span class="hl-4">job</span><span class="hl-1">] </span><span class="hl-3">of</span><span class="hl-1"> </span><span class="hl-5">data</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-5">job</span><span class="hl-1">) </span><span class="hl-5">jobs</span><span class="hl-1">.</span><span class="hl-0">add</span><span class="hl-1">(</span><span class="hl-5">job</span><span class="hl-1">);</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// You can send this to your logger / metrics system</span><br/><span class="hl-1">  </span><span class="hl-9">// console.log(&#39;[queue] batch ready&#39;, { total, jobs: Array.from(jobs) });</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1034">PowerQueues.ts:1034</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="onretry"><span>on<wbr/>Retry</span><a href="#onretry" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="onretry-1"><span class="tsd-kind-call-signature">onRetry</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">err</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">payload</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">createdAt</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">job</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">attempt</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#onretry-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Hook that runs when a <strong>task fails but will be retried</strong>.</p>
+<p>This method is called immediately after:</p>
+<ul>
+<li><code>onExecute()</code> throws an error,</li>
+<li>the internal attempt counter is incremented,</li>
+<li><strong>before</strong> <code>onError()</code> and before deciding whether the task goes to DLQ.</li>
+</ul>
+<p>Use this hook for logic that is <strong>specifically about retries</strong>, such as:</p>
+<ul>
+<li>logging retry attempts separately from final failures,</li>
+<li>applying exponential backoff logic (if you want custom behavior),</li>
+<li>collecting retry metrics,</li>
+<li>tracking repeated failures,</li>
+<li>triggering &quot;early warning&quot; alerts when retry counts start increasing.</li>
+</ul>
+<p>Parameters:</p>
+<ul>
+<li><code>err</code> – The error thrown by <code>onExecute()</code> (any type).</li>
+<li><code>id</code> – Redis stream entry ID of the task.</li>
+<li><code>payload</code> – Decoded payload passed to <code>onExecute()</code>.</li>
+<li><code>createdAt</code> – Timestamp (ms) when the task was originally created.</li>
+<li><code>job</code> – Job identifier grouping tasks from the same batch.</li>
+<li><code>key</code> – Idempotency key (empty string if not used).</li>
+<li><code>attempt</code> – Current retry index <strong>after incrementing</strong>, so:
+<ul>
+<li><code>1</code> = first retry,</li>
+<li><code>2</code> = second retry,</li>
+<li>etc.</li>
+</ul>
+</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>This method is only called for tasks that <strong>will be retried</strong>.
+(If <code>attempt &gt;= workerMaxRetries</code>, the queue still calls <code>onRetry()</code>,
+but the next step is DLQ transfer.)</li>
+<li>Do <strong>not throw</strong> errors here. The retry process is already ongoing.</li>
+<li>Do <strong>not</strong> ACK, delete, or requeue tasks manually — the queue handles everything.</li>
+<li>Keep this hook fast — the worker often processes dozens/hundreds of tasks per batch.</li>
+</ul>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">err</span>: <span class="tsd-signature-type">any</span></span><div class="tsd-comment tsd-typography"><p>The error that triggered a retry.</p>
+</div></li><li><span><span class="tsd-kind-parameter">id</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Redis stream entry ID.</p>
+</div></li><li><span><span class="tsd-kind-parameter">payload</span>: <span class="tsd-signature-type">any</span></span><div class="tsd-comment tsd-typography"><p>Decoded payload for the task.</p>
+</div></li><li><span><span class="tsd-kind-parameter">createdAt</span>: <span class="tsd-signature-type">number</span></span><div class="tsd-comment tsd-typography"><p>Creation timestamp of the task in ms.</p>
+</div></li><li><span><span class="tsd-kind-parameter">job</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Job identifier for this task.</p>
+</div></li><li><span><span class="tsd-kind-parameter">key</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Idempotency key used for this task (or empty).</p>
+</div></li><li><span><span class="tsd-kind-parameter">attempt</span>: <span class="tsd-signature-type">number</span></span><div class="tsd-comment tsd-typography"><p>Attempt number after incrementing.</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-29">Example<a href="#example-29" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example: logging retries with exponential backoff info</span><br/><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">onRetry</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">err</span><span class="hl-1">: </span><span class="hl-5">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">id</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">payload</span><span class="hl-1">: </span><span class="hl-5">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">createdAt</span><span class="hl-1">: </span><span class="hl-5">number</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">job</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">key</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">attempt</span><span class="hl-1">: </span><span class="hl-5">number</span><span class="hl-1">,</span><br/><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">errorMsg</span><span class="hl-1"> = </span><span class="hl-5">err</span><span class="hl-1"> </span><span class="hl-3">instanceof</span><span class="hl-1"> </span><span class="hl-8">Error</span><span class="hl-1"> ? </span><span class="hl-5">err</span><span class="hl-1">.</span><span class="hl-5">message</span><span class="hl-1"> : </span><span class="hl-0">String</span><span class="hl-1">(</span><span class="hl-5">err</span><span class="hl-1">);</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 1. Log retry attempt</span><br/><span class="hl-1">  </span><span class="hl-9">// console.log(&#39;[queue] retrying task&#39;, {</span><br/><span class="hl-1">  </span><span class="hl-9">//   id, job, key, attempt, error: errorMsg,</span><br/><span class="hl-1">  </span><span class="hl-9">// });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 2. Track metrics for retries</span><br/><span class="hl-1">  </span><span class="hl-9">// await this.metrics.inc(&#39;queue_task_retry_total&#39;, { job, attempt });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 3. Optional: custom backoff hints or adaptive behavior</span><br/><span class="hl-1">  </span><span class="hl-9">// const backoffMs = Math.min(5000, attempt * 250);</span><br/><span class="hl-1">  </span><span class="hl-9">// console.log(`Next retry scheduled in about ~${backoffMs}ms`);</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1308">PowerQueues.ts:1308</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="onselected"><span>on<wbr/>Selected</span><a href="#onselected" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="onselected-1"><span class="tsd-kind-call-signature">onSelected</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span><a href="#onselected-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Hook that runs <strong>after tasks are read from Redis</strong> but <strong>before they are executed</strong>.</p>
+<p>You can override this method to:</p>
+<ul>
+<li>filter tasks (drop some of them),</li>
+<li>reorder tasks (change processing order),</li>
+<li>enrich/normalize payloads,</li>
+<li>add logging/metrics.</li>
+</ul>
+<p>Each item in <code>data</code> is a tuple with the following structure:</p>
+<ul>
+<li><code>[0] id: string</code> – Redis stream entry ID (e.g. <code>&quot;1719935620000-0&quot;</code>).</li>
+<li><code>[1] payload: any[]</code> – decoded task payload.
+<ul>
+<li>For JSON payloads this is usually the parsed object or its fields.</li>
+</ul>
+</li>
+<li><code>[2] createdAt: number</code> – UNIX timestamp in milliseconds when the task was created.</li>
+<li><code>[3] job: string</code> – job identifier used to group tasks added in one batch.</li>
+<li><code>[4] idemKey: string</code> – idempotency key used by the worker to avoid duplicate execution.</li>
+</ul>
+<p>Important notes:</p>
+<ul>
+<li>If you <strong>return a non-empty array</strong>, it will be passed to the internal <code>execute()</code> method.</li>
+<li>If you <strong>return <code>undefined</code>, <code>null</code> or an empty array</strong>, the original <code>data</code> array
+will be used instead.</li>
+<li>If you want to <strong>remove only some tasks</strong>, return a filtered array with the
+remaining tuples.</li>
+<li>If you need to change a task, you can either:
+<ul>
+<li>mutate the objects inside <code>data</code> in place, or</li>
+<li>return a new array with modified tuples.</li>
+</ul>
+</li>
+</ul>
+<p>Keep this method fast and non-blocking: it is called on every worker loop
+iteration before executing tasks.</p>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">data</span>: <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span></span><div class="tsd-comment tsd-typography"><p>Array of raw task tuples selected from the stream for this iteration.</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4><ul>
+<li>The array of tasks to execute (filtered/reordered/modified), or</li>
+<li><code>undefined</code> / <code>null</code> / empty array to use the original <code>data</code> as-is.</li>
+</ul>
+<div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-30">Example<a href="#example-30" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example: filter out tasks with invalid payloads and log them</span><br/><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">onSelected</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">data</span><span class="hl-1">: </span><span class="hl-5">Array</span><span class="hl-1">&lt;[</span><span class="hl-5">string</span><span class="hl-1">, </span><span class="hl-5">any</span><span class="hl-1">[], </span><span class="hl-5">number</span><span class="hl-1">, </span><span class="hl-5">string</span><span class="hl-1">, </span><span class="hl-5">string</span><span class="hl-1">]&gt;,</span><br/><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">valid</span><span class="hl-1">: </span><span class="hl-8">Array</span><span class="hl-1">&lt;[</span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-8">any</span><span class="hl-1">[], </span><span class="hl-8">number</span><span class="hl-1">, </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-8">string</span><span class="hl-1">]&gt; = [];</span><br/><br/><span class="hl-1">  </span><span class="hl-6">for</span><span class="hl-1"> (</span><span class="hl-3">const</span><span class="hl-1"> [</span><span class="hl-4">id</span><span class="hl-1">, </span><span class="hl-4">payload</span><span class="hl-1">, </span><span class="hl-4">createdAt</span><span class="hl-1">, </span><span class="hl-4">job</span><span class="hl-1">, </span><span class="hl-4">idemKey</span><span class="hl-1">] </span><span class="hl-3">of</span><span class="hl-1"> </span><span class="hl-5">data</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">isOk</span><span class="hl-1"> = </span><span class="hl-5">payload</span><span class="hl-1"> &amp;&amp; </span><span class="hl-3">typeof</span><span class="hl-1"> </span><span class="hl-5">payload</span><span class="hl-1"> === </span><span class="hl-2">&#39;object&#39;</span><span class="hl-1"> &amp;&amp; </span><span class="hl-5">payload</span><span class="hl-1">[</span><span class="hl-2">&#39;type&#39;</span><span class="hl-1">];</span><br/><br/><span class="hl-1">    </span><span class="hl-6">if</span><span class="hl-1"> (</span><span class="hl-5">isOk</span><span class="hl-1">) {</span><br/><span class="hl-1">      </span><span class="hl-5">valid</span><span class="hl-1">.</span><span class="hl-0">push</span><span class="hl-1">([</span><span class="hl-5">id</span><span class="hl-1">, </span><span class="hl-5">payload</span><span class="hl-1">, </span><span class="hl-5">createdAt</span><span class="hl-1">, </span><span class="hl-5">job</span><span class="hl-1">, </span><span class="hl-5">idemKey</span><span class="hl-1">]);</span><br/><span class="hl-1">    } </span><span class="hl-6">else</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-9">// you can send invalid tasks to DLQ / log / metrics here</span><br/><span class="hl-1">      </span><span class="hl-9">// await this.addTasks(`${this.stream}:invalid`, [{ payload: { id, payload, createdAt, job, idemKey } }]);</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">  }</span><br/><br/><span class="hl-1">  </span><span class="hl-6">return</span><span class="hl-1"> </span><span class="hl-5">valid</span><span class="hl-1">;</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L892">PowerQueues.ts:892</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="onsuccess"><span>on<wbr/>Success</span><a href="#onsuccess" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="onsuccess-1"><span class="tsd-kind-call-signature">onSuccess</span><span class="tsd-signature-symbol">(</span><br/>    <span class="tsd-kind-parameter">id</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">payload</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">createdAt</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">job</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-kind-parameter">key</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#onsuccess-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Hook that runs <strong>after a task has been executed successfully</strong>, but <strong>before it is ACKed</strong>.</p>
+<p>Call order for a successful task (simplified):</p>
+<ol>
+<li>Task is selected from Redis (<code>select()</code>).</li>
+<li><code>onExecute()</code> runs your main business logic.</li>
+<li>If <code>onExecute()</code> finishes without throwing:
+<ul>
+<li>internal <code>success()</code> is called,</li>
+<li>job-level counters may be updated,</li>
+<li><strong><code>onSuccess()</code> is called (this method).</strong></li>
+</ul>
+</li>
+<li>The task ID is added to the list of successfully processed IDs.</li>
+<li>Later, the batch of IDs is ACKed (and optionally deleted) by <code>approve()</code>.</li>
+</ol>
+<p>Use this method when you want to:</p>
+<ul>
+<li>log successful executions,</li>
+<li>send events/notifications (e.g. WebSocket, message bus),</li>
+<li>update external metrics / audit logs,</li>
+<li>trigger follow-up actions that should only happen <strong>if the task really succeeded</strong>.</li>
+</ul>
+<p>Parameters:</p>
+<ul>
+<li><code>id</code> – Redis stream entry ID (e.g. <code>&quot;1719935620000-0&quot;</code>).</li>
+<li><code>payload</code> – the same decoded payload that was passed to <code>onExecute()</code>.</li>
+<li><code>createdAt</code> – UNIX timestamp in milliseconds when the task was created.</li>
+<li><code>job</code> – job identifier used to group tasks added in one batch.</li>
+<li><code>key</code> – idempotency key (empty string if idempotency was not used).</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li>This hook is <strong>not</strong> retried: if it throws, the error is handled via <code>onBatchError()</code>,
+but the main task is still considered successful (it already passed <code>onExecute()</code>).</li>
+<li>Keep this method <strong>side-effect safe</strong>: avoid throwing unless it is really necessary.</li>
+<li>Do <strong>not</strong> ACK, delete, or requeue messages here – the queue handles that automatically.</li>
+</ul>
+</div><div class="tsd-parameters"><h4 class="tsd-parameters-title">Parameters</h4><ul class="tsd-parameter-list"><li><span><span class="tsd-kind-parameter">id</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Redis stream entry ID of the successfully processed task.</p>
+</div></li><li><span><span class="tsd-kind-parameter">payload</span>: <span class="tsd-signature-type">any</span></span><div class="tsd-comment tsd-typography"><p>Decoded payload that was handled in <code>onExecute()</code>.</p>
+</div></li><li><span><span class="tsd-kind-parameter">createdAt</span>: <span class="tsd-signature-type">number</span></span><div class="tsd-comment tsd-typography"><p>Task creation time in milliseconds since UNIX epoch.</p>
+</div></li><li><span><span class="tsd-kind-parameter">job</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Job identifier for this task batch.</p>
+</div></li><li><span><span class="tsd-kind-parameter">key</span>: <span class="tsd-signature-type">string</span></span><div class="tsd-comment tsd-typography"><p>Idempotency key used for this task (or empty string).</p>
+</div></li></ul></div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-31">Example<a href="#example-31" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Example: log success and send a simple metric</span><br/><span class="hl-5">async</span><span class="hl-1"> </span><span class="hl-0">onSuccess</span><span class="hl-1">(</span><br/><span class="hl-1">  </span><span class="hl-5">id</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">payload</span><span class="hl-1">: </span><span class="hl-5">any</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">createdAt</span><span class="hl-1">: </span><span class="hl-5">number</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">job</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">key</span><span class="hl-1">: </span><span class="hl-5">string</span><span class="hl-1">,</span><br/><span class="hl-1">) {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">durationMs</span><span class="hl-1"> = </span><span class="hl-5">Date</span><span class="hl-1">.</span><span class="hl-0">now</span><span class="hl-1">() - </span><span class="hl-5">createdAt</span><span class="hl-1">;</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 1. Log success (to console, logger, etc.)</span><br/><span class="hl-1">  </span><span class="hl-9">// console.log(&#39;[queue] success&#39;, { id, job, key, durationMs });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 2. Update metrics / monitoring</span><br/><span class="hl-1">  </span><span class="hl-9">// await this.metrics.inc(&#39;queue_task_success_total&#39;, { job });</span><br/><span class="hl-1">  </span><span class="hl-9">// await this.metrics.observe(&#39;queue_task_duration_ms&#39;, durationMs, { job });</span><br/><br/><span class="hl-1">  </span><span class="hl-9">// 3. Optionally notify other services</span><br/><span class="hl-1">  </span><span class="hl-9">// await this.events.emit(&#39;task.success&#39;, { id, job, payload });</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1097">PowerQueues.ts:1097</a></li></ul></aside></div></li></ul></section><section class="tsd-panel tsd-member"><h3 class="tsd-anchor-link" id="runqueue"><span>run<wbr/>Queue</span><a href="#runqueue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul class="tsd-signatures"><li class=""><div class="tsd-signature tsd-anchor-link" id="runqueue-1"><span class="tsd-kind-call-signature">runQueue</span><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span><a href="#runqueue-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div><div class="tsd-description"><div class="tsd-comment tsd-typography"><p>Starts the queue worker: initializes the consumer group and begins the
+infinite processing loop.</p>
+<p>This is the <strong>entrypoint</strong> for running a worker instance.<br>
+Calling <code>runQueue()</code>:</p>
+<ol>
+<li>Ensures the Redis consumer group exists (creates it if needed).</li>
+<li>Starts the main worker loop via <code>consumerLoop()</code>.</li>
+<li>The worker will continue running until <code>this.abort.abort()</code> is called.</li>
+</ol>
+<p>Typical usage:</p>
+<pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">queue</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">MyQueue</span><span class="hl-1">(</span><span class="hl-5">redisClient</span><span class="hl-1">);</span><br/><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-5">stream</span><span class="hl-1"> = </span><span class="hl-2">&#39;events&#39;</span><span class="hl-1">;</span><br/><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-5">group</span><span class="hl-1"> = </span><span class="hl-2">&#39;worker-1&#39;</span><span class="hl-1">;</span><br/><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-5">consumerHost</span><span class="hl-1"> = </span><span class="hl-2">&#39;api-server&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">runQueue</span><span class="hl-1">(); </span><span class="hl-9">// begins processing</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Internals and Flow:</p>
+<ul>
+<li>
+<p><strong>createGroup('0-0')</strong><br>
+Ensures the Redis Stream Group exists.<br>
+<code>'0-0'</code> means the worker will handle all historical messages that
+haven't been acknowledged yet.</p>
+</li>
+<li>
+<p><strong>consumerLoop()</strong><br>
+Starts the continuous polling loop:</p>
+<ul>
+<li>reads tasks using <code>select()</code> / <code>selectStuck()</code> / <code>selectFresh()</code>,</li>
+<li>calls <code>onSelected()</code>,</li>
+<li>executes tasks (idempotent, retries, DLQ),</li>
+<li>calls <code>onReady()</code>,</li>
+<li>ACKs completed tasks.</li>
+</ul>
+</li>
+</ul>
+<p>Stopping the worker:</p>
+<ul>
+<li>The worker responds to <code>this.abort</code> signal.</li>
+<li>Calling <code>this.abort.abort()</code> will break the loop at the next safe point.</li>
+</ul>
+<p>Important Notes:</p>
+<ul>
+<li>This method should be called <strong>once per worker instance</strong>.</li>
+<li>It never resolves unless the worker is stopped.</li>
+<li>Safe to call in background processes, NestJS modules, or standalone runners.</li>
+<li>Does not block the event loop — all work inside is asynchronous.</li>
+</ul>
+</div><h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><div class="tsd-comment tsd-typography"><div class="tsd-tag-example"><h4 class="tsd-anchor-link" id="example-32">Example<a href="#example-32" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4><pre><code class="ts"><span class="hl-9">// Full example: running a queue worker</span><br/><span class="hl-3">async</span><span class="hl-1"> </span><span class="hl-3">function</span><span class="hl-1"> </span><span class="hl-0">main</span><span class="hl-1">() {</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">redis</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">IORedis</span><span class="hl-1">(...);</span><br/><span class="hl-1">  </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">q</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">MyQueue</span><span class="hl-1">(</span><span class="hl-5">redis</span><span class="hl-1">);</span><br/><br/><span class="hl-1">  </span><span class="hl-5">q</span><span class="hl-1">.</span><span class="hl-5">stream</span><span class="hl-1"> = </span><span class="hl-2">&#39;user:events&#39;</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-5">q</span><span class="hl-1">.</span><span class="hl-5">group</span><span class="hl-1"> = </span><span class="hl-2">&#39;analytics&#39;</span><span class="hl-1">;</span><br/><span class="hl-1">  </span><span class="hl-5">q</span><span class="hl-1">.</span><span class="hl-5">consumerHost</span><span class="hl-1"> = </span><span class="hl-2">&#39;analytics-service&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-1">  </span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">log</span><span class="hl-1">(</span><span class="hl-2">&#39;Worker starting...&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">  </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">q</span><span class="hl-1">.</span><span class="hl-0">runQueue</span><span class="hl-1">();       </span><span class="hl-9">// does not return unless aborted</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<pre><code>
+</code><button>Copy</button></pre>
+
+</div></div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/362c57329f1dc7edc47fe79e86a0465e69ba4278/src/PowerQueues.ts#L1370">PowerQueues.ts:1370</a></li></ul></aside></div></li></ul></section></section></details></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Constructors"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Constructors</summary><div><a href="#constructor"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Constructor"><use href="../assets/icons.svg#icon-512"></use></svg><span>constructor</span></a></div></details><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Properties"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Properties</summary><div><a href="#abort"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>abort</span></a><a href="#addingbatchkeyslimit"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>adding<wbr/>Batch<wbr/>Keys<wbr/>Limit</span></a><a href="#addingbatchtaskscount"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>adding<wbr/>Batch<wbr/>Tasks<wbr/>Count</span></a><a href="#approvebatchtaskscount"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>approve<wbr/>Batch<wbr/>Tasks<wbr/>Count</span></a><a href="#consumerhost"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>consumer<wbr/>Host</span></a><a href="#executebatchatonce"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>execute<wbr/>Batch<wbr/>At<wbr/>Once</span></a><a href="#executejobstatus"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>execute<wbr/>Job<wbr/>Status</span></a><a href="#executejobstatusttlms"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>execute<wbr/>Job<wbr/>Status<wbr/>Ttl<wbr/>Ms</span></a><a href="#group"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>group</span></a><a href="#recoverystucktaskstimeoutms"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>recovery<wbr/>Stuck<wbr/>Tasks<wbr/>Timeout<wbr/>Ms</span></a><a href="#redis"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>redis</span></a><a href="#removeonexecuted"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>remove<wbr/>On<wbr/>Executed</span></a><a href="#scripts"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>scripts</span></a><a href="#stream"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>stream</span></a><a href="#workerbatchtaskscount"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Batch<wbr/>Tasks<wbr/>Count</span></a><a href="#workercachetasktimeoutms"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Cache<wbr/>Task<wbr/>Timeout<wbr/>Ms</span></a><ul><li><ul><li><ul><li><a href="#what-this-timeout-does"><span>What this timeout does</span></a></li><li><a href="#why-it-exists"><span>Why it exists</span></a></li><li><a href="#best-practices"><span>Best practices</span></a></li></ul></li></ul></li></ul><a href="#workerclearattemptstimeoutms"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Clear<wbr/>Attempts<wbr/>Timeout<wbr/>Ms</span></a><a href="#workerexecutelocktimeoutms"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Execute<wbr/>Lock<wbr/>Timeout<wbr/>Ms</span></a><a href="#workerloopintervalms"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Loop<wbr/>Interval<wbr/>Ms</span></a><a href="#workermaxretries"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Max<wbr/>Retries</span></a><a href="#workerselectiontimeoutms"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Property"><use href="../assets/icons.svg#icon-1024"></use></svg><span>worker<wbr/>Selection<wbr/>Timeout<wbr/>Ms</span></a></div></details><details open class="tsd-accordion tsd-page-navigation-section"><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>Methods</summary><div><a href="#addtasks"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>add<wbr/>Tasks</span></a><ul><li><ul><li><ul><li><a href="#input-data-format"><span>Input data format</span></a></li><li><a href="#trimming-stream-options-"><span>Trimming &amp; stream options ()</span></a></li><li><a href="#status-tracking-"><span>Status tracking ()</span></a></li><li><a href="#idempotency-helper-"><span>Idempotency helper ()</span></a></li></ul></li></ul></li></ul><a href="#consumerloop"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>consumer<wbr/>Loop</span></a><a href="#loadscripts"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>load<wbr/>Scripts</span></a><a href="#onbatcherror"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Batch<wbr/>Error</span></a><a href="#onerror"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Error</span></a><a href="#onexecute"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Execute</span></a><a href="#onready"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Ready</span></a><a href="#onretry"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Retry</span></a><a href="#onselected"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Selected</span></a><a href="#onsuccess"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>on<wbr/>Success</span></a><a href="#runqueue"><svg class="tsd-kind-icon" viewBox="0 0 24 24" aria-label="Method"><use href="../assets/icons.svg#icon-2048"></use></svg><span>run<wbr/>Queue</span></a></div></details></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../modules.html">power-queues API Docs - v2.0.15</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
