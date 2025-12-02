@@ -36,7 +36,6 @@ class Base {
 export class PowerQueues extends PowerRedis {
 	public abort = new AbortController();
 	public redis!: IORedisLike;
-	public readonly strictCheckingConnection: boolean = [ 'true', 'on', 'yes', 'y', '1' ].includes(String(process.env.REDIS_STRICT_CHECK_CONNECTION ?? '').trim().toLowerCase());
 	public readonly scripts: Record<string, SavedScript> = {};
 	public readonly addingBatchTasksCount: number = 800;
 	public readonly addingBatchKeysLimit: number = 10000;
@@ -98,7 +97,7 @@ export class PowerQueues extends PowerRedis {
 				const tasksP = await this.onSelected(tasks);
 				const ids = await this.execute(isArrFilled(tasksP) ? tasksP : tasks);
 
-				if (isArrFilled(tasks)) {
+				if (isArrFilled(ids)) {
 					await this.approve(ids);
 				}
 			}
@@ -268,7 +267,7 @@ export class PowerQueues extends PowerRedis {
 			const pairs = flat.length / 2;
 
 			if (isNumNZ(pairs)) {
-				throw new Error('Task must have "payload" or "flat".');
+				throw new Error('Task "flat" must contain at least one field/value pair.');
 			}
 			argv.push(String(id));
 			argv.push(String(pairs));
@@ -335,7 +334,13 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	private keysLength(task: Task): number {
-		return 2 + (('flat' in task && Array.isArray(task.flat) && task.flat.length) ? task.flat.length : Object.keys(task).length * 2);
+		if ('flat' in task && Array.isArray(task.flat) && task.flat.length) {
+			return 2 + task.flat.length;
+		}
+		if ('payload' in task && isObj((task as any).payload)) {
+			return 2 + Object.keys((task as any).payload).length * 2;
+		}
+		return 2 + Object.keys(task as any).length * 2;
 	}
 
 	private attemptsKey(id: string): string {
@@ -547,6 +552,7 @@ export class PowerQueues extends PowerRedis {
 							createdAt,
 							job,
 							id,
+							attempt: 0,
 						},
 					}]);
 					await this.clearAttempts(id);
@@ -669,41 +675,65 @@ export class PowerQueues extends PowerRedis {
 			if (signal?.aborted) {
 				return resolve();
 			}
+			let delay: number;
+
+			if (ttl > 0) {
+				const base = Math.max(25, Math.min(ttl, 5000)); // 25ms–5s
+				const jitter = Math.floor(Math.min(base, 200) * Math.random());
+				
+				delay = base + jitter;
+			}
+			else {
+				delay = 5 + Math.floor(Math.random() * 15);
+			}
 			const t = setTimeout(() => {
 				if (signal) {
 					signal.removeEventListener('abort', onAbort as any);
 				}
 				resolve();
-			}, (ttl > 0)
-				? (25 + Math.floor(Math.random() * 50))
-				: (5 + Math.floor(Math.random() * 15)));
+			}, delay);
 			(t as any).unref?.();
 
 			function onAbort() { 
 				clearTimeout(t); 
 				resolve(); 
 			}
-			signal?.addEventListener('abort', onAbort, { once: true });
+			signal?.addEventListener?.('abort', onAbort, { once: true });
 		});
+	}
+
+	private async sendHeartbeat(keys: IdempotencyKeys): Promise<boolean> {
+		try {
+			const r1 = await (this.redis as any).pexpire(keys.lockKey, this.workerExecuteLockTimeoutMs);
+			const r2 = await (this.redis as any).pexpire(keys.startKey, this.workerExecuteLockTimeoutMs);
+			const ok1 = Number(r1 || 0) === 1;
+			const ok2 = Number(r2 || 0) === 1;
+
+			return ok1 || ok2;
+		}
+		catch {
+			return false;
+		}
 	}
 
 	private heartbeat(keys: IdempotencyKeys) {
 		if (this.workerExecuteLockTimeoutMs <= 0) {
 			return;
 		}
-		let timer: any, 
-			alive = true, 
-			hbFails = 0;
 		const workerHeartbeatTimeoutMs = Math.max(1000, Math.floor(Math.max(5000, this.workerExecuteLockTimeoutMs | 0) / 4));
-		const stop = () => { 
-			alive = false; 
+		let timer: any;
+		let alive = true;
+		let hbFails = 0;
+
+		const stop = () => {
+			alive = false;
 
 			if (timer) {
 				clearTimeout(timer);
-			} 
+			}
 		};
-		const onAbort = () => stop();
 		const signal = this.signal();
+		const onAbort = () => stop();
 
 		signal?.addEventListener?.('abort', onAbort, { once: true });
 
@@ -712,9 +742,9 @@ export class PowerQueues extends PowerRedis {
 				return;
 			}
 			try {
-				const r = await this.heartbeat(keys);
+				const ok = await this.sendHeartbeat(keys);
 
-				hbFails = r ? 0 : hbFails + 1;
+				hbFails = ok ? 0 : hbFails + 1;
 
 				if (hbFails >= 3) {
 					throw new Error('Heartbeat lost.');
@@ -723,15 +753,18 @@ export class PowerQueues extends PowerRedis {
 			catch {
 				hbFails++;
 
-				if (hbFails >= 6) { 
-					stop(); 
-					return; 
+				if (hbFails >= 6) {
+					stop();
+					
+					return;
 				}
 			}
-			timer = setTimeout(tick, workerHeartbeatTimeoutMs).unref?.();
+			timer = setTimeout(tick, workerHeartbeatTimeoutMs);
+			(timer as any).unref?.();
 		};
 
-		timer = setTimeout(tick, workerHeartbeatTimeoutMs).unref?.();
+		timer = setTimeout(tick, workerHeartbeatTimeoutMs);
+		(timer as any).unref?.();
 
 		return () => {
 			signal?.removeEventListener?.('abort', onAbort as any);
