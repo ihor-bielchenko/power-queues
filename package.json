@@ -91,7 +91,7 @@
 	},
 	"dependencies": {
 		"full-utils": "^2.0.3",
-		"power-redis": "^2.0.6",
+		"power-redis": "^2.0.8",
 		"uuid": "^13.0.0"
 	}
 }
