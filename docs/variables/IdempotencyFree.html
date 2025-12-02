@@ -1,0 +1,63 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>IdempotencyFree | power-queues API Docs - v2.0.16</title><meta name="description" content="Documentation for power-queues API Docs"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="../index.html" class="title">power-queues API Docs - v2.0.16</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb" aria-label="Breadcrumb"><li><a href="" aria-current="page">IdempotencyFree</a></li></ul><h1>Variable IdempotencyFree</h1></div><div class="tsd-signature"><span class="tsd-kind-variable">IdempotencyFree</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><div class="tsd-comment tsd-typography"><p>Lua script that <strong>safely releases</strong> idempotency lock keys when a worker
+decides to give up processing a task (for example, after a failure or
+when deferring execution).</p>
+<p>This is used internally by <a href="../classes/PowerQueues.html#idempotencyfree" class="tsd-kind-method">PowerQueues.idempotencyFree</a> as a
+counterpart to <a href="IdempotencyAllow.html" class="tsd-kind-variable">IdempotencyAllow</a> and <a href="IdempotencyStart.html" class="tsd-kind-variable">IdempotencyStart</a>.</p>
+<p>It does <strong>not</strong> touch the <code>doneKey</code> and <strong>does not mark the task as completed</strong>.
+It only frees the lock so that another worker may later try to process the
+same idempotency key again.</p>
+<hr>
+<h1 id="what-the-script-does" class="tsd-anchor-link">What the script does<a href="#what-the-script-does" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><ol>
+<li>Reads the value of <code>lockKey</code> from Redis.</li>
+<li>Compares it with the provided <code>token</code> (<code>ARGV[1]</code>).</li>
+<li>If the token matches:
+<ul>
+<li>Deletes <code>lockKey</code>.</li>
+<li>Deletes <code>startKey</code> (if provided).</li>
+<li>Returns <code>1</code> (successfully freed).</li>
+</ul>
+</li>
+<li>If the token does <strong>not</strong> match:
+<ul>
+<li>Returns <code>0</code> (do nothing; another worker owns the lock or it’s gone).</li>
+</ul>
+</li>
+</ol>
+<p>This ensures that <strong>only the worker who owns the lock</strong> can release it,
+preventing accidental unlocks by other workers.</p>
+<hr>
+<h1 id="keys" class="tsd-anchor-link">Keys<a href="#keys" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p><strong>KEYS[1] - <code>lockKey</code></strong></p>
+<ul>
+<li>The lock key that protects idempotent execution.</li>
+<li>Contains a worker-specific <code>token</code> set by <a href="IdempotencyAllow.html" class="tsd-kind-variable">IdempotencyAllow</a>.</li>
+</ul>
+<p><strong>KEYS[2] - <code>startKey</code></strong></p>
+<ul>
+<li>Optional key indicating that execution has started.</li>
+<li>Deleted together with <code>lockKey</code> when the worker successfully frees the lock.</li>
+</ul>
+<hr>
+<h1 id="arguments" class="tsd-anchor-link">Arguments<a href="#arguments" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p><strong>ARGV[1] - <code>token</code></strong></p>
+<ul>
+<li>The unique token assigned to the worker when it acquired the lock.</li>
+<li>Must match the value stored in <code>lockKey</code> for the script to delete it.</li>
+</ul>
+<hr>
+<h1 id="return-codes" class="tsd-anchor-link">Return codes<a href="#return-codes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><ul>
+<li><code>1</code> - Lock successfully released (and <code>startKey</code> deleted if present).</li>
+<li><code>0</code> - Lock not released (token mismatch or lock missing).</li>
+</ul>
+<hr>
+<h1 id="when-it-is-used" class="tsd-anchor-link">When it is used<a href="#when-it-is-used" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p>This script is typically called when:</p>
+<ul>
+<li>A worker fails to complete the task but wants to <strong>give up ownership</strong>
+(for example, after scheduling a retry).</li>
+<li>The worker encounters an error during idempotent execution and wants
+to allow other workers to attempt the same task later.</li>
+</ul>
+<p>It is called from <a href="../classes/PowerQueues.html#idempotencyfree" class="tsd-kind-method">PowerQueues.idempotencyFree</a>, which:</p>
+<ul>
+<li>builds the idempotency key set via <a href="../classes/PowerQueues.html#idempotencykeys" class="tsd-kind-method">PowerQueues.idempotencyKeys</a>,</li>
+<li>passes the same <code>token</code> that was used to acquire the lock.</li>
+</ul>
+</div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/042b7622524484447243ddf0e3aa381cdbb4ef41/src/scripts.ts#L468">scripts.ts:468</a></li></ul></aside></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#what-the-script-does"><span>What the script does</span></a><a href="#keys"><span>Keys</span></a><a href="#arguments"><span>Arguments</span></a><a href="#return-codes"><span>Return codes</span></a><a href="#when-it-is-used"><span>When it is used</span></a></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../modules.html">power-queues API Docs - v2.0.16</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

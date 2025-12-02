@@ -1,0 +1,164 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>SelectStuck | power-queues API Docs - v2.0.16</title><meta name="description" content="Documentation for power-queues API Docs"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="../index.html" class="title">power-queues API Docs - v2.0.16</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb" aria-label="Breadcrumb"><li><a href="" aria-current="page">SelectStuck</a></li></ul><h1>Variable SelectStuck</h1></div><div class="tsd-signature"><span class="tsd-kind-variable">SelectStuck</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><div class="tsd-comment tsd-typography"><p>Lua script that finds and reclaims <strong>stuck</strong> (long-idle) messages from a
+Redis Stream consumer group, then, if needed, falls back to reading <strong>fresh</strong>
+messages.</p>
+<p>This script is used internally by <a href="../classes/PowerQueues.html#selectstuck" class="tsd-kind-method">PowerQueues.selectStuck</a> as the
+first step in every consumer loop to:</p>
+<ul>
+<li>rescue messages that were delivered but never acknowledged
+(because a worker crashed, stalled, or lost connection),</li>
+<li>keep the queue moving even when some workers die,</li>
+<li>respect a small time + iteration budget to avoid blocking Redis too long.</li>
+</ul>
+<hr>
+<h1 id="high-level-behaviour" class="tsd-anchor-link">High-level behaviour<a href="#high-level-behaviour" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><ol>
+<li>
+<p><strong>Try to reclaim stuck messages</strong> using <code>XAUTOCLAIM</code>:</p>
+<ul>
+<li>Only messages idle longer than <code>pendingIdleMs</code> are considered.</li>
+<li>Reclaims up to <code>count</code> messages, iterating in small batches.</li>
+<li>Stops if:
+<ul>
+<li>enough messages were collected, or</li>
+<li><code>max_iters</code> is reached, or</li>
+<li><code>timeBudgetMs</code> (wall-clock time limit) is exceeded.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>If fewer than <code>count</code> messages could be reclaimed:</p>
+<ul>
+<li>Reads <strong>fresh</strong> messages with <code>XREADGROUP</code> (using <code>&gt;</code>),</li>
+<li>Up to the remaining number (<code>count - collected</code>),</li>
+<li>Adds them to the result as well.</li>
+</ul>
+</li>
+<li>
+<p>Returns a flat array of entries in the same structure as returned by
+<code>XREADGROUP</code> / <code>XAUTOCLAIM</code>, ready to be post-processed by
+<a href="../classes/PowerQueues.html#normalizeentries" class="tsd-kind-method">PowerQueues.normalizeEntries</a>.</p>
+</li>
+</ol>
+<p>This makes the worker <strong>prioritize stuck work</strong> but still continue with new
+messages if there is nothing to reclaim.</p>
+<hr>
+<h1 id="keys" class="tsd-anchor-link">Keys<a href="#keys" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p><strong>KEYS[1] - <code>stream</code></strong><br>
+The name of the Redis Stream being consumed (e.g. <code>&quot;queue:emails&quot;</code>).</p>
+<hr>
+<h1 id="arguments-argv" class="tsd-anchor-link">Arguments (ARGV)<a href="#arguments-argv" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>group</code></td>
+<td>string</td>
+<td>Consumer group name.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>consumer</code></td>
+<td>string</td>
+<td>Current consumer name (e.g. <code>&quot;host:pid&quot;</code>).</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>pendingIdleMs</code></td>
+<td>number</td>
+<td>Minimum idle time in ms for a message to count as &quot;stuck&quot;.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>count</code></td>
+<td>number</td>
+<td>Desired number of messages to reclaim/read.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>timeBudgetMs</code></td>
+<td>number</td>
+<td>Max time (ms) the script is allowed to run.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Notes:</strong></p>
+<ul>
+<li><code>count &lt; 1</code> is normalized to <code>1</code>.</li>
+<li><code>timeBudgetMs</code> defaults to <code>15</code> ms if not provided.</li>
+</ul>
+<hr>
+<h1 id="internal-algorithm" class="tsd-anchor-link">Internal algorithm<a href="#internal-algorithm" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><ol>
+<li>
+<p>Initialize:</p>
+<ul>
+<li><code>start_ms</code> - current Redis time in ms (via <code>TIME</code>),</li>
+<li><code>results</code> - empty array for collected entries,</li>
+<li><code>start_id</code> - <code>&quot;0-0&quot;</code> (starting point for <code>XAUTOCLAIM</code>),</li>
+<li>A helper <code>time_exceeded()</code> to check if <code>(now - start_ms) &gt;= timeBudgetMs</code>,</li>
+<li><code>max_iters</code> - safety cap (at least <code>16</code>, or <code>ceil(count / 100)</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Reclaim loop</strong> (while <code>collected &lt; count</code> and <code>iters &lt; max_iters</code>):</p>
+<ul>
+<li>Compute <code>to_claim = count - collected</code>.</li>
+<li>Call:<pre><code class="lua"><span class="hl-5">XAUTOCLAIM</span><span class="hl-1"> </span><span class="hl-5">stream</span><span class="hl-1"> </span><span class="hl-5">group</span><span class="hl-1"> </span><span class="hl-5">consumer</span><span class="hl-1"> </span><span class="hl-5">pendingIdleMs</span><span class="hl-1"> </span><span class="hl-5">start_id</span><span class="hl-1"> </span><span class="hl-5">COUNT</span><span class="hl-1"> </span><span class="hl-5">to_claim</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>Result format:
+<ul>
+<li><code>claim[1]</code> - <code>next_id</code> (where to continue from),</li>
+<li><code>claim[2]</code> - array of entries <code>[ [id, [field, value, ...]], ... ]</code>.</li>
+</ul>
+</li>
+<li>Append all returned entries to <code>results</code>.</li>
+<li>Update <code>start_id</code>:
+<ul>
+<li>If <code>next_id</code> == previous <code>start_id</code>, bump sequence part to avoid
+infinite loops (<code>&quot;s-1&quot; → &quot;s-2&quot;</code> etc.).</li>
+</ul>
+</li>
+<li>Break if <code>time_exceeded()</code> returns true.</li>
+</ul>
+</li>
+<li>
+<p><strong>If still need more messages</strong>:</p>
+<ul>
+<li>Compute <code>left = count - collected</code>.</li>
+<li>If <code>left &gt; 0</code>, call:<pre><code class="lua"><span class="hl-5">XREADGROUP</span><span class="hl-1"> </span><span class="hl-5">GROUP</span><span class="hl-1"> </span><span class="hl-5">group</span><span class="hl-1"> </span><span class="hl-5">consumer</span><span class="hl-1"> </span><span class="hl-5">COUNT</span><span class="hl-1"> </span><span class="hl-5">left</span><span class="hl-1"> </span><span class="hl-5">STREAMS</span><span class="hl-1"> </span><span class="hl-5">stream</span><span class="hl-1"> &gt;</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>Append all new entries (if any) to <code>results</code>.</li>
+</ul>
+</li>
+<li>
+<p>Return <code>results</code>:</p>
+<ul>
+<li>An array of raw entries in the same format as returned by <code>XREADGROUP</code>.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h1 id="return-value" class="tsd-anchor-link">Return value<a href="#return-value" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p>An array like:</p>
+<pre><code class="lua"><span class="hl-1">{</span><br/><span class="hl-1">  { </span><span class="hl-2">&quot;id-1&quot;</span><span class="hl-1">, { </span><span class="hl-2">&quot;field1&quot;</span><span class="hl-1">, </span><span class="hl-2">&quot;value1&quot;</span><span class="hl-1">, </span><span class="hl-2">&quot;field2&quot;</span><span class="hl-1">, </span><span class="hl-2">&quot;value2&quot;</span><span class="hl-1">, </span><span class="hl-3">...</span><span class="hl-1"> } },</span><br/><span class="hl-1">  { </span><span class="hl-2">&quot;id-2&quot;</span><span class="hl-1">, { </span><span class="hl-2">&quot;field1&quot;</span><span class="hl-1">, </span><span class="hl-2">&quot;value1&quot;</span><span class="hl-1">, </span><span class="hl-3">...</span><span class="hl-1"> } },</span><br/><span class="hl-1">  </span><span class="hl-3">...</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<p>It is later normalized by <a href="../classes/PowerQueues.html#normalizeentries" class="tsd-kind-method">PowerQueues.normalizeEntries</a> into a
+structured <code>[id, payload, createdAt, job, idemKey]</code> tuple.</p>
+<hr>
+<h1 id="error-handling" class="tsd-anchor-link">Error handling<a href="#error-handling" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><ul>
+<li>If the consumer group does not exist (<code>NOGROUP</code>), the caller
+(<a href="../classes/PowerQueues.html#selectstuck" class="tsd-kind-method">PowerQueues.selectStuck</a>) will handle this by calling
+<a href="../classes/PowerQueues.html#creategroup" class="tsd-kind-method">PowerQueues.createGroup</a> and retrying.</li>
+<li>The script itself focuses only on selection/reclaiming and assumes
+keys / groups are valid.</li>
+</ul>
+</div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/042b7622524484447243ddf0e3aa381cdbb4ef41/src/scripts.ts#L587">scripts.ts:587</a></li></ul></aside></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#high-level-behaviour"><span>High-<wbr/>level behaviour</span></a><a href="#keys"><span>Keys</span></a><a href="#arguments-argv"><span>Arguments (<wbr/>ARGV)</span></a><a href="#internal-algorithm"><span>Internal algorithm</span></a><a href="#return-value"><span>Return value</span></a><a href="#error-handling"><span>Error handling</span></a></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../modules.html">power-queues API Docs - v2.0.16</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

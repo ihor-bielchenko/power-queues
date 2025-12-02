@@ -11,7 +11,7 @@
 	"exclude": [ "**/*.spec.ts", "**/dist/**", "**/*.js" ],
 	"excludeExternals": true,
 	"excludeInternal": true,
-	"excludePrivate": true,
+	"excludePrivate": false,
 	"excludeNotDocumented": false,
 
 	"categorizeByGroup": true,
@@ -25,11 +25,15 @@
 			"Error": "#",
 			"AbortController": "#"
 		},
+		"full-utils": {
+			"jsonDecode": "#",
+		},
 		"power-redis": {
 			"Jsonish": "#",
 			"PowerRedis.toKeyString": "#",
 			"PowerRedis.toPayload": "#",
-			"IORedisLike": "#"
+			"IORedisLike": "#",
+			"PowerRedis": "#"
 		},
 		"power-queues": {
 			"PowerQueue.readyKey": "#",
@@ -46,17 +50,12 @@
 			"PowerQueue.getRequeueScript": "#",
 			"PowerQueue.evalshaWithReload": "#",
 			"PowerQueue.nowSec": "#",
-			"PowerQueue.evalshaWithReload": "#",
 			"PowerQueue.getPromoteScript": "#",
-			"PowerQueue.nowSec": "#",
 			"PowerQueue.delayedKey": "#",
 			"PowerQueue.zaddCompatXXCH": "#",
 			"PowerQueue.startHeartbeat": "#",
-			"PowerQueue.processingVtKey": "#",
-			"PowerQueue.startHeartbeat": "#",
 			"PowerQueue.loop": "#",
 			"PowerQueue.runners": "#",
-			"PowerQueue.startHeartbeat": "#",
 			"PowerQueue.logic": "#",
 			"PowerQueue.jitteredBackoffSec": "#",
 			"PowerQueue.data": "#",
@@ -69,9 +68,17 @@
 			"PowerQueues.heartbeat": "#",
 			"PowerQueues.approve": "#",
 			"SelectStuck": "#",
-			"PowerQueues.attemptsKey": "#"
-		},
+			"PowerQueues.attemptsKey": "#",
+			"IdempotencyKeys": "#"
+		}
 	},
 
-	"highlightLanguages": [ "ts", "js", "json", "bash", "regex" ]
+	"highlightLanguages": [ "ts", "js", "json", "bash", "regex", "lua" ],
+
+	"visibilityFilters": {
+		"protected": true,
+		"private": true,
+		"inherited": true,
+		"external": true
+	}
 }

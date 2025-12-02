@@ -1,0 +1,88 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>IdempotencyAllow | power-queues API Docs - v2.0.16</title><meta name="description" content="Documentation for power-queues API Docs"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="../index.html" class="title">power-queues API Docs - v2.0.16</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb" aria-label="Breadcrumb"><li><a href="" aria-current="page">IdempotencyAllow</a></li></ul><h1>Variable IdempotencyAllow</h1></div><div class="tsd-signature"><span class="tsd-kind-variable">IdempotencyAllow</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><div class="tsd-comment tsd-typography"><p>Lua script that performs the <strong>first step</strong> of idempotent task execution:
+it decides whether a worker is allowed to execute a task, based on the
+current idempotency keys.</p>
+<p>This is used internally by <a href="../classes/PowerQueues.html#idempotencyallow" class="tsd-kind-method">PowerQueues.idempotencyAllow</a> before
+any actual work is done for a given <code>idemKey</code>.</p>
+<hr>
+<h1 id="what-the-script-checks" class="tsd-anchor-link">What the script checks<a href="#what-the-script-checks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><ol>
+<li>
+<p><strong>Is the task already completed?</strong></p>
+<ul>
+<li>If <code>doneKey</code> exists → the task has been processed in the past.</li>
+<li>In this case, the script returns <code>1</code> (&quot;already done, skip&quot;).</li>
+</ul>
+</li>
+<li>
+<p><strong>Can the worker acquire a lock?</strong></p>
+<ul>
+<li>If <code>doneKey</code> is missing, the script attempts to set <code>lockKey</code> with
+a unique token and TTL.</li>
+<li>Uses <code>SET lockKey token NX PX ttl</code>.</li>
+<li>On success, it optionally sets <code>startKey</code> (with the same TTL) and
+returns <code>2</code> (&quot;lock acquired, proceed to execute&quot;).</li>
+</ul>
+</li>
+<li>
+<p><strong>Otherwise</strong></p>
+<ul>
+<li>If neither <code>doneKey</code> exists nor the lock can be acquired, it returns <code>0</code>
+(&quot;another worker is handling this, do not execute now&quot;).</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h1 id="keys" class="tsd-anchor-link">Keys<a href="#keys" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p><strong>KEYS[1]</strong> - <code>doneKey</code><br>
+Indicates that the task has been successfully processed at least once.<br>
+If present, the script immediately returns <code>1</code>.</p>
+<p><strong>KEYS[2]</strong> - <code>lockKey</code><br>
+A short-lived lock used to allow <strong>exactly one worker</strong> to start executing
+the task. Stored with a random token to prevent accidental unlocks.</p>
+<p><strong>KEYS[3]</strong> - <code>startKey</code><br>
+Optional key signaling that execution has started.<br>
+Helps other workers detect that someone is currently processing the task.</p>
+<hr>
+<h1 id="arguments" class="tsd-anchor-link">Arguments<a href="#arguments" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p><strong>ARGV[1]</strong> - <code>ttl</code> (milliseconds)<br>
+Lifetime for both <code>lockKey</code> and <code>startKey</code>. If <code>ttl &lt;= 0</code>, the script
+immediately returns <code>0</code> (no lock can be taken).</p>
+<p><strong>ARGV[2]</strong> - <code>token</code><br>
+A unique value used to identify the worker that holds the lock.</p>
+<hr>
+<h1 id="return-codes" class="tsd-anchor-link">Return codes<a href="#return-codes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><ul>
+<li>
+<p><code>0</code> - <strong>Do not execute</strong></p>
+<ul>
+<li>Either <code>ttl &lt;= 0</code>, or</li>
+<li>Lock could not be acquired (another worker holds it).</li>
+</ul>
+</li>
+<li>
+<p><code>1</code> - <strong>Already completed</strong></p>
+<ul>
+<li><code>doneKey</code> exists → the task was processed in a previous run and should
+be skipped without doing any work.</li>
+</ul>
+</li>
+<li>
+<p><code>2</code> - <strong>Lock acquired, proceed</strong></p>
+<ul>
+<li><code>lockKey</code> was successfully set.</li>
+<li><code>startKey</code> is also set (if provided) with the same TTL.</li>
+<li>The caller may proceed to <a href="IdempotencyStart.html" class="tsd-kind-variable">IdempotencyStart</a> / execute the job.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="usage-internal" class="tsd-anchor-link">Usage (internal)<a href="#usage-internal" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p>This script is not called directly. It is wrapped by
+<a href="../classes/PowerQueues.html#idempotencyallow" class="tsd-kind-method">PowerQueues.idempotencyAllow</a>, which:</p>
+<ul>
+<li>builds the key names via <a href="../classes/PowerQueues.html#idempotencykeys" class="tsd-kind-method">PowerQueues.idempotencyKeys</a>,</li>
+<li>passes <code>workerExecuteLockTimeoutMs</code> as TTL,</li>
+<li>interprets the result as <code>0 | 1 | 2</code> to decide the next step:
+<ul>
+<li><code>1</code> → short-circuit success,</li>
+<li><code>0</code> → wait / contend,</li>
+<li><code>2</code> → proceed with execution.</li>
+</ul>
+</li>
+</ul>
+</div><aside class="tsd-sources"><ul><li>Defined in <a href="https://github.com/ihor-bielchenko/power-queues/blob/042b7622524484447243ddf0e3aa381cdbb4ef41/src/scripts.ts#L250">scripts.ts:250</a></li></ul></aside></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#what-the-script-checks"><span>What the script checks</span></a><a href="#keys"><span>Keys</span></a><a href="#arguments"><span>Arguments</span></a><a href="#return-codes"><span>Return codes</span></a><a href="#usage-internal"><span>Usage (internal)</span></a></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../modules.html">power-queues API Docs - v2.0.16</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

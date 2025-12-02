@@ -33,6 +33,103 @@ import {
 class Base {
 }
 
+/**
+ * High-level Redis Streams worker built on top of {@link PowerRedis}.
+ *
+ * `PowerQueues` turns a Redis Stream into a **reliable background queue**
+ * with batching, retry logic, dead-letter queue (DLQ), and optional
+ * idempotent processing.
+ *
+ * @remarks
+ * This class is designed to be **extended** in your application code.
+ * You typically:
+ *
+ * 1. Subclass `PowerQueues`.
+ * 2. Override lifecycle hooks such as:
+ *    - {@link PowerQueues.onExecute | onExecute} - main job handler.
+ *    - {@link PowerQueues.onSuccess | onSuccess} - called on successful execution.
+ *    - {@link PowerQueues.onError | onError} - called on failure.
+ *    - {@link PowerQueues.onRetry | onRetry} - called when a retry is scheduled.
+ *    - {@link PowerQueues.onBatchError | onBatchError} - batch-level error handler.
+ * 3. Configure `stream`, `group`, and `consumerHost` to match your queue name and worker identity.
+ * 4. Call {@link PowerQueues.runQueue | runQueue} to start the consumer loop.
+ *
+ * Under the hood it:
+ * - Uses Redis **Streams + Consumer Groups** for message delivery.
+ * - Stores tasks in batches via a Lua script (`XAddBulk`) for high throughput.
+ * - Automatically **claims stuck** messages using `XAUTOCLAIM` (see `SelectStuck` script).
+ * - Supports **idempotent execution** using a `done/lock/start` key pattern in Redis:
+ *   - Avoids duplicate execution when the same idempotency key is seen again.
+ *   - Uses a short-lived lock and heartbeat to coordinate multiple workers.
+ * - Tracks **attempt counts** per message and pushes failed tasks to a `:dlq` stream
+ *   when `workerMaxRetries` is reached.
+ *
+ * The public readonly properties (like `addingBatchTasksCount`, `workerBatchTasksCount`,
+ * `workerExecuteLockTimeoutMs`, etc.) define core behaviour:
+ *
+ * - **Batching / insertion**
+ *   - `addingBatchTasksCount` / `addingBatchKeysLimit` control how many tasks
+ *     are grouped into a single Redis call when using {@link PowerQueues.addTasks | addTasks}.
+ * - **Worker behaviour**
+ *   - `workerBatchTasksCount` limits how many messages are read/claimed per loop.
+ *   - `workerLoopIntervalMs` and `workerSelectionTimeoutMs` control how often the
+ *     worker checks for new or stuck tasks.
+ *   - `workerMaxRetries` and `workerClearAttemptsTimeoutMs` define retry strategy
+ *     and how long attempt counters are kept.
+ * - **Idempotency / status tracking**
+ *   - `workerExecuteLockTimeoutMs` and `workerCacheTaskTimeoutMs` control lock and
+ *     completion marker TTLs for idempotent jobs.
+ *   - `executeJobStatus` and `executeJobStatusTtlMs` enable simple per-job metrics
+ *     (`ok`, `err`, `ready` counters stored in Redis).
+ * - **Cleanup / deletion**
+ *   - `removeOnExecuted` and `approveBatchTasksCount` control how processed
+ *     messages are acknowledged and optionally deleted from the stream.
+ *
+ * The main entrypoints you will commonly use are:
+ *
+ * - {@link PowerQueues.addTasks | addTasks} - enqueue tasks into a Redis Stream
+ *   (with optional idempotency and basic status keys).
+ * - {@link PowerQueues.runQueue | runQueue} - create consumer group (if needed)
+ *   and start the long-running consumer loop.
+ *
+ * @example
+ * ```ts
+ * import { PowerQueues } from 'power-queues';
+ * import type { IORedisLike } from 'power-redis';
+ *
+ * class EmailQueue extends PowerQueues {
+ *   public redis: IORedisLike;
+ *   public readonly stream = 'queue:emails';
+ *   public readonly group = 'email-workers';
+ *   public readonly consumerHost = 'worker-1';
+ *
+ *   constructor(redis: IORedisLike) {
+ *     super();
+ *     this.redis = redis;
+ *   }
+ *
+ *   // Main handler: process a single task payload
+ *   async onExecute(
+ *     id: string,
+ *     payload: any,
+ *     createdAt: number,
+ *     job: string,
+ *     idemKey: string | undefined,
+ *   ) {
+ *     // Your business logic here, e.g. send an email
+ *   }
+ * }
+ *
+ * // Usage example:
+ * const queue = new EmailQueue(redisClient);
+ * queue.runQueue(); // start consuming
+ *
+ * // Later, enqueue tasks:
+ * await queue.addTasks('queue:emails', [
+ *   { payload: { to: 'user@example.com', subject: 'Hello' } },
+ * ]);
+ * ```
+ */
 export class PowerQueues extends PowerRedis {
 	/**
 	 * A controller used to manage cancellation signals inside the queue worker.
@@ -104,8 +201,8 @@ export class PowerQueues extends PowerRedis {
 	 * Each entry is stored under a human-readable key (for example `"XAddBulk"`)
 	 * and contains a {@link SavedScript} object:
 	 *
-	 * - `codeBody`  – the original Lua source code
-	 * - `codeReady` – the SHA1 returned by `SCRIPT LOAD` (used with `EVALSHA`)
+	 * - `codeBody`  - the original Lua source code
+	 * - `codeReady` - the SHA1 returned by `SCRIPT LOAD` (used with `EVALSHA`)
 	 *
 	 * This allows the queue to:
 	 * - load scripts only once per process,
@@ -237,13 +334,13 @@ export class PowerQueues extends PowerRedis {
 	 * alive after a task has successfully finished.
 	 *
 	 * ### What this timeout does
-	 * When a task with an idempotency key finishes, Redis stores a small “done” flag
+	 * When a task with an idempotency key finishes, Redis stores a small "done" flag
 	 * so that repeated executions of the same task can be skipped immediately.
 	 *
 	 * `workerCacheTaskTimeoutMs` defines **how long this flag remains valid**.
 	 *
 	 * After the timeout expires:
-	 * - the task is considered “not completed” again,
+	 * - the task is considered "not completed" again,
 	 * - a future worker may reprocess the same idempotency key,
 	 * - this allows long-running or retried tasks to be re-executed if needed.
 	 *
@@ -253,7 +350,7 @@ export class PowerQueues extends PowerRedis {
 	 * duplicate work while still allowing re-execution in controlled scenarios.
 	 *
 	 * ### Best practices
-	 * - Use values between **30s–5min** depending on how often retries or
+	 * - Use values between **30s-5min** depending on how often retries or
 	 *   duplicate messages naturally happen in your system.
 	 * - Too small → might allow premature reprocessing.
 	 * - Too large → may block legitimate re-execution for too long.
@@ -424,9 +521,9 @@ export class PowerQueues extends PowerRedis {
 	 * When {@link executeJobStatus} is enabled, PowerQueues creates small Redis
 	 * counters for each job:
 	 *
-	 * - `...:ok`    — number of successfully executed tasks  
-	 * - `...:err`   — number of tasks that failed after all retries  
-	 * - `...:ready` — number of tasks processed (success + fail)  
+	 * - `...:ok`    - number of successfully executed tasks  
+	 * - `...:err`   - number of tasks that failed after all retries  
+	 * - `...:ready` - number of tasks processed (success + fail)  
 	 *
 	 * These counters should not stay in Redis forever, so each increment call
 	 * also sets a TTL. `executeJobStatusTtlMs` defines how long the job metrics
@@ -506,7 +603,7 @@ export class PowerQueues extends PowerRedis {
 	 * Stream. Workers read from it using `XREADGROUP`, `XAUTOCLAIM`, and other
 	 * stream-related commands.
 	 *
-	 * You should treat `stream` as the "queue name"—it uniquely identifies
+	 * You should treat `stream` as the "queue name"-it uniquely identifies
 	 * where tasks for this worker group are stored in Redis.
 	 *
 	 * Common examples:
@@ -622,11 +719,11 @@ export class PowerQueues extends PowerRedis {
 	public readonly workerBatchTasksCount: number = 200;
 
 	/**
-	 * Time (in milliseconds) after which a pending task is considered “stuck”.
+	 * Time (in milliseconds) after which a pending task is considered "stuck".
 	 *
 	 * @remarks
-	 * PowerQueues uses Redis Streams’ pending entries list (PEL) to detect tasks
-	 * that were delivered to a worker but never acknowledged—usually because the
+	 * PowerQueues uses Redis Streams pending entries list (PEL) to detect tasks
+	 * that were delivered to a worker but never acknowledged-usually because the
 	 * worker crashed, froze, or disconnected.
 	 *
 	 * `recoveryStuckTasksTimeoutMs` defines how long a task must remain idle
@@ -689,8 +786,8 @@ export class PowerQueues extends PowerRedis {
 	 * - efficiency (low overhead during quiet periods)
 	 *
 	 * Recommended adjustments:
-	 * - **Lower** (500–1500 ms) for real-time or high-frequency task ingestion  
-	 * - **Higher** (5–15 seconds) for slow background jobs or cost-sensitive systems  
+	 * - **Lower** (500-1500 ms) for real-time or high-frequency task ingestion  
+	 * - **Higher** (5-15 seconds) for slow background jobs or cost-sensitive systems  
 	 *
 	 * @example
 	 * ```ts
@@ -708,7 +805,7 @@ export class PowerQueues extends PowerRedis {
 	 * for stuck tasks during a single recovery cycle.
 	 *
 	 * @remarks
-	 * Before reading fresh tasks, PowerQueues first tries to recover “stuck”
+	 * Before reading fresh tasks, PowerQueues first tries to recover "stuck"
 	 * tasks using the {@link SelectStuck} Lua script.  
 	 * This script scans the pending entries list (PEL) and may perform several
 	 * iterations of `XAUTOCLAIM`.
@@ -843,12 +940,12 @@ export class PowerQueues extends PowerRedis {
 	 * - add logging/metrics.
 	 *
 	 * Each item in `data` is a tuple with the following structure:
-	 * - `[0] id: string` – Redis stream entry ID (e.g. `"1719935620000-0"`).
-	 * - `[1] payload: any[]` – decoded task payload.  
+	 * - `[0] id: string` - Redis stream entry ID (e.g. `"1719935620000-0"`).
+	 * - `[1] payload: any[]` - decoded task payload.  
 	 *   - For JSON payloads this is usually the parsed object or its fields.
-	 * - `[2] createdAt: number` – UNIX timestamp in milliseconds when the task was created.
-	 * - `[3] job: string` – job identifier used to group tasks added in one batch.
-	 * - `[4] idemKey: string` – idempotency key used by the worker to avoid duplicate execution.
+	 * - `[2] createdAt: number` - UNIX timestamp in milliseconds when the task was created.
+	 * - `[3] job: string` - job identifier used to group tasks added in one batch.
+	 * - `[4] idemKey: string` - idempotency key used by the worker to avoid duplicate execution.
 	 *
 	 * Important notes:
 	 * - If you **return a non-empty array**, it will be passed to the internal `execute()` method.
@@ -894,41 +991,41 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	/**
-	 * Main **task handler** – this is where you put your business logic.
+	 * Main **task handler** - this is where you put your business logic.
 	 *
 	 * The worker calls `onExecute()` **for every task that should be processed**:
 	 * - For normal tasks (without idempotency key) it is invoked directly from `executeProcess()`.
 	 * - For idempotent tasks it is invoked inside the idempotency flow (`idempotency()`).
 	 *
 	 * If this method:
-	 * - **resolves successfully** (no error thrown) – the task is considered **done**:
+	 * - **resolves successfully** (no error thrown) - the task is considered **done**:
 	 *   - `onSuccess()` will be called,
 	 *   - the task will be **ACKed** and optionally **removed** from the stream,
 	 *   - attempts counter is **not** increased.
-	 * - **throws an error** – the task is considered **failed**:
+	 * - **throws an error** - the task is considered **failed**:
 	 *   - the attempts counter is incremented,
 	 *   - `onRetry()` and `onError()` are called,
 	 *   - if attempts exceed `workerMaxRetries`, the task is moved to **DLQ** (`<stream>:dlq`).
 	 *
 	 * Parameters:
-	 * - `id` – Redis stream ID of this entry (e.g. `"1719935620000-0"`).
-	 * - `payload` – task payload already decoded by the queue:
-	 *   - If you pushed an object `{ foo: 'bar' }` – here you usually get the same object.
+	 * - `id` - Redis stream ID of this entry (e.g. `"1719935620000-0"`).
+	 * - `payload` - task payload already decoded by the queue:
+	 *   - If you pushed an object `{ foo: 'bar' }` - here you usually get the same object.
 	 *   - If JSON decode failed, you may get a raw string or other value.
-	 * - `createdAt` – UNIX timestamp in milliseconds when the task was originally created.
-	 * - `job` – job identifier for the batch this task was added with (used for grouping/statistics).
-	 * - `key` – idempotency key (empty string if idempotency is not used for this task).
-	 * - `attempt` – current attempt number **before** this execution:
-	 *   - `0` – first try,
-	 *   - `1` – second try, etc.
+	 * - `createdAt` - UNIX timestamp in milliseconds when the task was originally created.
+	 * - `job` - job identifier for the batch this task was added with (used for grouping/statistics).
+	 * - `key` - idempotency key (empty string if idempotency is not used for this task).
+	 * - `attempt` - current attempt number **before** this execution:
+	 *   - `0` - first try,
+	 *   - `1` - second try, etc.
 	 *
 	 * Important:
 	 * - Always treat this method as **async and potentially retried**:
 	 *   - Write idempotent business logic where possible (safe to run twice).
 	 *   - Use `key` + `id` if you need extra deduplication on your side.
-	 * - Do **not** manually ACK or delete messages in Redis here – the queue
+	 * - Do **not** manually ACK or delete messages in Redis here - the queue
 	 *   does this for you via `Approve` script.
-	 * - Long-running tasks are supported – the worker periodically updates
+	 * - Long-running tasks are supported - the worker periodically updates
 	 *   lock/start keys via the heartbeat mechanism while this method runs.
 	 *
 	 * @param id - Redis stream entry ID of the task.
@@ -973,7 +1070,7 @@ export class PowerQueues extends PowerRedis {
 	 *   // const data = await response.json();
 	 *   // await this.someService.saveResult(id, data);
 	 *
-	 *   // No return value is required – resolving without error means "success".
+	 *   // No return value is required - resolving without error means "success".
 	 * }
 	 */
 	async onExecute(id: string, payload: any, createdAt: number, job: string, key: string, attempt: number) {
@@ -996,17 +1093,17 @@ export class PowerQueues extends PowerRedis {
 	 * - flushing any in-memory buffers used during `onExecute()`.
 	 *
 	 * Each item in `data` is a tuple with this structure:
-	 * - `[0] id: string` – Redis stream entry ID (e.g. `"1719935620000-0"`).
-	 * - `[1] payload: any[]` – decoded and normalized payload used by `onExecute()`.
-	 * - `[2] createdAt: number` – UNIX timestamp in milliseconds when the task was created.
-	 * - `[3] job: string` – job identifier that groups tasks added in one batch.
-	 * - `[4] idemKey: string` – idempotency key (can be an empty string).
+	 * - `[0] id: string` - Redis stream entry ID (e.g. `"1719935620000-0"`).
+	 * - `[1] payload: any[]` - decoded and normalized payload used by `onExecute()`.
+	 * - `[2] createdAt: number` - UNIX timestamp in milliseconds when the task was created.
+	 * - `[3] job: string` - job identifier that groups tasks added in one batch.
+	 * - `[4] idemKey: string` - idempotency key (can be an empty string).
 	 *
 	 * Important:
 	 * - This method is called **even if some tasks failed** inside the batch:
 	 *   - failures are already handled (retries, DLQ) by the time `onReady()` runs.
 	 * - If `onReady()` throws, the error is caught and passed to `onBatchError()`.
-	 * - Do **not** modify Redis stream directly here (no manual XACK/XDEL) –
+	 * - Do **not** modify Redis stream directly here (no manual XACK/XDEL) -
 	 *   the queue will ACK successful IDs right after this hook.
 	 *
 	 * Keep this method **fast and side-effect friendly**: it should not block
@@ -1054,17 +1151,17 @@ export class PowerQueues extends PowerRedis {
 	 * - trigger follow-up actions that should only happen **if the task really succeeded**.
 	 *
 	 * Parameters:
-	 * - `id` – Redis stream entry ID (e.g. `"1719935620000-0"`).
-	 * - `payload` – the same decoded payload that was passed to `onExecute()`.
-	 * - `createdAt` – UNIX timestamp in milliseconds when the task was created.
-	 * - `job` – job identifier used to group tasks added in one batch.
-	 * - `key` – idempotency key (empty string if idempotency was not used).
+	 * - `id` - Redis stream entry ID (e.g. `"1719935620000-0"`).
+	 * - `payload` - the same decoded payload that was passed to `onExecute()`.
+	 * - `createdAt` - UNIX timestamp in milliseconds when the task was created.
+	 * - `job` - job identifier used to group tasks added in one batch.
+	 * - `key` - idempotency key (empty string if idempotency was not used).
 	 *
 	 * Notes:
 	 * - This hook is **not** retried: if it throws, the error is handled via `onBatchError()`,
 	 *   but the main task is still considered successful (it already passed `onExecute()`).
 	 * - Keep this method **side-effect safe**: avoid throwing unless it is really necessary.
-	 * - Do **not** ACK, delete, or requeue messages here – the queue handles that automatically.
+	 * - Do **not** ACK, delete, or requeue messages here - the queue handles that automatically.
 	 *
 	 * @param id - Redis stream entry ID of the successfully processed task.
 	 * @param payload - Decoded payload that was handled in `onExecute()`.
@@ -1112,21 +1209,21 @@ export class PowerQueues extends PowerRedis {
 	 * - inspect which tasks were affected (when `tasks` is provided).
 	 *
 	 * Parameters:
-	 * - `err` – the error object that was thrown (can be anything: Error, string, etc.).
-	 * - `tasks` – **optional** array of task tuples from the current batch:
+	 * - `err` - the error object that was thrown (can be anything: Error, string, etc.).
+	 * - `tasks` - **optional** array of task tuples from the current batch:
 	 *   - Only passed when the error is related to a specific batch
 	 *     (e.g. during `execute()` or `onReady()`).
 	 *   - May be `undefined` when the error happens before tasks are selected.
 	 *
 	 * When present, each item in `tasks` has the structure:
-	 * - `[0] id: string` – Redis stream entry ID.
-	 * - `[1] payload: any[]` – decoded payload passed later to `onExecute()`.
-	 * - `[2] createdAt: number` – creation time in ms since UNIX epoch.
-	 * - `[3] job: string` – job identifier for the batch.
-	 * - `[4] idemKey: string` – idempotency key (can be empty string).
+	 * - `[0] id: string` - Redis stream entry ID.
+	 * - `[1] payload: any[]` - decoded payload passed later to `onExecute()`.
+	 * - `[2] createdAt: number` - creation time in ms since UNIX epoch.
+	 * - `[3] job: string` - job identifier for the batch.
+	 * - `[4] idemKey: string` - idempotency key (can be empty string).
 	 *
 	 * Important:
-	 * - **Do not rethrow** from this method – the error is already caught.
+	 * - **Do not rethrow** from this method - the error is already caught.
 	 *   If you throw again, it will only add noise and not help recovery.
 	 * - Tasks from the batch may be in different states:
 	 *   - some may already be processed and ACKed,
@@ -1181,23 +1278,23 @@ export class PowerQueues extends PowerRedis {
 	 * - collecting statistics for debugging or analytics.
 	 *
 	 * Parameters:
-	 * - `err` – Error thrown from `onExecute()` (may be any type: Error instance, string, etc.).
-	 * - `id` – Redis stream entry ID of the failed task.
-	 * - `payload` – Decoded payload object used in `onExecute()`.
-	 * - `createdAt` – Creation timestamp of the task in milliseconds.
-	 * - `job` – Job identifier that groups tasks added in the same batch.
-	 * - `key` – Idempotency key (empty if not used).
-	 * - `attempt` – Attempt number **after incrementing**, so:
+	 * - `err` - Error thrown from `onExecute()` (may be any type: Error instance, string, etc.).
+	 * - `id` - Redis stream entry ID of the failed task.
+	 * - `payload` - Decoded payload object used in `onExecute()`.
+	 * - `createdAt` - Creation timestamp of the task in milliseconds.
+	 * - `job` - Job identifier that groups tasks added in the same batch.
+	 * - `key` - Idempotency key (empty if not used).
+	 * - `attempt` - Attempt number **after incrementing**, so:
 	 *   - `1` = first retry,
 	 *   - `2` = second retry, etc.
 	 *
 	 * Notes:
-	 * - Do **not** rethrow errors from this method — the queue has already handled the failure.
+	 * - Do **not** rethrow errors from this method - the queue has already handled the failure.
 	 * - The task may still be retried after this hook if `attempt < workerMaxRetries`.
 	 * - When `attempt >= workerMaxRetries`:
 	 *   - The queue moves the task to DLQ (`<stream>:dlq`),
 	 *   - `onError()` is still called before that happens.
-	 * - Do **not** ACK/Delete or requeue messages here — the queue will handle that.
+	 * - Do **not** ACK/Delete or requeue messages here - the queue will handle that.
 	 *
 	 * @param err - The error that occurred during execution.
 	 * @param id - Redis stream entry ID.
@@ -1252,13 +1349,13 @@ export class PowerQueues extends PowerRedis {
 	 * - triggering "early warning" alerts when retry counts start increasing.
 	 *
 	 * Parameters:
-	 * - `err` – The error thrown by `onExecute()` (any type).
-	 * - `id` – Redis stream entry ID of the task.
-	 * - `payload` – Decoded payload passed to `onExecute()`.
-	 * - `createdAt` – Timestamp (ms) when the task was originally created.
-	 * - `job` – Job identifier grouping tasks from the same batch.
-	 * - `key` – Idempotency key (empty string if not used).
-	 * - `attempt` – Current retry index **after incrementing**, so:
+	 * - `err` - The error thrown by `onExecute()` (any type).
+	 * - `id` - Redis stream entry ID of the task.
+	 * - `payload` - Decoded payload passed to `onExecute()`.
+	 * - `createdAt` - Timestamp (ms) when the task was originally created.
+	 * - `job` - Job identifier grouping tasks from the same batch.
+	 * - `key` - Idempotency key (empty string if not used).
+	 * - `attempt` - Current retry index **after incrementing**, so:
 	 *   - `1` = first retry,
 	 *   - `2` = second retry,
 	 *   - etc.
@@ -1268,8 +1365,8 @@ export class PowerQueues extends PowerRedis {
 	 *   (If `attempt >= workerMaxRetries`, the queue still calls `onRetry()`,
 	 *    but the next step is DLQ transfer.)
 	 * - Do **not throw** errors here. The retry process is already ongoing.
-	 * - Do **not** ACK, delete, or requeue tasks manually — the queue handles everything.
-	 * - Keep this hook fast — the worker often processes dozens/hundreds of tasks per batch.
+	 * - Do **not** ACK, delete, or requeue tasks manually - the queue handles everything.
+	 * - Keep this hook fast - the worker often processes dozens/hundreds of tasks per batch.
 	 *
 	 * @param err - The error that triggered a retry.
 	 * @param id - Redis stream entry ID.
@@ -1350,7 +1447,7 @@ export class PowerQueues extends PowerRedis {
 	 * - This method should be called **once per worker instance**.
 	 * - It never resolves unless the worker is stopped.
 	 * - Safe to call in background processes, NestJS modules, or standalone runners.
-	 * - Does not block the event loop — all work inside is asynchronous.
+	 * - Does not block the event loop - all work inside is asynchronous.
 	 *
 	 * @example
 	 * // Full example: running a queue worker
@@ -1503,16 +1600,16 @@ export class PowerQueues extends PowerRedis {
 	 * ### Trimming & stream options (`opts`)
 	 * These options are passed to the Lua `XAddBulk` script:
 	 *
-	 * - `maxlen?: number` – soft or exact limit for stream length:
+	 * - `maxlen?: number` - soft or exact limit for stream length:
 	 *   - combined with `approx` / `exact` to build `XADD ... MAXLEN [~|=] <maxlen>`.
-	 * - `approx?: boolean` – use approximate trimming (`~`, default if `exact` is not set).
-	 * - `exact?: boolean` – use exact trimming (`=`). If `true`, `approx` is ignored.
-	 * - `trimLimit?: number` – optional `LIMIT <n>` for trimming.
-	 * - `nomkstream?: boolean` – if `true`, adds `NOMKSTREAM` so the stream
+	 * - `approx?: boolean` - use approximate trimming (`~`, default if `exact` is not set).
+	 * - `exact?: boolean` - use exact trimming (`=`). If `true`, `approx` is ignored.
+	 * - `trimLimit?: number` - optional `LIMIT <n>` for trimming.
+	 * - `nomkstream?: boolean` - if `true`, adds `NOMKSTREAM` so the stream
 	 *   is **not** created automatically when it does not exist.
-	 * - `minidWindowMs?: number` – use `MINID` trimming instead of `MAXLEN`:
+	 * - `minidWindowMs?: number` - use `MINID` trimming instead of `MAXLEN`:
 	 *   - compute `now - minidWindowMs` and trim entries older than that ID.
-	 * - `minidExact?: boolean` – when using `MINID`, choose exact (`=`) vs approx (`~`) mode.
+	 * - `minidExact?: boolean` - when using `MINID`, choose exact (`=`) vs approx (`~`) mode.
 	 *
 	 * ### Status tracking (`opts.status`)
 	 * When `opts.status === true`:
@@ -1528,7 +1625,7 @@ export class PowerQueues extends PowerRedis {
 	 * When `opts.idem === true`:
 	 * - each task gets an `idemKey` field if not already set:
 	 *   - either using `entry.idemKey` or a generated UUID,
-	 * - this key is later used in the worker’s idempotency flow.
+	 * - this key is later used in the worker's idempotency flow.
 	 *
 	 * Validation & Errors:
 	 * - If `data` is empty, it throws: `"Tasks is not filled."`.
@@ -1626,20 +1723,20 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * - When `full === false` (default):
 	 *   - Loads only:
-	 *     - `"XAddBulk"` – high-throughput bulk `XADD` with trimming options (`MAXLEN`, `MINID`, etc.).
+	 *     - `"XAddBulk"` - high-throughput bulk `XADD` with trimming options (`MAXLEN`, `MINID`, etc.).
 	 *   - This is enough if you only use `addTasks()` as a **producer** and do not
 	 *     run workers in this process.
 	 *
 	 * - When `full === true`:
 	 *   - Loads all queue-related scripts:
-	 *     - `"XAddBulk"` – bulk enqueue of tasks to a stream.
-	 *     - `"Approve"` – ACK + optional delete logic for processed entries.
-	 *     - `"IdempotencyAllow"` – checks if a task with the same idempotency key
+	 *     - `"XAddBulk"` - bulk enqueue of tasks to a stream.
+	 *     - `"Approve"` - ACK + optional delete logic for processed entries.
+	 *     - `"IdempotencyAllow"` - checks if a task with the same idempotency key
 	 *       can start, based on done/lock/start keys.
-	 *     - `"IdempotencyStart"` – marks a task as started and refreshes lock TTL.
-	 *     - `"IdempotencyDone"` – marks a task as done and clears idempotency lock.
-	 *     - `"IdempotencyFree"` – releases idempotency lock without marking as done.
-	 *     - `"SelectStuck"` – finds and claims "stuck" tasks using `XAUTOCLAIM`
+	 *     - `"IdempotencyStart"` - marks a task as started and refreshes lock TTL.
+	 *     - `"IdempotencyDone"` - marks a task as done and clears idempotency lock.
+	 *     - `"IdempotencyFree"` - releases idempotency lock without marking as done.
+	 *     - `"SelectStuck"` - finds and claims "stuck" tasks using `XAUTOCLAIM`
 	 *       with a time budget and fallback to `XREADGROUP`.
 	 *   - Use this in **worker processes** that execute tasks.
 	 *
@@ -1702,7 +1799,7 @@ export class PowerQueues extends PowerRedis {
 	 * Retry behaviour:
 	 * - The method will try up to **3 times**:
 	 *   1. First attempt.
-	 *   2. If it fails, waits a short random delay (10–50 ms) and tries again.
+	 *   2. If it fails, waits a short random delay (10-50 ms) and tries again.
 	 *   3. If it fails again, waits another short random delay and tries a third time.
 	 * - If the **3rd attempt also fails**, the error is rethrown.
 	 *
@@ -1828,13 +1925,13 @@ export class PowerQueues extends PowerRedis {
 	 * - **Convenient** (call by logical name, not by SHA).
 	 *
 	 * Parameters:
-	 * - `name` – Logical name of the script in `this.scripts` (e.g. `"XAddBulk"`).
-	 * - `keys` – Array of Redis keys passed to the script:
+	 * - `name` - Logical name of the script in `this.scripts` (e.g. `"XAddBulk"`).
+	 * - `keys` - Array of Redis keys passed to the script:
 	 *   - First argument to `EVALSHA` after `numkeys`,
 	 *   - The Lua script sees them via the global `KEYS` table.
-	 * - `args` – Array of arguments (strings or numbers) passed **after** keys:
+	 * - `args` - Array of arguments (strings or numbers) passed **after** keys:
 	 *   - Lua script sees them via the global `ARGV` table.
-	 * - `defaultCode` – Optional raw Lua source:
+	 * - `defaultCode` - Optional raw Lua source:
 	 *   - Used only when `this.scripts[name]` is not registered yet.
 	 *   - Allows one-line "lazy" definition and execution.
 	 *
@@ -1939,7 +2036,7 @@ export class PowerQueues extends PowerRedis {
 	 * This method converts a batch of logical `Task` objects into a **flat string array**
 	 * that is later passed to Redis as `...ARGV` for `EVALSHA` of `XAddBulk`.
 	 *
-	 * It does **not** talk to Redis directly – it only prepares data.
+	 * It does **not** talk to Redis directly - it only prepares data.
 	 * The resulting array is consumed by {@link xaddBatch}.
 	 *
 	 * ### How it works
@@ -1950,8 +2047,8 @@ export class PowerQueues extends PowerRedis {
 	 *    - `trimLimit` → `LIMIT <trimLimit>` for trimming
 	 *    - `minidWindowMs` + `minidExact` → `MINID` based trimming (time-based retention)
 	 * 2. Encodes each task as:
-	 *    - `id` – stream entry ID (e.g. `"*"`, or a specific ID string);
-	 *    - `num_pairs` – number of field/value pairs;
+	 *    - `id` - stream entry ID (e.g. `"*"`, or a specific ID string);
+	 *    - `num_pairs` - number of field/value pairs;
 	 *    - then `field1, value1, field2, value2, ...` as strings.
 	 *
 	 * ### Task input rules
@@ -1972,7 +2069,7 @@ export class PowerQueues extends PowerRedis {
 	 * For `flat`:
 	 * - Its length **must be even**, otherwise an error is thrown:
 	 *   `"Property "flat" must contain an even number of realKeysLength (field/value pairs)."`
-	 * - It must contain **at least one pair** – otherwise an error is thrown:
+	 * - It must contain **at least one pair** - otherwise an error is thrown:
 	 *   `"Task "flat" must contain at least one field/value pair."`
 	 *
 	 * If a task has neither a valid `payload` object nor a valid `flat` array,
@@ -1991,15 +2088,15 @@ export class PowerQueues extends PowerRedis {
 	 * - It **does not mutate** the input tasks (only reads from them).
 	 *
 	 * ### Options (`AddTasksOptions`)
-	 * - `maxlen`        – Maximum allowed stream length (used with `MAXLEN`).
-	 * - `approx`        – If `true` or `undefined`, use `~` (approximate) trimming (default);
+	 * - `maxlen`        - Maximum allowed stream length (used with `MAXLEN`).
+	 * - `approx`        - If `true` or `undefined`, use `~` (approximate) trimming (default);
 	 *                      if `false` and `exact` is not set, no trim operator is sent.
-	 * - `exact`         – If `true`, use `=` (exact) trimming and ignore `approx`.
-	 * - `nomkstream`    – If `true`, pass `NOMKSTREAM` to avoid creating the stream automatically.
-	 * - `trimLimit`     – Optional `LIMIT` for trimming operations; `0` means "no limit".
-	 * - `minidWindowMs` – If > 0, switch from `MAXLEN` to **time-based retention** with `MINID`
+	 * - `exact`         - If `true`, use `=` (exact) trimming and ignore `approx`.
+	 * - `nomkstream`    - If `true`, pass `NOMKSTREAM` to avoid creating the stream automatically.
+	 * - `trimLimit`     - Optional `LIMIT` for trimming operations; `0` means "no limit".
+	 * - `minidWindowMs` - If > 0, switch from `MAXLEN` to **time-based retention** with `MINID`
 	 *                      (keep entries newer than `<now - minidWindowMs>`).
-	 * - `minidExact`    – When using `MINID`, if `true` use `=`, otherwise `~`.
+	 * - `minidExact`    - When using `MINID`, if `true` use `=`, otherwise `~`.
 	 *
 	 * Note: `minidWindowMs` has higher priority than `maxlen`. If `minidWindowMs > 0`,
 	 * the header will use `MINID` and **ignore** `MAXLEN`.
@@ -2113,8 +2210,8 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * This method uses two internal limits:
 	 *
-	 * - {@link addingBatchTasksCount} – max number of tasks per batch;
-	 * - {@link addingBatchKeysLimit}  – max total number of field/value tokens per batch.
+	 * - {@link addingBatchTasksCount} - max number of tasks per batch;
+	 * - {@link addingBatchKeysLimit}  - max total number of field/value tokens per batch.
 	 *
 	 * Once either limit would be exceeded by adding the next task, a **new batch** is started.
 	 *
@@ -2140,10 +2237,10 @@ export class PowerQueues extends PowerRedis {
 	 *      };
 	 *      ```
 	 *    - This means Redis always stores a small envelope with:
-	 *      - `payload`  – original payload serialized as JSON string;
-	 *      - `createdAt` – timestamp in ms;
-	 *      - `job` – job ID;
-	 *      - `idemKey` – optional idempotency key when `idem` is `true`.
+	 *      - `payload`  - original payload serialized as JSON string;
+	 *      - `createdAt` - timestamp in ms;
+	 *      - `job` - job ID;
+	 *      - `idemKey` - optional idempotency key when `idem` is `true`.
 	 *
 	 * 3. Extends flat payloads:
 	 *    - If `task.flat` is an array:
@@ -2327,7 +2424,7 @@ export class PowerQueues extends PowerRedis {
 	 *    - Field count = number of object keys.
 	 *    - Token count = `2 + Object.keys(payload).length * 2`
 	 *
-	 * 3. **Fallback** — rarely used:
+	 * 3. **Fallback** - rarely used:
 	 *    - If neither `flat` nor valid `payload` exists, fall back to:
 	 *      ```ts
 	 *      return 2 + Object.keys(task as any).length * 2;
@@ -2397,9 +2494,9 @@ export class PowerQueues extends PowerRedis {
 	 *   or cleaned up manually if needed.
 	 *
 	 * This helper is used internally by:
-	 * - {@link incrAttempts} – to increment the retry counter;
-	 * - {@link getAttempts} – to read the current retry counter;
-	 * - {@link clearAttempts} – to remove the counter once the task is done or dead-lettered.
+	 * - {@link incrAttempts} - to increment the retry counter;
+	 * - {@link getAttempts} - to read the current retry counter;
+	 * - {@link clearAttempts} - to remove the counter once the task is done or dead-lettered.
 	 *
 	 * ### Example key
 	 *
@@ -2473,8 +2570,8 @@ export class PowerQueues extends PowerRedis {
 	 * - Each time {@link onExecute} throws an error.
 	 * - Each time idempotent task processing fails inside {@link idempotency}.
 	 * - Used together with:
-	 *   - {@link getAttempts} – to check the number before executing;
-	 *   - {@link clearAttempts} – to reset after DLQ or success.
+	 *   - {@link getAttempts} - to check the number before executing;
+	 *   - {@link clearAttempts} - to reset after DLQ or success.
 	 *
 	 * ### Example
 	 *
@@ -2663,11 +2760,11 @@ export class PowerQueues extends PowerRedis {
 	 * ```
 	 *
 	 * The hook receives:
-	 * - `id`        – Redis stream entry ID  
-	 * - `payload`   – parsed payload  
-	 * - `createdAt` – timestamp (ms) extracted from the stream  
-	 * - `job`       – batch/job identifier  
-	 * - `key`       – idempotency key (empty string if not used)
+	 * - `id`        - Redis stream entry ID  
+	 * - `payload`   - parsed payload  
+	 * - `createdAt` - timestamp (ms) extracted from the stream  
+	 * - `job`       - batch/job identifier  
+	 * - `key`       - idempotency key (empty string if not used)
 	 *
 	 * ---
 	 * ## When this method is triggered
@@ -2679,8 +2776,8 @@ export class PowerQueues extends PowerRedis {
 	 * ## Error handling
 	 *
 	 * - Errors inside `success()` **do not block** task acknowledgment.
-	 * - Failures inside the user hook `onSuccess` are *not thrown upward* —
-	 *   this method assumes success handling should not affect the queue’s flow.
+	 * - Failures inside the user hook `onSuccess` are *not thrown upward* -
+	 *   this method assumes success handling should not affect the queue's flow.
 	 *
 	 * ---
 	 * ## Example
@@ -2742,21 +2839,21 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * ### Parameters
 	 *
-	 * - `err` – The error object that was thrown.  
+	 * - `err` - The error object that was thrown.  
 	 *   Can be anything (`Error`, string, custom object, etc.).
 	 *
-	 * - `tasks` – Optional array of tasks that were being processed as a batch
+	 * - `tasks` - Optional array of tasks that were being processed as a batch
 	 *   when the error occurred. The structure of each item is:
 	 *
 	 *   ```ts
 	 *   [ id, payload, createdAt, job, idemKey ]
 	 *   ```
 	 *
-	 *   - `id: string`        – Redis stream entry ID  
-	 *   - `payload: any[]`    – normalized key/value list for the task  
-	 *   - `createdAt: number` – timestamp (ms)  
-	 *   - `job: string`       – job/batch ID  
-	 *   - `idemKey: string`   – idempotency key (may be empty string)
+	 *   - `id: string`        - Redis stream entry ID  
+	 *   - `payload: any[]`    - normalized key/value list for the task  
+	 *   - `createdAt: number` - timestamp (ms)  
+	 *   - `job: string`       - job/batch ID  
+	 *   - `idemKey: string`   - idempotency key (may be empty string)
 	 *
 	 *   `tasks` may be `undefined` if the error happened **before** we had a list
 	 *   of tasks (for example, in `select()`).
@@ -2826,10 +2923,9 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * ### 3. (Earlier in the flow) the retry counter has already been incremented
 	 *
-	 * This method **does not increment retries** itself — that is done by:
+	 * This method **does not increment retries** itself - that is done by:
 	 *
 	 * - {@link incrAttempts}
-	 * - {@link attempt} (user hook for retry)
 	 *
 	 * By the time `error()` is invoked, we already know the final `attempt` number.
 	 *
@@ -2837,28 +2933,24 @@ export class PowerQueues extends PowerRedis {
 	 * ## Error behaviour
 	 *
 	 * - Any exception inside the user hook `onError` is caught upstream by callers.
-	 * - This method **never throws** by design — task cleanup must not break the worker.
+	 * - This method **never throws** by design - task cleanup must not break the worker.
 	 *
 	 * ---
 	 * ## Relation to other methods
 	 *
 	 * - Called inside {@link executeProcess} when non-idempotent task execution fails.
 	 * - For idempotent tasks, error handling is implemented separately inside {@link idempotency}.
-	 * - Complements:
-	 *   - {@link attempt} — user hook for retry attempts,
-	 *   - {@link success} — user hook for successful executions,
-	 *   - {@link batchError} — batch-level error handling.
 	 *
 	 * ---
 	 * ## Parameters
 	 *
-	 * - `err`        — the thrown error (can be any type)
-	 * - `id`         — Redis stream entry ID (e.g., `"1700000000000-0"`)
-	 * - `payload`    — parsed task payload
-	 * - `createdAt`  — timestamp extracted from the entry
-	 * - `job`        — job/batch ID assigned in {@link addTasks}
-	 * - `key`        — idempotency key (empty string for non-idempotent tasks)
-	 * - `attempt`    — current retry number (1 = first failure)
+	 * - `err`        - the thrown error (can be any type)
+	 * - `id`         - Redis stream entry ID (e.g., `"1700000000000-0"`)
+	 * - `payload`    - parsed task payload
+	 * - `createdAt`  - timestamp extracted from the entry
+	 * - `job`        - job/batch ID assigned in {@link addTasks}
+	 * - `key`        - idempotency key (empty string for non-idempotent tasks)
+	 * - `attempt`    - current retry number (1 = first failure)
 	 *
 	 * ---
 	 * ## Example override
@@ -2895,7 +2987,7 @@ export class PowerQueues extends PowerRedis {
 	 * Notifies user code that a **retry attempt** is happening for a failed task.
 	 *
 	 * This method is a thin wrapper around the {@link onRetry} hook.
-	 * It does not contain business logic itself – it only forwards all
+	 * It does not contain business logic itself - it only forwards all
 	 * necessary context so you can implement custom behaviour on retries.
 	 *
 	 * ---
@@ -2933,22 +3025,22 @@ export class PowerQueues extends PowerRedis {
 	 * }
 	 * ```
 	 *
-	 * Note: `attempt()` itself **does not** change scheduling or delay – it only
+	 * Note: `attempt()` itself **does not** change scheduling or delay - it only
 	 * calls `onRetry`. Actual retry timing is handled by the queue worker and
 	 * the consumer loop.
 	 *
 	 * ---
 	 * ## Parameters
 	 *
-	 * - `err`       – The error thrown by your `onExecute` handler.
-	 * - `id`        – Redis stream entry ID for this task (e.g. `"1700000000000-0"`).
-	 * - `payload`   – Task payload (already decoded if it was JSON).
-	 * - `createdAt` – Task creation timestamp in milliseconds.
-	 * - `job`       – Job/batch ID that groups related tasks.
-	 * - `key`       – Idempotency key for this task (may be an empty string).
-	 * - `attempt`   – Current retry attempt number (1 for first retry, 2 for second, etc.).
+	 * - `err`       - The error thrown by your `onExecute` handler.
+	 * - `id`        - Redis stream entry ID for this task (e.g. `"1700000000000-0"`).
+	 * - `payload`   - Task payload (already decoded if it was JSON).
+	 * - `createdAt` - Task creation timestamp in milliseconds.
+	 * - `job`       - Job/batch ID that groups related tasks.
+	 * - `key`       - Idempotency key for this task (may be an empty string).
+	 * - `attempt`   - Current retry attempt number (1 for first retry, 2 for second, etc.).
 	 *
-	 * As a library user, you rarely call this method directly – instead you implement
+	 * As a library user, you rarely call this method directly - instead you implement
 	 * `onRetry` and let the queue call it for you.
 	 *
 	 * @param err       - Error that caused the retry.
@@ -2985,11 +3077,11 @@ export class PowerQueues extends PowerRedis {
 	 * ```
 	 *
 	 * Where:
-	 * - `id: string`        – Redis stream entry ID (e.g. `"1700000000000-0"`);
-	 * - `payload: any`      – decoded payload object (from the stream);
-	 * - `createdAt: number` – timestamp in ms (added when the task was enqueued);
-	 * - `job: string`       – job/batch identifier (same for all tasks of one job);
-	 * - `idemKey: string`   – idempotency key (empty string if not used).
+	 * - `id: string`        - Redis stream entry ID (e.g. `"1700000000000-0"`);
+	 * - `payload: any`      - decoded payload object (from the stream);
+	 * - `createdAt: number` - timestamp in ms (added when the task was enqueued);
+	 * - `job: string`       - job/batch identifier (same for all tasks of one job);
+	 * - `idemKey: string`   - idempotency key (empty string if not used).
 	 *
 	 * This format comes from {@link normalizeEntries}.
 	 *
@@ -3000,9 +3092,9 @@ export class PowerQueues extends PowerRedis {
 	 * - runs user code via {@link onExecute};
 	 * - handles retries, DLQ, and idempotency;
 	 * - returns an object like:
-	 *   - `{ id: string }`       – task processed successfully (should be acked);
-	 *   - `{ contended: true }`  – idempotency contention, task will be retried later;
-	 *   - `{}` / other           – nothing to ack right now.
+	 *   - `{ id: string }`       - task processed successfully (should be acked);
+	 *   - `{ contended: true }`  - idempotency contention, task will be retried later;
+	 *   - `{}` / other           - nothing to ack right now.
 	 *
 	 * Depending on {@link executeBatchAtOnce}:
 	 *
@@ -3248,13 +3340,13 @@ export class PowerQueues extends PowerRedis {
 	 * ---
 	 * ## Parameters
 	 *
-	 * - `id`        – Redis stream entry ID (e.g. `"1700000000000-0"`).
-	 * - `payload`   – decoded payload of the task (object or primitive).
-	 * - `createdAt` – timestamp in ms when the task was enqueued.
-	 * - `job`       – job/batch ID shared across related tasks.
-	 * - `key`       – idempotency key; empty string means "no idempotency".
+	 * - `id`        - Redis stream entry ID (e.g. `"1700000000000-0"`).
+	 * - `payload`   - decoded payload of the task (object or primitive).
+	 * - `createdAt` - timestamp in ms when the task was enqueued.
+	 * - `job`       - job/batch ID shared across related tasks.
+	 * - `key`       - idempotency key; empty string means "no idempotency".
 	 *
-	 * As a user, you typically do **not** call `executeProcess` directly –
+	 * As a user, you typically do **not** call `executeProcess` directly -
 	 * you override hooks like `onExecute`, `onRetry`, `onError`, `onSuccess`
 	 * and let the worker handle the flow.
 	 *
@@ -3392,7 +3484,7 @@ export class PowerQueues extends PowerRedis {
 	 * }
 	 * ```
 	 *
-	 * As a library user, you usually don’t call `approve()` directly – the
+	 * As a library user, you usually don't call `approve()` directly - the
 	 * queue worker handles it for you.
 	 *
 	 * @param ids - Array of Redis stream entry IDs that were successfully
@@ -3429,9 +3521,9 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * ### High-level flow
 	 * 1. Build Redis idempotency keys via {@link idempotencyKeys}:
-	 *    - `doneKey`  – marks that the task for this key has been fully processed.
-	 *    - `lockKey`  – a short-lived lock that identifies the "owner" worker.
-	 *    - `startKey` – indicates that processing has started and holds a TTL.
+	 *    - `doneKey`  - marks that the task for this key has been fully processed.
+	 *    - `lockKey`  - a short-lived lock that identifies the "owner" worker.
+	 *    - `startKey` - indicates that processing has started and holds a TTL.
 	 * 2. Call {@link idempotencyAllow} (Lua `IdempotencyAllow` script):
 	 *    - Returns `1` → `doneKey` exists -> task already processed → `{ id }`.
 	 *    - Returns `0` → another worker is processing this key:
@@ -3559,17 +3651,17 @@ export class PowerQueues extends PowerRedis {
 	 * ### What it generates
 	 * For a given idempotency key and the current queue (`this.stream`), it returns:
 	 *
-	 * - `prefix`   – common prefix for all idempotency keys of this stream:
+	 * - `prefix`   - common prefix for all idempotency keys of this stream:
 	 *   `q:{safeStream}:`
-	 * - `doneKey`  – marks that the operation for this key has been **fully processed**:
+	 * - `doneKey`  - marks that the operation for this key has been **fully processed**:
 	 *   `q:{safeStream}:done:{safeKey}`
-	 * - `lockKey`  – short-lived **lock owner marker** used to decide which worker
+	 * - `lockKey`  - short-lived **lock owner marker** used to decide which worker
 	 *   is allowed to execute the task:
 	 *   `q:{safeStream}:lock:{safeKey}`
-	 * - `startKey` – indicates that processing has **started**, also used to store
+	 * - `startKey` - indicates that processing has **started**, also used to store
 	 *   TTL for waiting workers:
 	 *   `q:{safeStream}:start:{safeKey}`
-	 * - `token`    – unique random token identifying the current worker instance.
+	 * - `token`    - unique random token identifying the current worker instance.
 	 *   It is stored in `lockKey` and passed to scripts so that only the owner
 	 *   can refresh or release the lock.
 	 *
@@ -3644,15 +3736,15 @@ export class PowerQueues extends PowerRedis {
 	 * ### Return codes
 	 * The result is normalized to a small numeric union:
 	 *
-	 * - `1` — Task is **already completed** (the `doneKey` exists).
+	 * - `1` - Task is **already completed** (the `doneKey` exists).
 	 *   - The caller (see {@link idempotency}) should return `{ id }` immediately
 	 *     without executing the user handler again.
 	 *
-	 * - `2` — This worker **successfully acquired** the idempotency lock.
+	 * - `2` - This worker **successfully acquired** the idempotency lock.
 	 *   - The caller should continue with {@link idempotencyStart}, start heartbeat,
 	 *     and execute the actual business logic.
 	 *
-	 * - `0` — Another worker is currently processing (or recently processed) this key.
+	 * - `0` - Another worker is currently processing (or recently processed) this key.
 	 *   - The caller should typically:
 	 *     - Read `PTTL` of `startKey`,
 	 *     - Wait a small amount via {@link waitAbortable},
@@ -3743,7 +3835,7 @@ export class PowerQueues extends PowerRedis {
 	 * if (allow === 2) {
 	 *   const started = await this.idempotencyStart(keys);
 	 *   if (!started) {
-	 *     // Lost the race – another worker owns the lock now
+	 *     // Lost the race - another worker owns the lock now
 	 *     return { contended: true };
 	 *   }
 	 *
@@ -3901,7 +3993,7 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * Internally it executes:
 	 *
-	 * ```redis
+	 * ```bash
 	 * XGROUP CREATE {stream} {group} {from} MKSTREAM
 	 * ```
 	 *
@@ -3921,8 +4013,8 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * @param from
 	 * Starting ID for the consumer group:
-	 * - `'0-0'` – consume the entire history of the stream.
-	 * - `'$'`   – start from the latest message only (default).
+	 * - `'0-0'` - consume the entire history of the stream.
+	 * - `'$'`   - start from the latest message only (default).
 	 *
 	 * @returns A promise that resolves when the group is successfully created
 	 *          or already exists. Rejects only on unexpected Redis errors.
@@ -3980,11 +4072,11 @@ export class PowerQueues extends PowerRedis {
 	 * ][]
 	 * ```
 	 *
-	 * - `id`        – Redis stream entry ID (e.g. `"1699780000000-0"`).
-	 * - `payload`   – Parsed/decoded payload passed later into {@link onExecute}.
-	 * - `createdAt` – Unix timestamp (in ms) when the task was originally created.
-	 * - `job`       – Job/batch identifier used for grouping and metrics.
-	 * - `idemKey`   – Idempotency key (empty string if not set); used by
+	 * - `id`        - Redis stream entry ID (e.g. `"1699780000000-0"`).
+	 * - `payload`   - Parsed/decoded payload passed later into {@link onExecute}.
+	 * - `createdAt` - Unix timestamp (in ms) when the task was originally created.
+	 * - `job`       - Job/batch identifier used for grouping and metrics.
+	 * - `idemKey`   - Idempotency key (empty string if not set); used by
 	 *                 {@link idempotency} to ensure only one execution per key.
 	 *
 	 * ### Usage
@@ -4129,20 +4221,20 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * Internally it issues a blocking `XREADGROUP` command:
 	 *
-	 * ```redis
+	 * ```bash
 	 * XREADGROUP GROUP {group} {consumer}
 	 *   BLOCK {blockMs}
 	 *   COUNT {batchSize}
 	 *   STREAMS {stream} >
 	 * ```
 	 *
-	 * - `GROUP {group} {consumer}` – reads messages on behalf of the current
+	 * - `GROUP {group} {consumer}` - reads messages on behalf of the current
 	 *   consumer in the configured group.
-	 * - `BLOCK {blockMs}` – waits up to `blockMs` milliseconds for new messages.
+	 * - `BLOCK {blockMs}` - waits up to `blockMs` milliseconds for new messages.
 	 *   - `blockMs` is derived from `workerLoopIntervalMs` (with a minimum of 2ms).
-	 * - `COUNT {batchSize}` – at most `workerBatchTasksCount` messages will be
+	 * - `COUNT {batchSize}` - at most `workerBatchTasksCount` messages will be
 	 *   returned in a single call.
-	 * - `STREAMS {stream} >` – the special ID `>` means:
+	 * - `STREAMS {stream} >` - the special ID `>` means:
 	 *   "Give me only **new** messages that have not been delivered before".
 	 *
 	 * ### Returned data
@@ -4231,8 +4323,8 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * The returned promise resolves in two cases:
 	 *
-	 * 1. **Timeout finished** – normal delay elapsed.
-	 * 2. **Abort signal fired** – if `this.abort.abort()` was called, the wait
+	 * 1. **Timeout finished** - normal delay elapsed.
+	 * 2. **Abort signal fired** - if `this.abort.abort()` was called, the wait
 	 *    is cancelled early and the promise resolves immediately.
 	 *
 	 * ### How the delay is calculated
@@ -4241,7 +4333,7 @@ export class PowerQueues extends PowerRedis {
 	 * of some key) and is used to choose a reasonable wait duration:
 	 *
 	 * - If `ttl > 0`:
-	 *   - `base` = `clamp(ttl, 25ms, 5000ms)` – so we never sleep less than 25ms
+	 *   - `base` = `clamp(ttl, 25ms, 5000ms)` - so we never sleep less than 25ms
 	 *     and never longer than 5s in one call.
 	 *   - `jitter` = random number between `0` and `min(base, 200ms)`.
 	 *   - `delay` = `base + jitter`.
@@ -4293,7 +4385,7 @@ export class PowerQueues extends PowerRedis {
 	 * Suggested time-to-wait in milliseconds:
 	 * - If `ttl > 0`, it is used to derive the base delay (clamped between 25ms and 5000ms)
 	 *   plus some jitter.
-	 * - If `ttl <= 0`, a small default delay (5–20ms) is used instead.
+	 * - If `ttl <= 0`, a small default delay (5-20ms) is used instead.
 	 *
 	 * @returns A promise that resolves when the delay has elapsed or when the
 	 * current abort signal is triggered.
@@ -4341,8 +4433,8 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * Internally it calls `PEXPIRE` on:
 	 *
-	 * - `keys.lockKey`  – lock owner marker for the current worker.
-	 * - `keys.startKey` – marker that indicates processing has started.
+	 * - `keys.lockKey`  - lock owner marker for the current worker.
+	 * - `keys.startKey` - marker that indicates processing has started.
 	 *
 	 * Both keys are extended by `workerExecuteLockTimeoutMs` milliseconds.
 	 *
@@ -4695,12 +4787,12 @@ export class PowerQueues extends PowerRedis {
 	 * }
 	 * ```
 	 *
-	 * It is intentionally minimal — no type conversion or parsing is performed
+	 * It is intentionally minimal - no type conversion or parsing is performed
 	 * here. All values remain raw strings unless later processed by higher-level
 	 * methods such as:
 	 *
-	 * - {@link payload} – which tries to JSON-decode the `"payload"` field,
-	 * - {@link normalizeEntries} – which extracts `createdAt`, `job`, `idemKey`, etc.
+	 * - {@link payload} - which tries to JSON-decode the `"payload"` field,
+	 * - {@link normalizeEntries} - which extracts `createdAt`, `job`, `idemKey`, etc.
 	 *
 	 * ---
 	 * ### How it works
@@ -4841,8 +4933,8 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * ### Why this exists
 	 *
-	 * Many internal operations — such as {@link waitAbortable}, {@link heartbeat},
-	 * and the main {@link consumerLoop} — need a way to stop immediately when
+	 * Many internal operations - such as {@link waitAbortable}, {@link heartbeat},
+	 * and the main {@link consumerLoop} - need a way to stop immediately when
 	 * the queue is shutting down. Using a shared abort signal allows:
 	 *
 	 * - Breaking out of sleeps or backoff delays,
@@ -4891,7 +4983,7 @@ export class PowerQueues extends PowerRedis {
 	 *
 	 * ### Returns
 	 *
-	 * The active `AbortSignal` associated with this queue’s lifecycle.
+	 * The active `AbortSignal` associated with this queue's lifecycle.
 	 */
 	private signal() {
 		return this.abort.signal;
@@ -4912,9 +5004,9 @@ export class PowerQueues extends PowerRedis {
 	 * {host}:{pid}
 	 * ```
 	 *
-	 * - `{host}` – taken from `this.consumerHost`  
+	 * - `{host}` - taken from `this.consumerHost`  
 	 *   (defaults to `"host"` unless overridden in your subclass or instance)
-	 * - `{pid}` – the current Node.js process ID (`process.pid`)
+	 * - `{pid}` - the current Node.js process ID (`process.pid`)
 	 *
 	 * Example:
 	 *
