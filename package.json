@@ -1,7 +1,7 @@
 {
 	"name": "power-queues",
-	"version": "2.0.0",
-	"description": "Base classes for implementing custom queues in redis under high load conditions based on nestjs.",
+	"version": "2.0.15",
+	"description": "High-performance Redis Streams queue for Node.js with Lua-powered bulk XADD, idempotent workers, heartbeat locks, stuck-task recovery, retries, DLQ, and distributed processing.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
 	"repository": {
@@ -92,8 +92,8 @@
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
-		"full-utils": "^2.0.0",
-		"power-redis": "^2.0.2",
+		"full-utils": "^2.0.5",
+		"power-redis": "^2.0.8",
 		"uuid": "^13.0.0"
 	}
 }

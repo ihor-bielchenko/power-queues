@@ -1,17 +1,13 @@
-import type {
-	TaskChain,
-	TaskProgress,
+import { PowerQueues } from './PowerQueues';
+import type{
+	AddTasksOptions,
 	Task,
-	TaskResult,
 } from './types';
-import { PowerQueue } from './PowerQueue';
 
-export type {
-	TaskChain,
-	TaskProgress,
-	Task,
-	TaskResult,
-};
 export {
-	PowerQueue,
+	PowerQueues,
+};
+export type {
+	AddTasksOptions,
+	Task,
 };
