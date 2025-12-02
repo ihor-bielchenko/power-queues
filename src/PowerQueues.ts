@@ -40,7 +40,7 @@ export class PowerQueues extends PowerRedis {
 	public readonly addingBatchTasksCount: number = 800;
 	public readonly addingBatchKeysLimit: number = 10000;
 	public readonly workerExecuteLockTimeoutMs: number = 180000;
-	public readonly workerCacheTaskTimeoutMs: number = 60;
+	public readonly workerCacheTaskTimeoutMs: number = 60000;
 	public readonly approveBatchTasksCount: number = 2000;
 	public readonly removeOnExecuted: boolean = false;
 	public readonly executeBatchAtOnce: boolean = false;
