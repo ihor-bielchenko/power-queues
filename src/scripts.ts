@@ -154,7 +154,6 @@ export const IdempotencyDone = `
 	return 1
 `;
 
-
 export const IdempotencyFree = `
 	local lockKey  = KEYS[1]
 	local startKey = KEYS[2]
