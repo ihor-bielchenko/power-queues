@@ -6,7 +6,7 @@ The library is designed for real-world distributed systems that require high thr
 
 Unlike traditional Redis-based queues that rely on lists or complex abstractions, **power-queues** focuses on low-level control, atomic operations, and minimal overhead, making it ideal for high-load backends, microservices, schedulers, telemetry pipelines, and data-processing clusters.
 
-Extends **power-redis**.
+Extends **[power-redis](https://www.npmjs.com/package/power-redis)**.
 
 <p align="center">
 	<img src="https://img.shields.io/badge/redis-streams-red?logo=redis" />
@@ -194,6 +194,5 @@ Every part of the engine is designed to prevent:
 The heartbeat + TTL strategy guarantees that no task is "lost" even in
 chaotic cluster environments.
 
-## 📝 License
-
+## 📜 License  
 MIT - free for commercial and private use.
