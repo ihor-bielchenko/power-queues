@@ -153,7 +153,7 @@ npm install power-queues
 ```
 OR
 ```bash
-yarn add power-redis
+yarn add power-queues
 ```
 ---
 
