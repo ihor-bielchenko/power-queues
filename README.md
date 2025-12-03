@@ -29,7 +29,62 @@ Full documentation is available here:
 
 ---
 
-## 🚀 Key Features
+# 📦 Installation
+
+``` bash
+npm install power-queues
+```
+OR
+```bash
+yarn add power-queues
+```
+---
+
+# 🧪 Quick Start
+
+``` ts
+const queue = new PowerQueues({
+  stream: "email",
+  group: "workers",
+});
+
+await queue.loadScripts(true);
+
+await queue.addTasks("email", [
+  { payload: { type: "welcome", userId: 42 } },
+]);
+```
+
+Worker:
+
+``` ts
+class EmailWorker extends PowerQueues {
+  async onExecute(id, payload) {
+    await sendEmail(payload);
+  }
+}
+```
+
+---
+
+# ⚙ power-queues vs Existing Solutions
+
+|Feature               |power-queues    |BullMQ      |Bee-Queue   |Custom Streams|
+|----------------------|----------------|----------- |------------|--------------|
+|Bulk XADD (Lua)       |✅ Yes          |❌ No       |❌ No       |Rare          |
+|Idempotent workers    |✅ Built-in     |Partial     |❌ No       |❌ No         |
+|Stuck-task recovery   |✅ Advanced     |Basic       |❌ No       |Manual        |
+|Heartbeats            |✅ Yes          |Limited     |❌ No       |Manual        |
+|Retry logic           |✅ Flexible     |Good        |Basic       |Manual        |
+|DLQ                   |✅ Native       |Basic       |❌ No       |Manual        |
+|Pure Streams          |✅ Yes          |Partial     |❌ No       |Yes           |
+|Lua optimization      |✅ Strong       |Minimal     |❌ No       |Manual        |
+|Throughput            |🔥 Very high    |High        |Medium      |Depends       |
+|Overhead              |Low             |Medium      |Low         |Very high     |
+
+---
+
+# 🚀 Key Features
 
 ### **1. Ultra‑Fast Bulk XADD (Lua‑Powered)**
 
@@ -146,60 +201,7 @@ Useful for UI dashboards and real‑time job progress visualization.
 
 ---
 
-## 📦 Installation
-
-``` bash
-npm install power-queues
-```
-OR
-```bash
-yarn add power-queues
-```
----
-
-## 🧪 Quick Start
-
-``` ts
-const queue = new PowerQueues({
-  stream: "email",
-  group: "workers",
-});
-
-await queue.loadScripts(true);
-
-await queue.addTasks("email", [
-  { payload: { type: "welcome", userId: 42 } },
-]);
-```
-
-Worker:
-
-``` ts
-class EmailWorker extends PowerQueues {
-  async onExecute(id, payload) {
-    await sendEmail(payload);
-  }
-}
-```
-
----
-
-## ⚙ power-queues vs Existing Solutions
-
-|Feature               |power-queues    |BullMQ      |Bee-Queue   |Custom Streams|
-|----------------------|----------------|----------- |------------|--------------|
-|Bulk XADD (Lua)       |✅ Yes          |❌ No       |❌ No       |Rare          |
-|Idempotent workers    |✅ Built-in     |Partial     |❌ No       |❌ No         |
-|Stuck-task recovery   |✅ Advanced     |Basic       |❌ No       |Manual        |
-|Heartbeats            |✅ Yes          |Limited     |❌ No       |Manual        |
-|Retry logic           |✅ Flexible     |Good        |Basic       |Manual        |
-|DLQ                   |✅ Native       |Basic       |❌ No       |Manual        |
-|Pure Streams          |✅ Yes          |Partial     |❌ No       |Yes           |
-|Lua optimization      |✅ Strong       |Minimal     |❌ No       |Manual        |
-|Throughput            |🔥 Very high    |High        |Medium      |Depends       |
-|Overhead              |Low             |Medium      |Low         |Very high     |
-
-## 🛠 When to Choose power-queues
+# 🛠 When to Choose power-queues
 
 Use this engine if you need:
 
@@ -225,7 +227,7 @@ Backpressure, recovery, retries, dead-lettering - all included.
 
 ---
 
-## 🏗️ Project Structure & Architecture
+# 🏗️ Project Structure & Architecture
 
 -   Redis Streams for messaging
 -   Lua scripts for atomic operations
@@ -236,7 +238,7 @@ Backpressure, recovery, retries, dead-lettering - all included.
 
 ---
 
-## 🧩 Extensibility
+# 🧩 Extensibility
 
 power-queues is ideal for building:
 
@@ -251,7 +253,7 @@ power-queues is ideal for building:
 
 ---
 
-## 🧱 Reliability First
+# 🧱 Reliability First
 
 Every part of the engine is designed to prevent:
 
@@ -264,6 +266,23 @@ Every part of the engine is designed to prevent:
 
 The heartbeat + TTL strategy guarantees that no task is "lost" even in
 chaotic cluster environments.
+
+---
+
+## ⭐ Why This Project Exists
+
+Most Node.js queue libraries are: - too slow
+- too abstract
+- not idempotent
+- not safe for financial or mission‑critical workloads
+
+power-queues was built to solve real production problems where: -
+*duplicate tasks cost money*,
+- *workers are unstable*,
+- *tasks must survive restarts*,
+- *performance matters at scale*.
+
+If these things matter to you - this engine will feel like home.
 
 ---
 
@@ -287,20 +306,3 @@ power-queues is relevant for:
 ## 📝 License
 
 MIT - free for commercial and private use.
-
----
-
-## ⭐ Why This Project Exists
-
-Most Node.js queue libraries are: - too slow
-- too abstract
-- not idempotent
-- not safe for financial or mission‑critical workloads
-
-power-queues was built to solve real production problems where: -
-*duplicate tasks cost money*,
-- *workers are unstable*,
-- *tasks must survive restarts*,
-- *performance matters at scale*.
-
-If these things matter to you - this engine will feel like home.
