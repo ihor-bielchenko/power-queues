@@ -115,7 +115,7 @@ export class PowerQueues extends PowerRedis {
 		if (!isStrFilled(queueName)) {
 			throw new Error('Queue name is required.');
 		}
-		const job = uuid();
+		const job = opts.id ?? uuid();
 		const batches = this.buildBatches(data, job, opts.idem);
 		const result: string[] = new Array(data.length);
 		const promises: Array<() => Promise<void>> = [];

@@ -1,6 +1,6 @@
 {
 	"name": "power-queues",
-	"version": "2.0.21",
+	"version": "2.0.22",
 	"description": "High-performance Redis Streams queue for Node.js with Lua-powered bulk XADD, idempotent workers, heartbeat locks, stuck-task recovery, retries, DLQ, and distributed processing.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
@@ -90,8 +90,8 @@
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
-		"full-utils": "^3.0.2",
-		"power-redis": "^2.0.21",
+		"full-utils": "^3.0.3",
+		"power-redis": "^2.0.22",
 		"uuid": "^13.0.0"
 	}
 }
