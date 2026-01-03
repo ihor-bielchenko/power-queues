@@ -81,7 +81,7 @@
 		"power-redis"
 	],
 	"dependencies": {
-		"full-utils": "^3.0.8",
+		"full-utils": "^3.0.9",
 		"power-redis": "^2.0.23",
 		"uuid": "^13.0.0"
 	}
