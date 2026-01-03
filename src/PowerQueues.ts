@@ -50,7 +50,7 @@ export class PowerQueues extends PowerRedis {
 	public readonly logStatus: boolean = false;
 	public readonly logStatusTimeout: number = 300000;
 	public readonly approveCount: number = 2000;
-	public readonly removeOnExecuted: boolean = false;
+	public readonly removeOnExecuted: boolean = true;
 
 	private signal() {
 		return this.abort.signal;
@@ -145,16 +145,17 @@ export class PowerQueues extends PowerRedis {
 		}
 	}
 
-	private async approve(queueName: string, ids: string[]) {
-		if (!isArrFilled(ids)) {
+	private async approve(queueName: string, tasks: Task[]) {
+		if (!isArrFilled(tasks)) {
 			return 0;
 		}
 		const approveCount = Math.max(500, Math.min(4000, this.approveCount));
-		let total = 0, i = 0;
+		let total = 0,
+			i = 0;
 
-		while (i < ids.length) {
-			const room = Math.min(approveCount, ids.length - i);
-			const part = ids.slice(i, i + room);
+		while (i < tasks.length) {
+			const room = Math.min(approveCount, tasks.length - i);
+			const part = tasks.slice(i, i + room).map((item) => String(item.id || ''));
 			const approved = await this.runScript('Approve', [ queueName ], [ this.group, this.removeOnExecuted ? '1' : '0', ...part ], Approve);
 
 			total += Number(approved || 0);
@@ -250,8 +251,8 @@ export class PowerQueues extends PowerRedis {
 		return data;
 	}
 
-	private async execute(queueName: string, tasks: Array<[ string, any[], number, string, string, number ]>): Promise<string[]> {
-		const result: string[] = [];
+	private async execute(queueName: string, tasks: Array<[ string, any[], number, string, string, number ]>): Promise<Task[]> {
+		const result: Task[] = [];
 		let contended = 0,
 			promises = [];
 
@@ -261,7 +262,7 @@ export class PowerQueues extends PowerRedis {
 					const r = await this.executeProcess(queueName, { id, payload, createdAt, job, idemKey, attempt });
 
 					if (r.id) {
-						result.push(id);
+						result.push(r);
 					}
 					else if (r.contended) {
 						contended++;
@@ -272,7 +273,7 @@ export class PowerQueues extends PowerRedis {
 				const r = await this.executeProcess(queueName, { id, payload, createdAt, job, idemKey, attempt });
 
 				if (r.id) {
-					result.push(id);
+					result.push(r);
 				}
 				else if (r.contended) {
 					contended++;
@@ -282,7 +283,7 @@ export class PowerQueues extends PowerRedis {
 		if (!this.executeSync && promises.length > 0) {
 			await Promise.all(promises);
 		}
-		await this.onBatchSuccess(queueName, tasks);
+		await this.onBatchSuccess(queueName, result);
 
 		if (!isArrFilled(result) && contended > (tasks.length >> 1)) {
 			await this.waitAbortable((15 + Math.floor(Math.random() * 35)) + Math.min(250, 15 * contended + Math.floor(Math.random() * 40)));
@@ -314,10 +315,10 @@ export class PowerQueues extends PowerRedis {
 		const heartbeat = this.heartbeat(keys) || (() => {});
 
 		try {
-			await this.onExecute(queueName, task);
+			const processed = await this.onExecute(queueName, task);
+			
 			await this.idempotencyDone(keys);
-			await this.success(queueName, task);
-			return { id: task.id };
+			return await this.success(queueName, processed);
 		}
 		catch (err: any) {
 			try {
@@ -328,7 +329,7 @@ export class PowerQueues extends PowerRedis {
 				if (task.attempt >= this.retryCount) {
 					await this.idempotencyFree(keys);
 						
-					return { id: task.id };
+					return task;
 				}
 				await this.idempotencyFree(keys);
 			}
@@ -384,7 +385,7 @@ export class PowerQueues extends PowerRedis {
 			await this.incr(statusKey +'ok', this.logStatusTimeout);
 			await this.incr(statusKey +'ready', this.logStatusTimeout);
 		}
-		await this.onSuccess(queueName, task);
+		return await this.onSuccess(queueName, task);
 	}
 
 	private async error(err: any, queueName: string, task: Task) {
@@ -729,13 +730,15 @@ export class PowerQueues extends PowerRedis {
 		return tasks;
 	}
 
-	async onExecute(queueName: string, task: Task) {
+	async onExecute(queueName: string, task: Task): Promise<Task> {
+		return task;
 	}
 
-	async onBatchSuccess(queueName: string, tasks: Array<[ string, any[], number, string, string, number ]>) {
+	async onBatchSuccess(queueName: string, tasks: Array<Task>) {
 	}
 
-	async onSuccess(queueName: string, task: Task) {
+	async onSuccess(queueName: string, task: Task): Promise<Task> {
+		return task;
 	}
 
 	async onError(err: any, queueName: string, task: Task) {
