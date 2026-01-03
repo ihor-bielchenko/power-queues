@@ -594,6 +594,8 @@ export class PowerQueues extends PowerRedis {
 		if (!isStrFilled(queueName)) {
 			throw new Error('Queue name is required.');
 		}
+		opts.job = opts.job ?? uuid();
+
 		const batches = this.buildBatches(data, opts);
 		const result: string[] = new Array(data.length);
 		const promises: Array<() => Promise<void>> = [];
@@ -625,7 +627,7 @@ export class PowerQueues extends PowerRedis {
 
 		if (opts.status) {
 			await (this.redis as any).set(`${queueName}:${opts.job}:total`, data.length);
-			await (this.redis as any).pexpire(`${queueName}:${opts.job}:total`, opts.statusTimeoutMs || 300000);
+			await (this.redis as any).pexpire(`${queueName}:${opts.job}:total`, this.logStatusTimeout);
 		}
 		await Promise.all(runners);
 		return result;
