@@ -1,4 +1,3 @@
-import type { JsonPrimitiveOrUndefined } from 'power-redis';
 
 export type Constructor<T = {}> = new (...args: any[]) => T;
 
@@ -15,10 +14,11 @@ export type AddTasksOptions = {
 	approx?: boolean;
 	exact?: boolean;
 	trimLimit?: number;
-	id?: string;
+	job?: string;
 	status?: boolean;
 	statusTimeoutMs?: number;
-	idem?: boolean;
+	attempt?: number;
+	createdAt?: number;
 };
 
 export type IdempotencyKeys = {
@@ -29,6 +29,11 @@ export type IdempotencyKeys = {
 	token: string;
 };
 
-export type Task =
-	| { job: string; id?: string; createdAt?: number; payload: any; idemKey?: string; }
-	| { job: string; id?: string; createdAt?: number; flat: JsonPrimitiveOrUndefined[]; idemKey?: string; };
+export type Task = { 
+	job: string; 
+	id?: string; 
+	createdAt?: number; 
+	payload: any; 
+	idemKey?: string; 
+	attempt: number; 
+};
