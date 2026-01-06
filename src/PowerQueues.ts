@@ -281,7 +281,7 @@ export class PowerQueues extends PowerRedis {
 			}
 		}
 		if (!this.executeSync && promises.length > 0) {
-			await Promise.all(promises.map((item) => item));
+			await Promise.all(promises.map((item) => item()));
 		}
 		await this.onBatchReady(queueName, result);
 
