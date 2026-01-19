@@ -40,7 +40,7 @@ export class PowerQueues extends PowerRedis {
 	public readonly selectStuckTimeout: number = 60000;
 	public readonly selectStuckMaxTimeout: number = 80;
 	public readonly selectCount: number = 200;
-	public readonly selectTimeout: number = 5000;
+	public readonly selectTimeout: number = 3000;
 	public readonly buildBatchCount: number = 800;
 	public readonly buildBatchMaxCount: number = 10000;
 	public readonly retryCount: number = 1;
@@ -48,7 +48,7 @@ export class PowerQueues extends PowerRedis {
 	public readonly idemLockTimeout: number = 180000;
 	public readonly idemDoneTimeout: number = 60000;
 	public readonly logStatus: boolean = false;
-	public readonly logStatusTimeout: number = 600000;
+	public readonly logStatusTimeout: number = 1800000;
 	public readonly approveCount: number = 2000;
 	public readonly removeOnExecuted: boolean = true;
 
@@ -119,19 +119,30 @@ export class PowerQueues extends PowerRedis {
 				if (!filtered[key]) {
 					filtered[key] = [];
 				}
-				filtered[key].push(tasks[index]);
+				filtered[key].push(tasks[index][1]);
 			});
 
 			for (let key in filtered) {
 				const filteredTasks = filtered[key];
 				const keySplit = key.split(':');
 				const attempt = Number(keySplit[0]);
+				const job = String(keySplit[2]);
 
-				await this.addTasks(queueName + ((attempt >= (this.retryCount - 1)) ? ':dlq' : ''), filteredTasks.map((task: Array<[ string, any, number, string, string, number ]>) => ({ ...task[1] })), {
-					createdAt: Number(keySplit[1]), 
-					job: keySplit[2], 
-					attempt: attempt + 1,
-				});
+				if (!(attempt >= (this.retryCount - 1))) {
+					await this.addTasks(queueName, filteredTasks, {
+						job,
+						attempt: attempt + 1,
+					});
+				}
+				else if (this.logStatus) {
+					const statusKey = `${queueName}:${job}:`;
+
+					await this.setOne(statusKey +'err', Number(await this.getOne(statusKey +'err') || 0) + filteredTasks.length, this.logStatusTimeout);
+					await this.setOne(statusKey +'ready', Number(await this.getOne(statusKey +'ready') || 0) + filteredTasks.length, this.logStatusTimeout);
+					await this.addTasks(queueName +':dlq', filteredTasks, {
+						job,
+					});
+				}
 			}
 		}
 		catch (err: any) {
@@ -280,6 +291,8 @@ export class PowerQueues extends PowerRedis {
 				}
 			}
 		}
+		let start = Date.now();
+
 		if (!this.executeSync && promises.length > 0) {
 			await Promise.all(promises.map((item) => item()));
 		}
@@ -381,28 +394,26 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	private async error(err: any, queueName: string, task: Task): Promise<Task> {
-		const dlqKey = queueName +':dlq';
 		const taskP: any = { ...task };
 
-		if (taskP.attempt >= (this.retryCount - 1)) {
-			const statusKey = `${queueName}:${taskP.job}:`;
-
-			if (this.logStatus) {
-				await this.incr(statusKey +'err', this.logStatusTimeout);
-				await this.incr(statusKey +'ready', this.logStatusTimeout);
-			}
-			await this.addTasks(dlqKey, [{ ...taskP.payload }], {
-				createdAt: taskP.createdAt,
-				job: taskP.job,
-				attempt: taskP.attempt,
-			});
-		}
-		else {
+		if (!(taskP.attempt >= (this.retryCount - 1))) {
 			await this.onRetry(err, queueName, taskP);
 			await this.addTasks(queueName, [{ ...taskP.payload }], {
 				createdAt: taskP.createdAt,
 				job: taskP.job,
 				attempt: (taskP.attempt || 0) + 1,
+			});
+		}
+		else if (this.logStatus) {
+			const dlqKey = queueName +':dlq';
+			const statusKey = `${queueName}:${taskP.job}:`;
+
+			await this.incr(statusKey +'err', this.logStatusTimeout);
+			await this.incr(statusKey +'ready', this.logStatusTimeout);
+			await this.addTasks(dlqKey, [{ ...taskP.payload }], {
+				createdAt: taskP.createdAt,
+				job: taskP.job,
+				attempt: taskP.attempt,
 			});
 		}
 		return await this.onError(err, queueName, { ...taskP, attempt: (taskP.attempt || 0) + 1 });
@@ -666,7 +677,7 @@ export class PowerQueues extends PowerRedis {
 		return 2 + Object.keys(task as any).length * 2;
 	}
 
-	private payloadBatch(data: Array<Task>, opts: AddTasksOptions): string[] {
+	private payloadBatch(data: Task[], opts: AddTasksOptions): string[] {
 		const maxlen = Math.max(0, Math.floor(opts?.maxlen ?? 0));
 		const approx = opts?.exact ? 0 : (opts?.approx !== false ? 1 : 0);
 		const exact = opts?.exact ? 1 : 0;
@@ -725,7 +736,7 @@ export class PowerQueues extends PowerRedis {
 		return task;
 	}
 
-	async onBatchReady(queueName: string, tasks: Array<Task>) {
+	async onBatchReady(queueName: string, tasks: Task[]) {
 	}
 
 	async onSuccess(queueName: string, task: Task): Promise<Task> {
