@@ -128,7 +128,7 @@ export class PowerQueues extends PowerRedis {
 			for (let key in filtered) {
 				const filteredTasks = filtered[key];
 				const keySplit = key.split(':');
-				const attempt = Number(keySplit[0]);
+				const attempt = Number(keySplit[0] || 0);
 				const job = String(keySplit[2]);
 
 				if (!(attempt >= (this.retryCount - 1))) {
