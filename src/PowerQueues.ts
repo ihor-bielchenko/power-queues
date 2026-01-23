@@ -1,3 +1,4 @@
+import { setMaxListeners } from 'node:events';
 import type { IORedisLike } from 'power-redis';
 import type {
 	AddTasksOptions, 
@@ -61,6 +62,8 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	async runQueue(queueName: string, from: '$' | '0-0' = '0-0') {
+		setMaxListeners(0, this.abort.signal);
+
 		await this.createGroup(queueName, from);
 		await this.consumerLoop(queueName, from);
 	}
@@ -472,41 +475,41 @@ export class PowerQueues extends PowerRedis {
 			return;
 		}
 		const workerHeartbeatTimeoutMs = Math.max(1000, Math.floor(Math.max(5000, this.idemLockTimeout | 0) / 4));
-		let timer: any;
-		let alive = true;
-		let hbFails = 0;
+		let timer: any,
+			alive = true,
+			hbFails = 0;
 
 		const stop = () => {
 			alive = false;
-
+			
 			if (timer) {
 				clearTimeout(timer);
 			}
 		};
-		const signal = this.signal();
-		const onAbort = () => stop();
-
-		signal?.addEventListener?.('abort', onAbort, { once: true });
-
 		const tick = async () => {
 			if (!alive) {
 				return;
 			}
+			if (this.signal()?.aborted) {
+				stop();
+				return;
+			}
 			try {
 				const ok = await this.sendHeartbeat(keys);
-
-				hbFails = ok ? 0 : hbFails + 1;
-
+				
+				hbFails = ok 
+					? 0 
+					: (hbFails + 1);
+				
 				if (hbFails >= 3) {
 					throw new Error('Heartbeat lost.');
 				}
 			}
 			catch {
 				hbFails++;
-
+				
 				if (hbFails >= 6) {
 					stop();
-					
 					return;
 				}
 			}
@@ -517,10 +520,7 @@ export class PowerQueues extends PowerRedis {
 		timer = setTimeout(tick, workerHeartbeatTimeoutMs);
 		(timer as any).unref?.();
 
-		return () => {
-			signal?.removeEventListener?.('abort', onAbort as any);
-			stop();
-		};
+		return () => stop();
 	}
 
 	private async runScript(name: string, keys: string[], args: (string|number)[], defaultCode?: string) {
