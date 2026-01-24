@@ -103,7 +103,14 @@ export class PowerQueues extends PowerRedis {
 				await this.batchError(err, queueName, tasks);
 
 				try {
-					await this.approve(queueName, tasks.map((task) => task[0]));
+					await this.approve(queueName, tasks.map((task) => ({
+						id: task[0],
+						createdAt: Number(task[2]),
+						payload: task[1],
+						job: task[3],
+						idemKey: task[4],
+						attempt: Number(task[5] || 0),
+					})));
 				}
 				catch {
 				}
@@ -117,7 +124,7 @@ export class PowerQueues extends PowerRedis {
 			const filtered: any = {};
 
 			tasks.forEach((task, index) => {
-				const key = String(task[5] +':'+ task[2] +':'+ task[3]);
+				const key = String((task[5] || '0') +':'+ task[2] +':'+ task[3]);
 
 				if (!filtered[key]) {
 					filtered[key] = [];
@@ -149,13 +156,11 @@ export class PowerQueues extends PowerRedis {
 			}
 		}
 		catch (err: any) {
-			throw new Error(`Batch error. ${err.message}`);
 		}
 		try {
 			await this.onBatchError(err, queueName, tasks);
 		}
 		catch (err: any) {
-			throw new Error(`Batch error. ${err.message}`);
 		}
 	}
 
