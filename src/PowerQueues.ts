@@ -14,7 +14,6 @@ import {
 	isArr,
 	isStrFilled,
 	isExists,
-	isNumNZ,
 	wait,
 } from 'full-utils';
 import { v4 as uuid } from 'uuid';
@@ -124,19 +123,19 @@ export class PowerQueues extends PowerRedis {
 			const filtered: any = {};
 
 			tasks.forEach((task, index) => {
-				const key = String((task[5] || '0') +':'+ task[2] +':'+ task[3]);
+				const key = JSON.stringify([ task[5] || '0', task[2], task[3] ]);
 
 				if (!filtered[key]) {
 					filtered[key] = [];
 				}
-				filtered[key].push(tasks[index][1]);
+				filtered[key].push({ ...tasks[index][1], idemKey: tasks[index][4] });
 			});
 
 			for (let key in filtered) {
 				const filteredTasks = filtered[key];
-				const keySplit = key.split(':');
-				const attempt = Number(keySplit[0] || 0);
-				const job = String(keySplit[2]);
+				const keyP = JSON.parse(key);
+				const attempt = Number(keyP[0] || 0);
+				const job = String(keyP[2]);
 
 				if (!(attempt >= (this.retryCount - 1))) {
 					await this.addTasks(queueName, filteredTasks, {
@@ -246,7 +245,7 @@ export class PowerQueues extends PowerRedis {
 			})
 			.filter(([ id, kv ]) => isStrFilled(id) && isArr(kv) && (kv.length & 1) === 0)
 			.map(([ id, kv ]) => {
-				const { payload, createdAt, job, idemKey = '', attempt } = this.values(kv);
+				const { payload, createdAt, job, idemKey, attempt } = this.values(kv);
 
 				return [ id, this.payload(payload), createdAt, job, idemKey, Number(attempt) ];
 			});
@@ -410,6 +409,7 @@ export class PowerQueues extends PowerRedis {
 				createdAt: taskP.createdAt,
 				job: taskP.job,
 				attempt: (taskP.attempt || 0) + 1,
+				idemKey: taskP.idemKey,
 			});
 		}
 		else if (this.logStatus) {
@@ -422,6 +422,7 @@ export class PowerQueues extends PowerRedis {
 				createdAt: taskP.createdAt,
 				job: taskP.job,
 				attempt: taskP.attempt,
+				idemKey: taskP.idemKey,
 			});
 		}
 		return await this.onError(err, queueName, { ...taskP, attempt: (taskP.attempt || 0) + 1 });
@@ -644,21 +645,18 @@ export class PowerQueues extends PowerRedis {
 	private buildBatches(tasks: Task[], opts: AddTasksOptions = {}): Task[][] {
 		const batches: Task[][] = [];
 		let batch: Task[] = [],
-			realKeysLength = 0;
+			realKeysLength = 8;
 
 		for (let task of tasks) {
 			const createdAt = opts?.createdAt || Date.now();
-			let entry: any = {};
-
-			if (isObj(entry)) {
-				entry = { 
-					payload: JSON.stringify(task),
-					attempt: Number(opts.attempt || 0),
-					job: opts.job ?? uuid(),
-					idemKey: uuid(),
-					createdAt,
-				};
-			}
+			const { idemKey, ...taskP } = task;
+			const entry: Task = { 
+				payload: JSON.stringify(taskP),
+				attempt: Number(opts.attempt || 0),
+				job: opts.job ?? uuid(),
+				idemKey: String((idemKey ?? opts?.idemKey) || uuid()),
+				createdAt,
+			};
 			const reqKeysLength = this.keysLength(entry);
 			
 			if (batch.length && (batch.length >= this.buildBatchCount || realKeysLength + reqKeysLength > this.buildBatchMaxCount)) {
@@ -676,9 +674,6 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	private keysLength(task: Task): number {
-		if ('payload' in task && isObj((task as any).payload)) {
-			return 2 + Object.keys((task as any).payload).length * 2;
-		}
 		return 2 + Object.keys(task as any).length * 2;
 	}
 
@@ -706,7 +701,7 @@ export class PowerQueues extends PowerRedis {
 			const id = entry.id ?? '*';
 			let flat: any = [];
 
-			if ('payload' in entry && isObjFilled(entry)) {
+			if ('payload' in entry) {
 				for (const [ k, v ] of Object.entries(entry)) {
 					flat.push(k, v as any);
 				}
@@ -716,7 +711,7 @@ export class PowerQueues extends PowerRedis {
 			}
 			const pairs = flat.length / 2;
 
-			if (isNumNZ(pairs)) {
+			if (pairs <= 0) {
 				throw new Error('Task "flat" must contain at least one field/value pair.');
 			}
 			argv.push(String(id));

@@ -35,26 +35,99 @@ yarn add power-queues
 
 ``` ts
 const queue = new PowerQueues({
-	stream: 'email',
+	stream: 'mysql',
 	group: 'workers',
 });
 
 await queue.loadScripts(true);
 
-await queue.addTasks('email', [
-	{ payload: { type: 'welcome', userId: 42 } },
-	{ payload: { type: 'hello', userId: 51 } }
+await queue.addTasks('mysql_create:example:table_name', [
+	{ type: 'welcome', userId: 42 },
+	{ type: 'hello', userId: 51 }
 ]);
 ```
 
-Worker:
+Example of a worker for executing a MySQL insert transaction:
 
 ``` ts
-class EmailWorker extends PowerQueues {
-	async onExecute(id, payload) {
-		await sendEmail(payload);
+import mysql from 'mysql2/promise';
+import Redis from 'ioredis';
+import type { IORedisLike } from 'power-redis';
+import { type Task, PowerQueues, } from 'power-queues';
+import { 
+	isArrFilled,
+	isObjFilled,
+} from 'full-utils';
+
+const pool = mysql.createPool({
+	host: '127.0.0.1',
+	port: 3306,
+	user: 'user',
+	password: 'password',
+	database: 'example',
+	waitForConnections: true,
+	connectionLimit: 10,
+});
+const redis = new Redis('redis://127.0.0.1:6379');
+
+export class ExampleQueue extends PowerQueues {
+	public readonly selectStuckCount: number = 256;
+	public readonly selectCount: number = 256;
+	public readonly retryCount: number = 3;
+	public readonly executeSync: boolean = true;
+	public readonly removeOnExecuted: boolean = true;
+	public redis!: IORedisLike;
+
+	constructor() {
+		super();
+
+		this.redis = redis;
+	}
+
+	async onBatchReady(queueName: string, tasks: Task[]) {
+		const values = tasks
+			.filter((task) => isObjFilled(task.payload))
+			.map((task) => task.payload);
+
+		if (isArrFilled(values)) {
+			const conn = await pool.getConnection();
+
+			try {
+				await conn.beginTransaction();
+
+				const cols = Object.keys(values[0]);
+				const placeholder = `(${cols.map(() => '?').join(',')})`;
+				const sql = `INSERT INTO \`alerts\` (${cols.map((c) => `\`${c}\``).join(',')}) VALUES ${values.map(() => placeholder).join(',')}`;
+				const params = [];
+
+				for (const row of values) {
+					for (const c of cols) {
+						params.push(row[c]);
+					}
+				}
+				await conn.execute(sql, params);
+				await conn.commit();
+			}
+			catch (err) {
+				await conn.rollback();
+				throw err;
+			}
+			finally {
+				conn.release();
+			}
+		}
+	}
+
+	async onBatchError(err: any, queueName: string, tasks: Array<[ string, any, number, string, string, number ]>) {
+		this.logger.error('Transaction error', queueName, tasks.length, (process.env.NODE_ENV === 'production')
+			? err.message
+			: err, tasks.map((task) => task[1]));
 	}
 }
+
+const exampleQueue = new ExampleQueue();
+
+exampleQueue.runQueue('mysql_create:example:table_name');
 ```
 
 ## ⚖️ power-queues vs Existing Solutions
@@ -124,27 +197,24 @@ and efficiently.
 When retries reach the configured limit:
 - the task is moved into `${stream}:dlq`
 - includes: payload, attempt count, job, timestamp, error text
-- fully JSON‑safe
 
 Perfect for monitoring or later re‑processing.
 
 ### ✔ Zero‑Overhead Serialization
 **power-queues** uses:
 - safe JSON encoding
-- optional "flat" key/value task format
 - predictable and optimized payload transformation
 
 This keeps Redis memory layout clean and eliminates overhead.
 
 ### ✔ Complete Set of Lifecycle Hooks
 You can extend any part of the execution flow:
-- `onSelected`
 - `onExecute`
+- `onBatchReady`
 - `onSuccess`
 - `onError`
-- `onRetry`
 - `onBatchError`
-- `onReady`
+- `onRetry`
 
 This allows full integration with:
 - monitoring systems
@@ -163,6 +233,7 @@ Ensures resilience in failover scenarios.
 
 ### ✔ Job Progress Tracking
 Optional per‑job counters:
+- `job:total`
 - `job:ok`
 - `job:err`
 - `job:ready`
