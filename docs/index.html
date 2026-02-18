@@ -1,136 +1,36 @@
-<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>power-queues API Docs - v2.0.16</title><meta name="description" content="Documentation for power-queues API Docs"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">power-queues API Docs - v2.0.16</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>power-queues API Docs - v2.0.16</h1></div><div class="tsd-panel tsd-typography"><h1 id="power-queues-highperformance-redis-streams-queue-engine-for-nodejs" class="tsd-anchor-link">power-queues - High‑Performance Redis Streams Queue Engine for Node.js<a href="#power-queues-highperformance-redis-streams-queue-engine-for-nodejs" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><p>Production‑ready, lightweight and highly scalable
-queue engine built directly on <strong>Redis Streams + Lua scripts</strong>.
-It is designed for real‑world distributed systems that require <strong>high
-throughput</strong>, <strong>idempotent task execution</strong>, <strong>automatic recovery</strong>, and
-<strong>predictable performance under heavy load</strong>.</p>
-<p>Unlike traditional Redis‑based queues that rely on lists or heavy
-abstractions, power-queues focuses on <strong>low‑level control</strong>, <strong>atomic
-operations</strong>, and <strong>minimal overhead</strong>, making it ideal for high‑load
-backends, microservices, schedulers, telemetry pipelines, and data
-processing clusters.</p>
+<!DOCTYPE html><html class="default" lang="en" data-base="./"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>power-queues API Docs - v2.1.8</title><meta name="description" content="Documentation for power-queues API Docs"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="index.html" class="title">power-queues API Docs - v2.1.8</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h1>power-queues API Docs - v2.1.8</h1></div><div class="tsd-panel tsd-typography"><h1 id="power-queues" class="tsd-anchor-link">power-queues<a href="#power-queues" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<h2 id="a-lightweight-scalable-and-high-performance-queue-engine-for-nodejs-built-on-redis-streams-lua-scripts" class="tsd-anchor-link">A lightweight, scalable, and high-performance queue engine for <strong>Node.js</strong> built on <strong>Redis Streams</strong> + <strong>Lua scripts</strong>.<a href="#a-lightweight-scalable-and-high-performance-queue-engine-for-nodejs-built-on-redis-streams-lua-scripts" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>The library is designed for real-world distributed systems that require high throughput, idempotent task execution, automatic recovery, and predictable performance under heavy load.</p>
+<p>Unlike traditional Redis-based queues that rely on lists or complex abstractions, <strong>power-queues</strong> focuses on low-level control, atomic operations, and minimal overhead, making it ideal for high-load backends, microservices, schedulers, telemetry pipelines, and data-processing clusters.</p>
+<p>Extends <strong><a href="https://www.npmjs.com/package/power-redis">power-redis</a></strong>.</p>
 <p align="center">
-  <img src="https://img.shields.io/badge/redis-streams-red?logo=redis" />
-  <img src="https://img.shields.io/badge/nodejs-queue-green?logo=node.js" />
-  <img src="https://img.shields.io/badge/typescript-ready-blue?logo=typescript" />
-  <img src="https://img.shields.io/badge/license-MIT-lightgrey" />
-  <img src="https://img.shields.io/badge/status-production-success" />
+	<img src="https://img.shields.io/badge/redis-streams-red?logo=redis" />
+	<img src="https://img.shields.io/badge/nodejs-queue-green?logo=node.js" />
+	<img src="https://img.shields.io/badge/typescript-ready-blue?logo=typescript" />
+	<img src="https://img.shields.io/badge/license-MIT-lightgrey" />
+	<img src="https://img.shields.io/badge/status-production-success" />
 </p>
-<hr>
-<h2 id="📚-documentation" class="tsd-anchor-link">📚 Documentation<a href="#📚-documentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Full documentation is available here:<br>
+<h2 id="📚-documentation" class="tsd-anchor-link">📚 Documentation<a href="#📚-documentation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Full documentation is available here:<br>
 👉 <strong><a href="https://power-queues.docs.ihor.bielchenko.com">https://power-queues.docs.ihor.bielchenko.com</a></strong></p>
-<hr>
-<h2 id="🚀-key-features" class="tsd-anchor-link">🚀 Key Features<a href="#🚀-key-features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><h3 id="1-ultrafast-bulk-xadd-luapowered" class="tsd-anchor-link"><strong>1. Ultra‑Fast Bulk XADD (Lua‑Powered)</strong><a href="#1-ultrafast-bulk-xadd-luapowered" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
-<li>Adds thousands of messages per second using optimized Lua scripts.</li>
-<li>Minimizes round‑trips to Redis.</li>
-<li>Supports batching based on:
-<ul>
-<li>number of tasks</li>
-<li>number of Redis arguments (safe upper bound)</li>
-</ul>
-</li>
-<li>Outperforms typical list‑based queues and generic abstractions.</li>
-</ul>
-<hr>
-<h3 id="2-builtin-idempotent-workers" class="tsd-anchor-link"><strong>2. Built‑in Idempotent Workers</strong><a href="#2-builtin-idempotent-workers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Every task can carry an <code>idemKey</code>, guaranteeing <strong>exactly‑once
-execution</strong> even under: - worker crashes</p>
-<ul>
-<li>network interruptions</li>
-<li>duplicate task submissions</li>
-<li>process restarts</li>
-</ul>
-<p>Idempotency includes: - Lock key</p>
-<ul>
-<li>Start key</li>
-<li>Done key</li>
-<li>TTL‑managed execution lock</li>
-<li>Automatic release on failure</li>
-<li>Heartbeat mechanism</li>
-<li>Waiting on TTL for contended executions</li>
-</ul>
-<p>This makes the engine ideal for: - payment processing</p>
-<ul>
-<li>external API calls</li>
-<li>high‑value jobs</li>
-<li>distributed pipelines</li>
-</ul>
-<hr>
-<h3 id="3-stuck-task-recovery-advanced-stream-scanning" class="tsd-anchor-link"><strong>3. Stuck Task Recovery (Advanced Stream Scanning)</strong><a href="#3-stuck-task-recovery-advanced-stream-scanning" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>If a worker crashes mid‑execution, power-queues automatically detects: -
-abandoned tasks</p>
-<ul>
-<li>stalled locks</li>
-<li>unfinished start keys</li>
-</ul>
-<p>The engine then recovers these tasks back to active processing safely
-and efficiently.</p>
-<hr>
-<h3 id="4-highthroughput-workers" class="tsd-anchor-link"><strong>4. High‑Throughput Workers</strong><a href="#4-highthroughput-workers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
-<li>Batch execution support</li>
-<li>Parallel or sequential processing mode</li>
-<li>Configurable worker loop interval</li>
-<li>Individual and batch‑level error hooks</li>
-<li>Safe retry flow with per‑task attempt counters</li>
-</ul>
-<hr>
-<h3 id="5-native-dlq-deadletter-queue" class="tsd-anchor-link"><strong>5. Native DLQ (Dead‑Letter Queue)</strong><a href="#5-native-dlq-deadletter-queue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>When retries reach the configured limit: - the task is moved into
-<code>${stream}:dlq</code></p>
-<ul>
-<li>includes: payload, attempt count, job, timestamp, error text</li>
-<li>fully JSON‑safe</li>
-</ul>
-<p>Perfect for monitoring or later re‑processing.</p>
-<hr>
-<h3 id="6-zerooverhead-serialization" class="tsd-anchor-link"><strong>6. Zero‑Overhead Serialization</strong><a href="#6-zerooverhead-serialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>power-queues uses: - safe JSON encoding</p>
-<ul>
-<li>optional &quot;flat&quot; key/value task format</li>
-<li>predictable and optimized payload transformation</li>
-</ul>
-<p>This keeps Redis memory layout clean and eliminates overhead.</p>
-<hr>
-<h3 id="7-complete-set-of-lifecycle-hooks" class="tsd-anchor-link"><strong>7. Complete Set of Lifecycle Hooks</strong><a href="#7-complete-set-of-lifecycle-hooks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>You can extend any part of the execution flow:</p>
-<ul>
-<li><code>onSelected</code></li>
-<li><code>onExecute</code></li>
-<li><code>onSuccess</code></li>
-<li><code>onError</code></li>
-<li><code>onRetry</code></li>
-<li><code>onBatchError</code></li>
-<li><code>onReady</code></li>
-</ul>
-<p>This allows full integration with: - monitoring systems</p>
-<ul>
-<li>logging pipelines</li>
-<li>external APM tools</li>
-<li>domain logic</li>
-</ul>
-<hr>
-<h3 id="8-atomic-script-loading-noscript-recovery" class="tsd-anchor-link"><strong>8. Atomic Script Loading + NOSCRIPT Recovery</strong><a href="#8-atomic-script-loading-noscript-recovery" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Scripts are: - loaded once</p>
-<ul>
-<li>cached</li>
-<li>auto‑reloaded if Redis restarts</li>
-<li>executed safely via SHA‑based calls</li>
-</ul>
-<p>Ensures resilience in failover scenarios.</p>
-<hr>
-<h3 id="9-job-progress-tracking" class="tsd-anchor-link"><strong>9. Job Progress Tracking</strong><a href="#9-job-progress-tracking" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Optional per‑job counters: - <code>job:ok</code> - <code>job:err</code> - <code>job:ready</code></p>
-<p>Useful for UI dashboards and real‑time job progress visualization.</p>
-<hr>
-<h2 id="📦-installation" class="tsd-anchor-link">📦 Installation<a href="#📦-installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-2">power-queues</span>
+<h2 id="📦-installation" class="tsd-anchor-link">📦 Installation<a href="#📦-installation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">install</span><span class="hl-1"> </span><span class="hl-2">power-queues</span>
 </code><button type="button">Copy</button></pre>
 
 <p>OR</p>
-<pre><code class="bash"><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-2">power-redis</span>
+<pre><code class="bash"><span class="hl-0">yarn</span><span class="hl-1"> </span><span class="hl-2">add</span><span class="hl-1"> </span><span class="hl-2">power-queues</span>
 </code><button type="button">Copy</button></pre>
 
-<hr>
-<h2 id="🧪-quick-start" class="tsd-anchor-link">🧪 Quick Start<a href="#🧪-quick-start" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">queue</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">PowerQueues</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-5">stream:</span><span class="hl-1"> </span><span class="hl-2">&quot;email&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-5">group:</span><span class="hl-1"> </span><span class="hl-2">&quot;workers&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">loadScripts</span><span class="hl-1">(</span><span class="hl-3">true</span><span class="hl-1">);</span><br/><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">addTasks</span><span class="hl-1">(</span><span class="hl-2">&quot;email&quot;</span><span class="hl-1">, [</span><br/><span class="hl-1">  { </span><span class="hl-5">payload:</span><span class="hl-1"> { </span><span class="hl-5">type:</span><span class="hl-1"> </span><span class="hl-2">&quot;welcome&quot;</span><span class="hl-1">, </span><span class="hl-5">userId:</span><span class="hl-1"> </span><span class="hl-7">42</span><span class="hl-1"> } },</span><br/><span class="hl-1">]);</span>
+<h2 id="🧪-basic-usage" class="tsd-anchor-link">🧪 Basic usage<a href="#🧪-basic-usage" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<pre><code class="ts"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">queue</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">PowerQueues</span><span class="hl-1">({</span><br/><span class="hl-1">	</span><span class="hl-5">stream:</span><span class="hl-1"> </span><span class="hl-2">&#39;mysql&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">	</span><span class="hl-5">group:</span><span class="hl-1"> </span><span class="hl-2">&#39;workers&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">loadScripts</span><span class="hl-1">(</span><span class="hl-3">true</span><span class="hl-1">);</span><br/><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queue</span><span class="hl-1">.</span><span class="hl-0">addTasks</span><span class="hl-1">(</span><span class="hl-2">&#39;mysql_create:example:table_name&#39;</span><span class="hl-1">, [</span><br/><span class="hl-1">	{ </span><span class="hl-5">type:</span><span class="hl-1"> </span><span class="hl-2">&#39;welcome&#39;</span><span class="hl-1">, </span><span class="hl-5">userId:</span><span class="hl-1"> </span><span class="hl-7">42</span><span class="hl-1"> },</span><br/><span class="hl-1">	{ </span><span class="hl-5">type:</span><span class="hl-1"> </span><span class="hl-2">&#39;hello&#39;</span><span class="hl-1">, </span><span class="hl-5">userId:</span><span class="hl-1"> </span><span class="hl-7">51</span><span class="hl-1"> }</span><br/><span class="hl-1">]);</span>
 </code><button type="button">Copy</button></pre>
 
-<p>Worker:</p>
-<pre><code class="ts"><span class="hl-3">class</span><span class="hl-1"> </span><span class="hl-8">EmailWorker</span><span class="hl-1"> </span><span class="hl-3">extends</span><span class="hl-1"> </span><span class="hl-8">PowerQueues</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-3">async</span><span class="hl-1"> </span><span class="hl-0">onExecute</span><span class="hl-1">(</span><span class="hl-5">id</span><span class="hl-1">, </span><span class="hl-5">payload</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">sendEmail</span><span class="hl-1">(</span><span class="hl-5">payload</span><span class="hl-1">);</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">}</span>
+<p>Example of queue worker for sending message to client via WebSocket and executing a MySQL insert transaction:</p>
+<pre><code class="ts"><span class="hl-6">import</span><span class="hl-1"> </span><span class="hl-5">express</span><span class="hl-1"> </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;express&#39;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> </span><span class="hl-5">http</span><span class="hl-1"> </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;http&#39;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> { </span><span class="hl-5">Server</span><span class="hl-1"> } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;socket.io&#39;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> </span><span class="hl-5">mysql</span><span class="hl-1"> </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;mysql2/promise&#39;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> </span><span class="hl-5">Redis</span><span class="hl-1"> </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;ioredis&#39;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> </span><span class="hl-6">type</span><span class="hl-1"> { </span><span class="hl-5">IORedisLike</span><span class="hl-1"> } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;power-redis&#39;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> { </span><span class="hl-6">type</span><span class="hl-1"> </span><span class="hl-5">Task</span><span class="hl-1">, </span><span class="hl-5">PowerQueues</span><span class="hl-1">, } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;power-queues&#39;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> { </span><br/><span class="hl-1">	</span><span class="hl-5">isArrFilled</span><span class="hl-1">,</span><br/><span class="hl-1">	</span><span class="hl-5">isObjFilled</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-2">&#39;full-utils&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">pool</span><span class="hl-1"> = </span><span class="hl-5">mysql</span><span class="hl-1">.</span><span class="hl-0">createPool</span><span class="hl-1">({</span><br/><span class="hl-1">	</span><span class="hl-5">host:</span><span class="hl-1"> </span><span class="hl-2">&#39;127.0.0.1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">	</span><span class="hl-5">port:</span><span class="hl-1"> </span><span class="hl-7">3306</span><span class="hl-1">,</span><br/><span class="hl-1">	</span><span class="hl-5">user:</span><span class="hl-1"> </span><span class="hl-2">&#39;user&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">	</span><span class="hl-5">password:</span><span class="hl-1"> </span><span class="hl-2">&#39;password&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">	</span><span class="hl-5">database:</span><span class="hl-1"> </span><span class="hl-2">&#39;example&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">	</span><span class="hl-5">waitForConnections:</span><span class="hl-1"> </span><span class="hl-3">true</span><span class="hl-1">,</span><br/><span class="hl-1">	</span><span class="hl-5">connectionLimit:</span><span class="hl-1"> </span><span class="hl-7">10</span><span class="hl-1">,</span><br/><span class="hl-1">});</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">redis</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">Redis</span><span class="hl-1">(</span><span class="hl-2">&#39;redis://127.0.0.1:6379&#39;</span><span class="hl-1">);</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">app</span><span class="hl-1"> = </span><span class="hl-0">express</span><span class="hl-1">();</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">server</span><span class="hl-1"> = </span><span class="hl-5">http</span><span class="hl-1">.</span><span class="hl-0">createServer</span><span class="hl-1">(</span><span class="hl-5">app</span><span class="hl-1">);</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">io</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">Server</span><span class="hl-1">(</span><span class="hl-5">server</span><span class="hl-1">);</span><br/><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">class</span><span class="hl-1"> </span><span class="hl-8">WebSocketAndMysqlCreateQueue</span><span class="hl-1"> </span><span class="hl-3">extends</span><span class="hl-1"> </span><span class="hl-8">PowerQueues</span><span class="hl-1"> {</span><br/><span class="hl-1">	</span><span class="hl-3">public</span><span class="hl-1"> </span><span class="hl-3">readonly</span><span class="hl-1"> </span><span class="hl-5">selectStuckCount</span><span class="hl-1">: </span><span class="hl-8">number</span><span class="hl-1"> = </span><span class="hl-7">256</span><span class="hl-1">;</span><br/><span class="hl-1">	</span><span class="hl-3">public</span><span class="hl-1"> </span><span class="hl-3">readonly</span><span class="hl-1"> </span><span class="hl-5">selectCount</span><span class="hl-1">: </span><span class="hl-8">number</span><span class="hl-1"> = </span><span class="hl-7">256</span><span class="hl-1">;</span><br/><span class="hl-1">	</span><span class="hl-3">public</span><span class="hl-1"> </span><span class="hl-3">readonly</span><span class="hl-1"> </span><span class="hl-5">retryCount</span><span class="hl-1">: </span><span class="hl-8">number</span><span class="hl-1"> = </span><span class="hl-7">3</span><span class="hl-1">;</span><br/><span class="hl-1">	</span><span class="hl-3">public</span><span class="hl-1"> </span><span class="hl-3">readonly</span><span class="hl-1"> </span><span class="hl-5">executeSync</span><span class="hl-1">: </span><span class="hl-8">boolean</span><span class="hl-1"> = </span><span class="hl-3">true</span><span class="hl-1">;</span><br/><span class="hl-1">	</span><span class="hl-3">public</span><span class="hl-1"> </span><span class="hl-3">readonly</span><span class="hl-1"> </span><span class="hl-5">removeOnExecuted</span><span class="hl-1">: </span><span class="hl-8">boolean</span><span class="hl-1"> = </span><span class="hl-3">true</span><span class="hl-1">;</span><br/><span class="hl-1">	</span><span class="hl-3">public</span><span class="hl-1"> </span><span class="hl-5">redis</span><span class="hl-1">!: </span><span class="hl-8">IORedisLike</span><span class="hl-1">;</span><br/><br/><span class="hl-1">	</span><span class="hl-3">constructor</span><span class="hl-1">() {</span><br/><span class="hl-1">		</span><span class="hl-3">super</span><span class="hl-1">();</span><br/><br/><span class="hl-1">		</span><span class="hl-3">this</span><span class="hl-1">.</span><span class="hl-5">redis</span><span class="hl-1"> = </span><span class="hl-5">redis</span><span class="hl-1">;</span><br/><span class="hl-1">	}</span><br/><br/><span class="hl-1">	</span><span class="hl-3">async</span><span class="hl-1"> </span><span class="hl-0">onExecute</span><span class="hl-1">(</span><span class="hl-5">queueName</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-5">task</span><span class="hl-1">: </span><span class="hl-8">Task</span><span class="hl-1">) {</span><br/><span class="hl-1">		</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">id</span><span class="hl-1"> = </span><span class="hl-0">uuid</span><span class="hl-1">();</span><br/><br/><span class="hl-1">		</span><span class="hl-5">io</span><span class="hl-1">.</span><span class="hl-0">to</span><span class="hl-1">(</span><span class="hl-2">`user:</span><span class="hl-3">${</span><span class="hl-5">task</span><span class="hl-9">.</span><span class="hl-5">payload</span><span class="hl-9">.</span><span class="hl-5">userId</span><span class="hl-3">}</span><span class="hl-2">`</span><span class="hl-1">).</span><span class="hl-0">emit</span><span class="hl-1">(</span><span class="hl-2">&#39;alerts&#39;</span><span class="hl-1">, {</span><br/><span class="hl-1">			</span><span class="hl-5">body:</span><span class="hl-1"> </span><span class="hl-5">task</span><span class="hl-1">.</span><span class="hl-5">payload</span><span class="hl-1">.</span><span class="hl-5">body</span><span class="hl-1">,</span><br/><span class="hl-1">			</span><span class="hl-5">id</span><span class="hl-1">,</span><br/><span class="hl-1">		});</span><br/><span class="hl-1">		</span><span class="hl-6">return</span><span class="hl-1"> {</span><br/><span class="hl-1">			...</span><span class="hl-5">task</span><span class="hl-1">,</span><br/><span class="hl-1">			</span><span class="hl-5">payload:</span><span class="hl-1"> {</span><br/><span class="hl-1">				...</span><span class="hl-5">task</span><span class="hl-1">.</span><span class="hl-5">payload</span><span class="hl-1">,</span><br/><span class="hl-1">				</span><span class="hl-5">id</span><span class="hl-1">,</span><br/><span class="hl-1">			},</span><br/><span class="hl-1">		};</span><br/><span class="hl-1">	}</span><br/><br/><span class="hl-1">	</span><span class="hl-3">async</span><span class="hl-1"> </span><span class="hl-0">onBatchReady</span><span class="hl-1">(</span><span class="hl-5">queueName</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-5">tasks</span><span class="hl-1">: </span><span class="hl-8">Task</span><span class="hl-1">[]) {</span><br/><span class="hl-1">		</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">values</span><span class="hl-1"> = </span><span class="hl-5">tasks</span><span class="hl-1">.</span><span class="hl-0">map</span><span class="hl-1">((</span><span class="hl-5">task</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-5">task</span><span class="hl-1">.</span><span class="hl-5">payload</span><span class="hl-1">);</span><br/><span class="hl-1">		</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">conn</span><span class="hl-1"> = </span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">pool</span><span class="hl-1">.</span><span class="hl-0">getConnection</span><span class="hl-1">();</span><br/><span class="hl-1">	</span><br/><span class="hl-1">		</span><span class="hl-6">try</span><span class="hl-1"> {</span><br/><span class="hl-1">			</span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">conn</span><span class="hl-1">.</span><span class="hl-0">beginTransaction</span><span class="hl-1">();</span><br/><br/><span class="hl-1">			</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">cols</span><span class="hl-1"> = </span><span class="hl-5">Object</span><span class="hl-1">.</span><span class="hl-0">keys</span><span class="hl-1">(</span><span class="hl-5">values</span><span class="hl-1">[</span><span class="hl-7">0</span><span class="hl-1">]);</span><br/><span class="hl-1">			</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">placeholder</span><span class="hl-1"> = </span><span class="hl-2">`(</span><span class="hl-3">${</span><span class="hl-5">cols</span><span class="hl-9">.</span><span class="hl-0">map</span><span class="hl-9">(() </span><span class="hl-3">=&gt;</span><span class="hl-9"> </span><span class="hl-2">&#39;?&#39;</span><span class="hl-9">).</span><span class="hl-0">join</span><span class="hl-9">(</span><span class="hl-2">&#39;,&#39;</span><span class="hl-9">)</span><span class="hl-3">}</span><span class="hl-2">)`</span><span class="hl-1">;</span><br/><span class="hl-1">			</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">sql</span><span class="hl-1"> = </span><span class="hl-2">`INSERT INTO </span><span class="hl-10">\`</span><span class="hl-2">alerts</span><span class="hl-10">\`</span><span class="hl-2"> (</span><span class="hl-3">${</span><span class="hl-5">cols</span><span class="hl-9">.</span><span class="hl-0">map</span><span class="hl-9">((</span><span class="hl-5">c</span><span class="hl-9">) </span><span class="hl-3">=&gt;</span><span class="hl-9"> </span><span class="hl-2">`</span><span class="hl-10">\`</span><span class="hl-3">${</span><span class="hl-5">c</span><span class="hl-3">}</span><span class="hl-10">\`</span><span class="hl-2">`</span><span class="hl-9">).</span><span class="hl-0">join</span><span class="hl-9">(</span><span class="hl-2">&#39;,&#39;</span><span class="hl-9">)</span><span class="hl-3">}</span><span class="hl-2">) VALUES </span><span class="hl-3">${</span><span class="hl-5">values</span><span class="hl-9">.</span><span class="hl-0">map</span><span class="hl-9">(() </span><span class="hl-3">=&gt;</span><span class="hl-9"> </span><span class="hl-5">placeholder</span><span class="hl-9">).</span><span class="hl-0">join</span><span class="hl-9">(</span><span class="hl-2">&#39;,&#39;</span><span class="hl-9">)</span><span class="hl-3">}</span><span class="hl-2">`</span><span class="hl-1">;</span><br/><span class="hl-1">			</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">params</span><span class="hl-1"> = [];</span><br/><br/><span class="hl-1">			</span><span class="hl-6">for</span><span class="hl-1"> (</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">row</span><span class="hl-1"> </span><span class="hl-3">of</span><span class="hl-1"> </span><span class="hl-5">values</span><span class="hl-1">) {</span><br/><span class="hl-1">				</span><span class="hl-6">for</span><span class="hl-1"> (</span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">c</span><span class="hl-1"> </span><span class="hl-3">of</span><span class="hl-1"> </span><span class="hl-5">cols</span><span class="hl-1">) {</span><br/><span class="hl-1">					</span><span class="hl-5">params</span><span class="hl-1">.</span><span class="hl-0">push</span><span class="hl-1">(</span><span class="hl-5">row</span><span class="hl-1">[</span><span class="hl-5">c</span><span class="hl-1">]);</span><br/><span class="hl-1">				}</span><br/><span class="hl-1">			}</span><br/><span class="hl-1">			</span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">conn</span><span class="hl-1">.</span><span class="hl-0">execute</span><span class="hl-1">(</span><span class="hl-5">sql</span><span class="hl-1">, </span><span class="hl-5">params</span><span class="hl-1">);</span><br/><span class="hl-1">			</span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">conn</span><span class="hl-1">.</span><span class="hl-0">commit</span><span class="hl-1">();</span><br/><span class="hl-1">		}</span><br/><span class="hl-1">		</span><span class="hl-6">catch</span><span class="hl-1"> (</span><span class="hl-5">err</span><span class="hl-1">) {</span><br/><span class="hl-1">			</span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queryRunner</span><span class="hl-1">.</span><span class="hl-0">rollbackTransaction</span><span class="hl-1">();</span><br/><span class="hl-1">			</span><span class="hl-6">throw</span><span class="hl-1"> </span><span class="hl-5">err</span><span class="hl-1">;</span><br/><span class="hl-1">		}</span><br/><span class="hl-1">		</span><span class="hl-6">finally</span><span class="hl-1"> {</span><br/><span class="hl-1">			</span><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-5">queryRunner</span><span class="hl-1">.</span><span class="hl-0">release</span><span class="hl-1">();</span><br/><span class="hl-1">		}</span><br/><span class="hl-1">	}</span><br/><br/><span class="hl-1">	</span><span class="hl-3">async</span><span class="hl-1"> </span><span class="hl-0">onError</span><span class="hl-1">(</span><span class="hl-5">err</span><span class="hl-1">: </span><span class="hl-8">any</span><span class="hl-1">, </span><span class="hl-5">queueName</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-5">task</span><span class="hl-1">: </span><span class="hl-8">Task</span><span class="hl-1">): </span><span class="hl-8">Promise</span><span class="hl-1">&lt;</span><span class="hl-8">Task</span><span class="hl-1">&gt; {</span><br/><span class="hl-1">		</span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">error</span><span class="hl-1">(</span><span class="hl-2">&#39;Alert error&#39;</span><span class="hl-1">, </span><span class="hl-5">queueName</span><span class="hl-1">, </span><span class="hl-5">task</span><span class="hl-1">, (</span><span class="hl-5">process</span><span class="hl-1">.</span><span class="hl-5">env</span><span class="hl-1">.</span><span class="hl-4">NODE_ENV</span><span class="hl-1"> === </span><span class="hl-2">&#39;production&#39;</span><span class="hl-1">)</span><br/><span class="hl-1">			? </span><span class="hl-5">err</span><span class="hl-1">.</span><span class="hl-5">message</span><br/><span class="hl-1">			: </span><span class="hl-5">err</span><span class="hl-1">);</span><br/><span class="hl-1">		</span><span class="hl-6">return</span><span class="hl-1"> </span><span class="hl-5">task</span><span class="hl-1">;</span><br/><span class="hl-1">	}</span><br/><br/><span class="hl-1">	</span><span class="hl-3">async</span><span class="hl-1"> </span><span class="hl-0">onBatchError</span><span class="hl-1">(</span><span class="hl-5">err</span><span class="hl-1">: </span><span class="hl-8">any</span><span class="hl-1">, </span><span class="hl-5">queueName</span><span class="hl-1">: </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-5">tasks</span><span class="hl-1">: </span><span class="hl-8">Array</span><span class="hl-1">&lt;[ </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-8">any</span><span class="hl-1">, </span><span class="hl-8">number</span><span class="hl-1">, </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-8">string</span><span class="hl-1">, </span><span class="hl-8">number</span><span class="hl-1"> ]&gt;) {</span><br/><span class="hl-1">		</span><span class="hl-5">console</span><span class="hl-1">.</span><span class="hl-0">error</span><span class="hl-1">(</span><span class="hl-2">&#39;Batch error&#39;</span><span class="hl-1">, </span><span class="hl-5">queueName</span><span class="hl-1">, </span><span class="hl-5">tasks</span><span class="hl-1">.</span><span class="hl-5">length</span><span class="hl-1">, (</span><span class="hl-5">process</span><span class="hl-1">.</span><span class="hl-5">env</span><span class="hl-1">.</span><span class="hl-4">NODE_ENV</span><span class="hl-1"> === </span><span class="hl-2">&#39;production&#39;</span><span class="hl-1">)</span><br/><span class="hl-1">			? </span><span class="hl-5">err</span><span class="hl-1">.</span><span class="hl-5">message</span><br/><span class="hl-1">			: </span><span class="hl-5">err</span><span class="hl-1">);</span><br/><span class="hl-1">	}</span><br/><span class="hl-1">}</span><br/><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">exampleQueue</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">ExampleQueue</span><span class="hl-1">();</span><br/><br/><span class="hl-5">exampleQueue</span><span class="hl-1">.</span><span class="hl-0">runQueue</span><span class="hl-1">(</span><span class="hl-2">&#39;ws&#39;</span><span class="hl-1">);</span>
 </code><button type="button">Copy</button></pre>
 
-<hr>
-<h2 id="⚙-power-queues-vs-existing-solutions" class="tsd-anchor-link">⚙ power-queues vs Existing Solutions<a href="#⚙-power-queues-vs-existing-solutions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><table>
+<h2 id="⚖️-power-queues-vs-existing-solutions" class="tsd-anchor-link">⚖️ power-queues vs Existing Solutions<a href="#⚖️-power-queues-vs-existing-solutions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<table>
 <thead>
 <tr>
 <th>Feature</th>
@@ -213,23 +113,112 @@ and efficiently.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="🛠-when-to-choose-power-queues" class="tsd-anchor-link">🛠 When to Choose power-queues<a href="#🛠-when-to-choose-power-queues" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Use this engine if you need:</p>
-<h3 id="✔-high-performance-under-load" class="tsd-anchor-link"><strong>✔ High performance under load</strong><a href="#✔-high-performance-under-load" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Millions of tasks per hour? No problem.</p>
-<h3 id="✔-strong-idempotent-guarantees" class="tsd-anchor-link"><strong>✔ Strong idempotent guarantees</strong><a href="#✔-strong-idempotent-guarantees" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Exactly‑once processing for critical operations.</p>
-<h3 id="✔-lowlevel-control-without-heavy-abstractions" class="tsd-anchor-link"><strong>✔ Low‑level control without heavy abstractions</strong><a href="#✔-lowlevel-control-without-heavy-abstractions" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>No magic, no hidden states - everything is explicit.</p>
-<h3 id="✔-predictable-behavior-in-distributed-environments" class="tsd-anchor-link"><strong>✔ Predictable behavior in distributed environments</strong><a href="#✔-predictable-behavior-in-distributed-environments" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Even with frequent worker restarts.</p>
-<h3 id="✔-productiongrade-reliability" class="tsd-anchor-link"><strong>✔ Production‑grade reliability</strong><a href="#✔-productiongrade-reliability" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Backpressure, recovery, retries, dead-lettering - all included.</p>
-<hr>
-<h2 id="🏗️-project-structure-architecture" class="tsd-anchor-link">🏗️ Project Structure &amp; Architecture<a href="#🏗️-project-structure-architecture" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
-<li>Redis Streams for messaging</li>
-<li>Lua scripts for atomic operations</li>
-<li>JavaScript/TypeScript API</li>
-<li>Full worker lifecycle management</li>
-<li>Configurable backpressure &amp; contention handling</li>
-<li>Optional job‑level progress tracking</li>
+<h2 id="🚀-key-features-advantages" class="tsd-anchor-link">🚀 Key Features &amp; Advantages<a href="#🚀-key-features-advantages" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="✔-ultrafast-bulk-xadd-luapowered" class="tsd-anchor-link">✔ Ultra‑Fast Bulk XADD (Lua‑Powered)<a href="#✔-ultrafast-bulk-xadd-luapowered" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li>Adds thousands of messages per second using optimized Lua scripts.</li>
+<li>Minimizes round‑trips to Redis.</li>
+<li>Supports batching based on:
+<ul>
+<li>number of tasks</li>
+<li>number of Redis arguments (safe upper bound)</li>
 </ul>
-<hr>
-<h2 id="🧩-extensibility" class="tsd-anchor-link">🧩 Extensibility<a href="#🧩-extensibility" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>power-queues is ideal for building:</p>
+</li>
+<li>Outperforms typical list‑based queues and generic abstractions.</li>
+</ul>
+<h3 id="✔-builtin-idempotent-workers" class="tsd-anchor-link">✔ Built‑in Idempotent Workers<a href="#✔-builtin-idempotent-workers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Every task can carry an <code>idemKey</code>, guaranteeing <strong>exactly‑once execution</strong> even under:</p>
+<ul>
+<li>worker crashes</li>
+<li>network interruptions</li>
+<li>duplicate task submissions</li>
+<li>process restarts</li>
+</ul>
+<p>Idempotency includes:</p>
+<ul>
+<li>Lock key</li>
+<li>Start key</li>
+<li>Done key</li>
+<li>TTL‑managed execution lock</li>
+<li>Automatic release on failure</li>
+<li>Heartbeat mechanism</li>
+<li>Waiting on TTL for contended executions</li>
+</ul>
+<p>This makes the engine ideal for:</p>
+<ul>
+<li>payment processing</li>
+<li>external API calls</li>
+<li>high‑value jobs</li>
+<li>distributed pipelines</li>
+</ul>
+<h3 id="✔-stuck-task-recovery-advanced-stream-scanning" class="tsd-anchor-link">✔ Stuck Task Recovery (Advanced Stream Scanning)<a href="#✔-stuck-task-recovery-advanced-stream-scanning" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>If a worker crashes mid‑execution, <strong>power-queues</strong> automatically detects:</p>
+<ul>
+<li>abandoned tasks</li>
+<li>stalled locks</li>
+<li>unfinished start keys</li>
+</ul>
+<p>The engine then recovers these tasks back to active processing safely
+and efficiently.</p>
+<h3 id="✔-highthroughput-workers" class="tsd-anchor-link">✔ High‑Throughput Workers<a href="#✔-highthroughput-workers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li>Batch execution support</li>
+<li>Parallel or sequential processing mode</li>
+<li>Configurable worker loop interval</li>
+<li>Individual and batch‑level error hooks</li>
+<li>Safe retry flow with per‑task attempt counters</li>
+</ul>
+<h3 id="✔-native-dlq-deadletter-queue" class="tsd-anchor-link">✔ Native DLQ (Dead‑Letter Queue)<a href="#✔-native-dlq-deadletter-queue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>When retries reach the configured limit:</p>
+<ul>
+<li>the task is moved into <code>${stream}:dlq</code></li>
+<li>includes: payload, attempt count, job, timestamp, error text</li>
+</ul>
+<p>Perfect for monitoring or later re‑processing.</p>
+<h3 id="✔-zerooverhead-serialization" class="tsd-anchor-link">✔ Zero‑Overhead Serialization<a href="#✔-zerooverhead-serialization" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p><strong>power-queues</strong> uses:</p>
+<ul>
+<li>safe JSON encoding</li>
+<li>predictable and optimized payload transformation</li>
+</ul>
+<p>This keeps Redis memory layout clean and eliminates overhead.</p>
+<h3 id="✔-complete-set-of-lifecycle-hooks" class="tsd-anchor-link">✔ Complete Set of Lifecycle Hooks<a href="#✔-complete-set-of-lifecycle-hooks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>You can extend any part of the execution flow:</p>
+<ul>
+<li><code>onExecute</code></li>
+<li><code>onBatchReady</code></li>
+<li><code>onSuccess</code></li>
+<li><code>onError</code></li>
+<li><code>onBatchError</code></li>
+<li><code>onRetry</code></li>
+</ul>
+<p>This allows full integration with:</p>
+<ul>
+<li>monitoring systems</li>
+<li>logging pipelines</li>
+<li>external APM tools</li>
+<li>domain logic</li>
+</ul>
+<h3 id="✔-atomic-script-loading-noscript-recovery" class="tsd-anchor-link">✔ Atomic Script Loading + NOSCRIPT Recovery<a href="#✔-atomic-script-loading-noscript-recovery" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Scripts are:</p>
+<ul>
+<li>loaded once</li>
+<li>cached</li>
+<li>auto‑reloaded if Redis restarts</li>
+<li>executed safely via SHA‑based calls</li>
+</ul>
+<p>Ensures resilience in failover scenarios.</p>
+<h3 id="✔-job-progress-tracking" class="tsd-anchor-link">✔ Job Progress Tracking<a href="#✔-job-progress-tracking" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>Optional per‑job counters:</p>
+<ul>
+<li><code>job:total</code></li>
+<li><code>job:ok</code></li>
+<li><code>job:err</code></li>
+<li><code>job:ready</code></li>
+</ul>
+<p>Useful for UI dashboards and real‑time job progress visualization.</p>
+<h2 id="🧩-extensibility" class="tsd-anchor-link">🧩 Extensibility<a href="#🧩-extensibility" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p><strong>power-queues</strong> is ideal for building:</p>
 <ul>
 <li>task schedulers</li>
 <li>distributed cron engines</li>
@@ -240,8 +229,8 @@ and efficiently.</p>
 <li>AI job pipelines</li>
 <li>high-frequency background jobs</li>
 </ul>
-<hr>
-<h2 id="🧱-reliability-first" class="tsd-anchor-link">🧱 Reliability First<a href="#🧱-reliability-first" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Every part of the engine is designed to prevent:</p>
+<h2 id="🧱-reliability-first" class="tsd-anchor-link">🧱 Reliability First<a href="#🧱-reliability-first" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Every part of the engine is designed to prevent:</p>
 <ul>
 <li>double execution</li>
 <li>stuck tasks</li>
@@ -252,35 +241,6 @@ and efficiently.</p>
 </ul>
 <p>The heartbeat + TTL strategy guarantees that no task is &quot;lost&quot; even in
 chaotic cluster environments.</p>
-<hr>
-<h2 id="🏷️-seooptimized-keywords-nonspam" class="tsd-anchor-link">🏷️ SEO‑Optimized Keywords (Non‑Spam)<a href="#🏷️-seooptimized-keywords-nonspam" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>power-queues is relevant for:</p>
-<ul>
-<li>Redis Streams queue engine</li>
-<li>Node.js stream-based queue</li>
-<li>idempotent task processing</li>
-<li>high‑performance job queue for Node.js</li>
-<li>Redis Lua queue</li>
-<li>distributed worker engine</li>
-<li>scalable background jobs</li>
-<li>enterprise-grade Redis queue</li>
-<li>microservices task runner</li>
-<li>fault-tolerant queue for Node.js</li>
-</ul>
-<hr>
-<h2 id="📝-license" class="tsd-anchor-link">📝 License<a href="#📝-license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>MIT - free for commercial and private use.</p>
-<hr>
-<h2 id="⭐-why-this-project-exists" class="tsd-anchor-link">⭐ Why This Project Exists<a href="#⭐-why-this-project-exists" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Most Node.js queue libraries are: - too slow</p>
-<ul>
-<li>too abstract</li>
-<li>not idempotent</li>
-<li>not safe for financial or mission‑critical workloads</li>
-</ul>
-<p>power-queues was built to solve real production problems where: -
-<em>duplicate tasks cost money</em>,</p>
-<ul>
-<li><em>workers are unstable</em>,</li>
-<li><em>tasks must survive restarts</em>,</li>
-<li><em>performance matters at scale</em>.</li>
-</ul>
-<p>If these things matter to you - this engine will feel like home.</p>
-</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#power-queues-highperformance-redis-streams-queue-engine-for-nodejs"><span>power-<wbr/>queues -<wbr/> <wbr/>High‑<wbr/>Performance <wbr/>Redis <wbr/>Streams <wbr/>Queue <wbr/>Engine for <wbr/>Node.js</span></a><ul><li><a href="#📚-documentation"><span>📚 <wbr/>Documentation</span></a></li><li><a href="#🚀-key-features"><span>🚀 <wbr/>Key <wbr/>Features</span></a></li><li><ul><li><a href="#1-ultrafast-bulk-xadd-luapowered"><span>1. <wbr/>Ultra‑<wbr/>Fast <wbr/>Bulk <wbr/>XADD (<wbr/>Lua‑<wbr/>Powered)</span></a></li><li><a href="#2-builtin-idempotent-workers"><span>2. <wbr/>Built‑in <wbr/>Idempotent <wbr/>Workers</span></a></li><li><a href="#3-stuck-task-recovery-advanced-stream-scanning"><span>3. <wbr/>Stuck <wbr/>Task <wbr/>Recovery (<wbr/>Advanced <wbr/>Stream <wbr/>Scanning)</span></a></li><li><a href="#4-highthroughput-workers"><span>4. <wbr/>High‑<wbr/>Throughput <wbr/>Workers</span></a></li><li><a href="#5-native-dlq-deadletter-queue"><span>5. <wbr/>Native <wbr/>DLQ (<wbr/>Dead‑<wbr/>Letter <wbr/>Queue)</span></a></li><li><a href="#6-zerooverhead-serialization"><span>6. <wbr/>Zero‑<wbr/>Overhead <wbr/>Serialization</span></a></li><li><a href="#7-complete-set-of-lifecycle-hooks"><span>7. <wbr/>Complete <wbr/>Set of <wbr/>Lifecycle <wbr/>Hooks</span></a></li><li><a href="#8-atomic-script-loading-noscript-recovery"><span>8. <wbr/>Atomic <wbr/>Script <wbr/>Loading + <wbr/>NOSCRIPT <wbr/>Recovery</span></a></li><li><a href="#9-job-progress-tracking"><span>9. <wbr/>Job <wbr/>Progress <wbr/>Tracking</span></a></li></ul></li><li><a href="#📦-installation"><span>📦 <wbr/>Installation</span></a></li><li><a href="#🧪-quick-start"><span>🧪 <wbr/>Quick <wbr/>Start</span></a></li><li><a href="#⚙-power-queues-vs-existing-solutions"><span>⚙ power-<wbr/>queues vs <wbr/>Existing <wbr/>Solutions</span></a></li><li><a href="#🛠-when-to-choose-power-queues"><span>🛠 <wbr/>When to <wbr/>Choose power-<wbr/>queues</span></a></li><li><ul><li><a href="#✔-high-performance-under-load"><span>✔ <wbr/>High performance under load</span></a></li><li><a href="#✔-strong-idempotent-guarantees"><span>✔ <wbr/>Strong idempotent guarantees</span></a></li><li><a href="#✔-lowlevel-control-without-heavy-abstractions"><span>✔ <wbr/>Low‑level control without heavy abstractions</span></a></li><li><a href="#✔-predictable-behavior-in-distributed-environments"><span>✔ <wbr/>Predictable behavior in distributed environments</span></a></li><li><a href="#✔-productiongrade-reliability"><span>✔ <wbr/>Production‑grade reliability</span></a></li></ul></li><li><a href="#🏗️-project-structure-architecture"><span>🏗️ <wbr/>Project <wbr/>Structure &amp; <wbr/>Architecture</span></a></li><li><a href="#🧩-extensibility"><span>🧩 <wbr/>Extensibility</span></a></li><li><a href="#🧱-reliability-first"><span>🧱 <wbr/>Reliability <wbr/>First</span></a></li><li><a href="#🏷️-seooptimized-keywords-nonspam"><span>🏷️ <wbr/>SEO‑<wbr/>Optimized <wbr/>Keywords (<wbr/>Non‑<wbr/>Spam)</span></a></li><li><a href="#📝-license"><span>📝 <wbr/>License</span></a></li><li><a href="#⭐-why-this-project-exists"><span>⭐ <wbr/>Why <wbr/>This <wbr/>Project <wbr/>Exists</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">power-queues API Docs - v2.0.16</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
+<h2 id="📜-license" class="tsd-anchor-link">📜 License<a href="#📜-license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>MIT - free for commercial and private use.</p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-private" name="private" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Private</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#power-queues"><span>power-<wbr/>queues</span></a><ul><li><a href="#a-lightweight-scalable-and-high-performance-queue-engine-for-nodejs-built-on-redis-streams-lua-scripts"><span>A lightweight, scalable, and high-<wbr/>performance queue engine for <wbr/>Node.js built on <wbr/>Redis <wbr/>Streams + <wbr/>Lua scripts.</span></a></li><li><a href="#📚-documentation"><span>📚 <wbr/>Documentation</span></a></li><li><a href="#📦-installation"><span>📦 <wbr/>Installation</span></a></li><li><a href="#🧪-basic-usage"><span>🧪 <wbr/>Basic usage</span></a></li><li><a href="#⚖️-power-queues-vs-existing-solutions"><span>⚖️ power-<wbr/>queues vs <wbr/>Existing <wbr/>Solutions</span></a></li><li><a href="#🚀-key-features-advantages"><span>🚀 <wbr/>Key <wbr/>Features &amp; <wbr/>Advantages</span></a></li><li><ul><li><a href="#✔-ultrafast-bulk-xadd-luapowered"><span>✔ <wbr/>Ultra‑<wbr/>Fast <wbr/>Bulk <wbr/>XADD (<wbr/>Lua‑<wbr/>Powered)</span></a></li><li><a href="#✔-builtin-idempotent-workers"><span>✔ <wbr/>Built‑in <wbr/>Idempotent <wbr/>Workers</span></a></li><li><a href="#✔-stuck-task-recovery-advanced-stream-scanning"><span>✔ <wbr/>Stuck <wbr/>Task <wbr/>Recovery (<wbr/>Advanced <wbr/>Stream <wbr/>Scanning)</span></a></li><li><a href="#✔-highthroughput-workers"><span>✔ <wbr/>High‑<wbr/>Throughput <wbr/>Workers</span></a></li><li><a href="#✔-native-dlq-deadletter-queue"><span>✔ <wbr/>Native <wbr/>DLQ (<wbr/>Dead‑<wbr/>Letter <wbr/>Queue)</span></a></li><li><a href="#✔-zerooverhead-serialization"><span>✔ <wbr/>Zero‑<wbr/>Overhead <wbr/>Serialization</span></a></li><li><a href="#✔-complete-set-of-lifecycle-hooks"><span>✔ <wbr/>Complete <wbr/>Set of <wbr/>Lifecycle <wbr/>Hooks</span></a></li><li><a href="#✔-atomic-script-loading-noscript-recovery"><span>✔ <wbr/>Atomic <wbr/>Script <wbr/>Loading + <wbr/>NOSCRIPT <wbr/>Recovery</span></a></li><li><a href="#✔-job-progress-tracking"><span>✔ <wbr/>Job <wbr/>Progress <wbr/>Tracking</span></a></li></ul></li><li><a href="#🧩-extensibility"><span>🧩 <wbr/>Extensibility</span></a></li><li><a href="#🧱-reliability-first"><span>🧱 <wbr/>Reliability <wbr/>First</span></a></li><li><a href="#📜-license"><span>📜 <wbr/>License</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="modules.html">power-queues API Docs - v2.1.8</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>

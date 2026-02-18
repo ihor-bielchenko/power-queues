@@ -1,278 +1,300 @@
-import type { JsonPrimitiveOrUndefined } from 'power-redis';
 
-/**
- * A simple generic type representing a class constructor.
- *
- * `Constructor<T>` describes any class that can be instantiated using `new`,
- * producing a value of type `T`. It is commonly used for mixins, base-class
- * composition patterns, dependency injection helpers, and factory utilities.
- *
- * ### What it represents
- * This type enforces the shape of:
- *
- * ```ts
- * new (...args: any[]) => T
- * ```
- *
- * Meaning:
- * - The class can be created with any number of arguments.
- * - It will always return an instance that satisfies the type `T`.
- *
- * ### When to use it
- * Use `Constructor<T>` when:
- * - You are writing a mixin that accepts a class and returns an extended class.
- * - You need to constrain a function to accept only constructible classes.
- * - You want strong typing for factories that dynamically instantiate classes.
- *
- * ### Example: Mixin usage
- * ```ts
- * function Timestamped<TBase extends Constructor>(Base: TBase) {
- *   return class extends Base {
- *     createdAt = Date.now();
- *   };
- * }
- *
- * class BaseClass {}
- * const Extended = Timestamped(BaseClass);
- * const instance = new Extended(); // instance.createdAt → number
- * ```
- *
- * ### Example: Factory function
- * ```ts
- * function makeInstance<T>(Cls: Constructor<T>): T {
- *   return new Cls();
- * }
- *
- * class User { name = 'John'; }
- * const user = makeInstance(User); // User instance
- * ```
- *
- * @typeParam T - The instance type produced by the constructor.
- */
 export type Constructor<T = {}> = new (...args: any[]) => T;
 
 /**
- * Represents a Lua script registered within Redis and managed by the queue system.
+ * A Lua script definition cached by {@link PowerQueues} for fast execution in Redis.
  *
- * `SavedScript` is used internally by {@link PowerQueues} to store both:
- * - the **raw script body** (the original source code), and
- * - the **compiled SHA1 hash** returned by Redis via `SCRIPT LOAD`.
+ * ### Mental model (beginner-friendly)
+ * Redis can run Lua scripts with `EVAL` (send the whole script every time),
+ * or faster with `EVALSHA` (send only the script hash after the script is loaded).
  *
- * Redis identifies loaded scripts by SHA1 rather than by source, so keeping both
- * values allows the system to:
+ * This type represents **one script in two forms**:
+ * 1) the **source code** (`codeBody`) — the actual Lua script text  
+ * 2) the **loaded hash** (`codeReady`) — the SHA1 returned by `SCRIPT LOAD`
  *
- * - reload scripts if Redis reports `NOSCRIPT`,
- * - avoid re-sending large Lua source on every execution,
- * - transparently recover after Redis restart, eviction, or failover,
- * - ensure consistent and efficient `EVALSHA` usage.
+ * `PowerQueues.runScript(...)` uses this structure like this:
+ * - If the script isn't saved yet → it saves `codeBody`
+ * - If it isn't loaded yet → it calls `SCRIPT LOAD` and stores the returned SHA in `codeReady`
+ * - Then it calls `EVALSHA` using `codeReady`
+ * - If Redis replies with `NOSCRIPT` (Redis restarted / cache flushed) → it loads again and retries
  *
- * ### Fields
- * - `codeBody`  
- *   The full Lua script text as a string.  
- *   This is always present and is what gets sent to Redis when loading the script.
- *
- * - `codeReady`  
- *   The SHA1 hash returned by `SCRIPT LOAD`.  
- *   It is filled automatically on first load and reused for all subsequent calls.
- *   If Redis forgets the script, the system loads it again and updates this value.
- *
- * ### Example (internal usage)
- * ```ts
- * // When saving:
- * scripts["XAddBulk"] = {
- *   codeBody: XAddBulk,
- *   codeReady: undefined
- * };
- *
- * // After loading via SCRIPT LOAD:
- * scripts["XAddBulk"].codeReady = "1ab2c3d4e5...";
- *
- * // During eval:
- * redis.evalsha(codeReady, ...)
- * ```
- *
- * @property codeReady - SHA1 digest assigned by Redis after loading the script. Optional.
- * @property codeBody - The original Lua script source code. Required.
- */
-export type SavedScript = { 
-	codeReady?: string; 
-	codeBody: string; 
-};
-
-/**
- * Fine-grained options controlling how tasks are added to a Redis Stream
- * using {@link PowerQueues.addTasks | addTasks}.
- *
- * `AddTasksOptions` allows you to tune trimming behavior, idempotency, batching
- * and basic progress-tracking for bulk task insertion.
- *
- * Every option is optional - defaults are designed to be safe and predictable.
- *
- * ---
- * ## Stream trimming & retention
- *
- * @property maxlen  
- * The maximum allowed length of the stream.  
- * When set, Redis may trim older messages using `MAXLEN` rules.
- *
- * @property approx  
- * Whether to use **approximate trimming** (`~`) instead of exact (`=`).  
- * Approximate trimming is faster and recommended for most queues.
- * Defaults to `true` unless `exact` is explicitly set.
- *
- * @property exact  
- * Forces **exact trimming** (`=`), which makes Redis strictly enforce `maxlen`.  
- * Slower and rarely needed; use only for strict historic retention rules.
- *
- * @property nomkstream  
- * Prevents Redis from creating the stream automatically when empty.  
- * Useful when you want predictable errors instead of auto-creation.
- *
- * @property trimLimit  
- * Redis `LIMIT` parameter for trimming - limits how many entries are removed
- * per XADD operation. Helps avoid latency spikes when maxlen is low and stream is large.
- *
- * ---
- * ## Time-based trimming (MINID)
- *
- * @property minidWindowMs  
- * Enables **MINID-based trimming**: automatically removes entries older than  
- * `now - minidWindowMs`.  
- * Only used if `minidWindowMs > 0`.
- *
- * @property minidExact  
- * Use exact (`=`) or approximate (`~`) MINID trimming.  
- * Approximate is faster; exact guarantees strict cutoff.
- *
- * ---
- * ## Idempotency mode
- *
- * @property idem  
- * Whether to attach an idempotency key to each task when using object payloads.
- * When enabled:
- * - the worker ensures each key is processed at most once,
- * - retries or duplicates with the same key are skipped automatically.
- *
- * ---
- * ## Status tracking (lightweight job progress)
- *
- * @property status  
- * Enables per-job total counter:  
- * `queueName:<jobId>:total = <number of tasks>`
- *
- * @property statusTimeoutMs  
- * TTL (in milliseconds) for all `status` keys.  
- * Defaults to `300000` (5 minutes).
- *
- * ---
- * ## Task ID overwrite
- *
- * @property id  
- * Optional entry ID for all tasks in this batch.  
- * When not set, Redis generates IDs automatically (recommended).
- *
- * ---
- * ## Summary
- * Use this type to control:
- * - how tasks are inserted,
- * - how the stream is trimmed,
- * - whether idempotency should be applied,
- * - and whether basic job-level statistics should be tracked.
+ * ### Why caching matters
+ * Loading scripts once and using `EVALSHA`:
+ * - reduces network traffic (no need to send the full Lua source each call)
+ * - improves performance under high load
+ * - avoids re-parsing the script on every call
  *
  * @example
  * ```ts
- * await queue.addTasks('queue:emails', data, {
- *   maxlen: 200000,
- *   approx: true,
- *   minidWindowMs: 300000, // keep only last 5 minutes
- *   idem: true,
- *   status: true,
- * });
+ * this.scripts['XAddBulk'] = { codeBody: XAddBulk };
+ * // later:
+ * if (!this.scripts['XAddBulk'].codeReady) {
+ *   this.scripts['XAddBulk'].codeReady = await redis.script('LOAD', this.scripts['XAddBulk'].codeBody);
+ * }
+ * const res = await redis.evalsha(this.scripts['XAddBulk'].codeReady, ...);
  * ```
+ */
+export type SavedScript = {
+	/**
+	 * The "ready-to-run" identifier of the script inside Redis: the SHA1 hash.
+	 *
+	 * ### What it is
+	 * When you call `redis.script('LOAD', luaSource)`, Redis returns a SHA1 string.
+	 * Example: `"e0e1f9b7d3c1..."`
+	 *
+	 * ### When it is present
+	 * - `undefined` until the script has been loaded at least once
+	 * - may become invalid if Redis restarts or script cache is flushed
+	 *
+	 * ### How the code handles invalidation
+	 * If `EVALSHA` throws `NOSCRIPT`, the library reloads the script and updates this field.
+	 *
+	 * @defaultValue `undefined` (until first `SCRIPT LOAD`)
+	 */
+	codeReady?: string;
+
+	/**
+	 * The Lua source code of the script.
+	 *
+	 * ### What it is
+	 * The full text of the Lua script that Redis will execute.
+	 *
+	 * ### Requirements
+	 * - must be a non-empty string
+	 * - should be valid Lua code compatible with Redis scripting environment
+	 *
+	 * ### Why it is always stored
+	 * Even after `codeReady` is known, you still need `codeBody` because:
+	 * - Redis may forget the script (restart / flush)
+	 * - the library must be able to reload it automatically on `NOSCRIPT`
+	 *
+	 * @example
+	 * ```lua
+	 * -- Lua script body
+	 * local key = KEYS[1]
+	 * return redis.call('GET', key)
+	 * ```
+	 */
+	codeBody: string;
+};
+
+/**
+ * Options that control how {@link PowerQueues.addTasks} writes tasks into a Redis Stream
+ * and how those tasks should be treated by the queue system (job grouping, retries, idempotency, trimming).
+ *
+ * ### Mental model (for beginners)
+ * `addTasks()` ultimately appends entries to a Redis Stream (via XADD, here wrapped by the `XAddBulk` Lua script).
+ * These options let you:
+ * - decide **how the stream is created / trimmed**
+ * - decide **how IDs are generated**
+ * - attach **metadata** to tasks (job name, attempt number, timestamps)
+ * - optionally enable **status counters** for monitoring
+ * - optionally influence **idempotency** (deduplication) key used by workers
+ *
+ * ### Common usage patterns
+ * - **Default behavior**: call `addTasks(queue, tasks)` without options — it will choose sane defaults.
+ * - **Group tasks under one job**: pass `{ job: 'import:2026-02-18' }`
+ * - **Retry batch with attempt+1**: pass `{ attempt: prevAttempt + 1 }`
+ * - **Keep stream small**: pass `{ maxlen: 100_000, approx: true }`
+ *
+ * @remarks
+ * Redis XADD trimming has two modes:
+ * - **Approximate trimming** (faster, less exact length guarantees): `approx = true`
+ * - **Exact trimming** (slower, stricter length): `exact = true`
+ *
+ * In this implementation:
+ * - If `exact` is `true`, then `approx` is forced to `false`.
+ * - If `approx` is not provided, it defaults to `true` (unless `exact` is `true`).
  */
 export type AddTasksOptions = {
+	/**
+	 * Do not create the stream automatically if it doesn't exist.
+	 *
+	 * ### What it does
+	 * Controls whether `XADD ... MKSTREAM` is allowed.
+	 *
+	 * - `false` (default): if the stream key does not exist, Redis will create it automatically.
+	 * - `true`: do **not** auto-create; writing to a missing stream may fail depending on the script/command behavior.
+	 *
+	 * ### When to use
+	 * - You want stricter infrastructure control and prefer to create streams explicitly during provisioning.
+	 * - You want to detect configuration errors early (e.g., wrong queue name).
+	 *
+	 * @defaultValue `false`
+	 */
 	nomkstream?: boolean;
+
+	/**
+	 * Maximum length of the Redis Stream after adding entries (stream trimming).
+	 *
+	 * ### What it does
+	 * Enables trimming so the stream does not grow forever.
+	 * Internally passed to the Lua `XAddBulk` implementation and typically maps to Redis `MAXLEN`.
+	 *
+	 * - `0` or not set: do not trim by length
+	 * - `N > 0`: keep stream length around `N` entries (exactness depends on {@link approx}/{@link exact})
+	 *
+	 * ### Important
+	 * Trimming can delete older entries. If you rely on long retention, do not set `maxlen` too small.
+	 *
+	 * @defaultValue `0` (no MAXLEN trimming)
+	 * @example
+	 * ```ts
+	 * await q.addTasks('alerts', tasks, { maxlen: 100_000, approx: true });
+	 * ```
+	 */
 	maxlen?: number;
+
+	/**
+	 * Sliding window (in milliseconds) used to build more deterministic stream IDs (MINID strategy).
+	 *
+	 * ### What it does
+	 * Helps to generate or constrain entry IDs based on time windows, so IDs increase predictably.
+	 * Useful when many producers write concurrently and you want IDs to be time-bucketed.
+	 *
+	 * This is an advanced option and depends on how `XAddBulk` script uses it.
+	 *
+	 * @defaultValue `0` (disabled)
+	 */
 	minidWindowMs?: number;
+
+	/**
+	 * Whether MINID calculations should be exact (strict) rather than relaxed/heuristic.
+	 *
+	 * ### What it does
+	 * If your `XAddBulk` script supports a "strict" mode for MINID, enabling this makes it
+	 * less tolerant to edge cases, but more deterministic.
+	 *
+	 * @defaultValue `false`
+	 */
 	minidExact?: boolean;
+
+	/**
+	 * Enable approximate trimming mode.
+	 *
+	 * ### What it does
+	 * Equivalent to Redis `MAXLEN ~ N` in spirit:
+	 * - faster
+	 * - does not guarantee exact stream size after trimming
+	 *
+	 * ### Rules in this implementation
+	 * - If {@link exact} is `true` => `approx` becomes `false` automatically.
+	 * - If not provided and {@link exact} is not `true` => treated as `true`.
+	 *
+	 * @defaultValue `true` (unless {@link exact} is `true`)
+	 */
 	approx?: boolean;
+
+	/**
+	 * Enable exact trimming mode.
+	 *
+	 * ### What it does
+	 * Equivalent to Redis `MAXLEN = N` in spirit:
+	 * - stricter stream length guarantee
+	 * - usually slower / more work for Redis
+	 *
+	 * ### Notes
+	 * If you set this to `true`, {@link approx} is effectively disabled.
+	 *
+	 * @defaultValue `false`
+	 */
 	exact?: boolean;
+
+	/**
+	 * A secondary trimming/cleanup limit used by the Lua script (`trimLimit`).
+	 *
+	 * ### What it does
+	 * This is not a standard Redis XADD flag; it is passed into your `XAddBulk` script.
+	 * Typically it means: "limit how many entries can be trimmed in one operation" or
+	 * "apply additional trimming constraints".
+	 *
+	 * ### When to use
+	 * - You observe spikes/latency due to heavy trimming and want to cap work per call.
+	 *
+	 * @defaultValue `0` (script-specific; usually means "no extra limit")
+	 */
 	trimLimit?: number;
-	id?: string;
+
+	/**
+	 * Job identifier assigned to all tasks in this `addTasks()` call.
+	 *
+	 * ### What it does
+	 * Acts as a label/group name for monitoring and status keys.
+	 * If not provided, a UUID is generated.
+	 *
+	 * ### Why it matters
+	 * If {@link status} is enabled, counters are stored under:
+	 * `\${queueName}:\${job}:total`
+	 * (and workers may maintain per-job/per-queue status as well).
+	 *
+	 * @defaultValue Random UUID
+	 */
+	job?: string;
+
+	/**
+	 * Enable writing a "total tasks" status counter for the current job.
+	 *
+	 * ### What it does
+	 * When `true`, `addTasks()` will store:
+	 * - key: `\${queueName}:\${job}:total`
+	 * - value: number of tasks added
+	 * - TTL: {@link PowerQueues.logStatusTimeout}
+	 *
+	 * This is useful for dashboards and progress tracking.
+	 *
+	 * ### Notes
+	 * This does **not** automatically track ok/err/ready here — those are managed elsewhere in the worker flow.
+	 *
+	 * @defaultValue `false`
+	 */
 	status?: boolean;
+
+	/**
+	 * Status TTL in milliseconds (how long status keys should live).
+	 *
+	 * ### Important
+	 * In the current code you pasted, the TTL used for status keys is `this.logStatusTimeout`,
+	 * not this field. So this option is either:
+	 * - planned for future use, or
+	 * - used in other parts of the codebase, or
+	 * - currently unused.
+	 *
+	 * If you want this option to work, you would need to apply it where `pexpire(...)` is called.
+	 *
+	 * @defaultValue (currently unused in shown code)
+	 */
 	statusTimeoutMs?: number;
-	idem?: boolean;
+
+	/**
+	 * Attempt number to assign to each enqueued task (retry counter).
+	 *
+	 * ### What it does
+	 * Sets the `attempt` field for all tasks created in this batch.
+	 * - First enqueue is usually `0`
+	 * - On retry, workers typically enqueue the same payload with `attempt + 1`
+	 *
+	 * @defaultValue `0`
+	 * @example
+	 * ```ts
+	 * await q.addTasks('sync', payloads, { job: 'sync:customers', attempt: 0 });
+	 * // later on retry:
+	 * await q.addTasks('sync', payloads, { job: 'sync:customers', attempt: 1 });
+	 * ```
+	 */
+	attempt?: number;
+
+	/**
+	 * Timestamp (milliseconds since epoch) to assign as `createdAt` for each task in this batch.
+	 *
+	 * ### What it does
+	 * If not provided, each task gets `Date.now()` at the time of batching.
+	 * Useful if you want tasks to preserve an original creation time across retries/requeues.
+	 *
+	 * @defaultValue `Date.now()`
+	 */
+	createdAt?: number;
 };
 
-/**
- * A structured collection of Redis keys used to implement safe idempotent
- * task execution inside {@link PowerQueues}.
- *
- * When a task includes an `idemKey`, the queue ensures that **only one worker**
- * processes that task - even if duplicates, retries, or race conditions occur.
- *
- * `IdempotencyKeys` contains the 3 keys needed for this coordination:
- *
- * ---
- * ## Keys
- *
- * @property prefix  
- * Common prefix (`q:<stream>:`) applied to all idempotency keys for a queue.  
- * Helps keep keys grouped and easily discoverable in Redis.
- *
- * @property doneKey  
- * Indicates that the task has been successfully processed at least once.  
- * - Set when the task finishes.  
- * - Has a short TTL (`workerCacheTaskTimeoutMs`).  
- * - When present, duplicate tasks are **instantly skipped**.
- *
- * @property lockKey  
- * A temporary lock used to ensure **only one worker** is allowed to start
- * executing a task with this idempotency key.  
- * Contains a random token to prevent other workers from stealing the lock.
- *
- * @property startKey  
- * Marks that a worker has begun processing this task.  
- * Used for detecting contention and calculating wait times for competing workers.
- *
- * @property token  
- * A unique value (per worker, per execution) used to:
- * - claim the lock uniquely,  
- * - validate ownership before freeing or completing the task,  
- * - prevent accidental unlocks or interference by other workers.
- *
- * ---
- * ## How these keys work together
- *
- * 1. **IdempotencyAllow** checks:
- *    - if `doneKey` exists → skip (task already processed);
- *    - otherwise tries to set `lockKey` with the worker’s `token`.
- *
- * 2. **IdempotencyStart** re-validates ownership and extends TTLs.
- *
- * 3. **IdempotencyDone** sets `doneKey` and clears locks.
- *
- * 4. **IdempotencyFree** is used to safely release locks when execution fails.
- *
- * Together, they provide strong guarantees that a task:
- * - is never processed twice,
- * - cannot be stolen by another worker mid-execution,
- * - becomes retryable after TTL expires if processing never fully completed.
- *
- * ---
- * @example
- * ```ts
- * const keys = queue.idempotencyKeys('upload:123');
- *
- * // {
- * //   prefix: "q:queue_name:",
- * //   doneKey:  "q:queue_name:done:upload_123",
- * //   lockKey:  "q:queue_name:lock:upload_123",
- * //   startKey: "q:queue_name:start:upload_123",
- * //   token: "host:12345:abcde"
- * // }
- * ```
- */
 export type IdempotencyKeys = {
 	prefix: string; 
 	doneKey: string; 
@@ -282,109 +304,190 @@ export type IdempotencyKeys = {
 };
 
 /**
- * Represents a single task that can be pushed into a queue via
- * {@link PowerQueues.addTasks | addTasks}.  
- * A task defines **what job should be executed** and **what data it carries**.
+ * A single unit of work processed by {@link PowerQueues}.
  *
- * A `Task` can be represented in **two formats** depending on how payload
- * should be encoded:
+ * ### Mental model (beginner-friendly)
+ * Think of a **Task** as a small “message” that goes into a queue.
+ * A worker (consumer) reads the message, runs some code (your handler), and then acknowledges it.
  *
- * ---
- * ## 1. Object payload form
+ * In this library, tasks are stored in a **Redis Stream** entry.
+ * Each stream entry contains fields like `payload`, `job`, `attempt`, `createdAt`, and `idemKey`.
  *
- * ```ts
- * {
- *   job: string;
- *   id?: string;
- *   createdAt?: number;
- *   payload: any;
- *   idemKey?: string;
- * }
- * ```
+ * ### Lifecycle overview
+ * 1. **Producer** creates a task object and calls `addTasks(queueName, [task])`
+ * 2. The task is written into Redis Stream (XADD via `XAddBulk` script)
+ * 3. **Consumer group** reads tasks with `XREADGROUP`
+ * 4. Worker calls {@link PowerQueues.onExecute} to process it
+ * 5. If successful: task is acknowledged and optionally removed from the stream
+ * 6. If failed: it may be re-enqueued with a higher {@link attempt} or moved to a DLQ
  *
- * - `payload` is a normal JavaScript object.
- * - Values are serialized into the Redis Stream entry automatically.
- * - Additional metadata (`createdAt`, `job`, and `idemKey`) is injected during batching.
+ * ### Important: shape depends on the context
+ * There are **two "views"** of a task:
+ * - **Input task** (what you pass to `addTasks`) — typically contains your `payload` + optional `idemKey`
+ * - **Runtime task** (what worker receives in `onExecute`) — contains `id`, timestamps, retry info, etc.
  *
- * Use this format whenever your task data is naturally an object.
- *
- * ---
- * ## 2. Flat array form
- *
- * ```ts
- * {
- *   job: string;
- *   id?: string;
- *   createdAt?: number;
- *   flat: JsonPrimitiveOrUndefined[];
- *   idemKey?: string;
- * }
- * ```
- *
- * - `flat` represents a pre-flattened list of alternating `field, value`
- *   pairs:  
- *   `["field1", "value1", "field2", "value2", ...]`
- * - Used when you want **full control** over Stream field/value structure
- *   or want to skip object→string serialization overhead.
- * - Must contain an **even number of elements**.
- *
- * ---
- * ## Field Descriptions
- *
- * @property job  
- * A logical identifier representing the type or category of the task.
- * Used to group related operations and track per-job metrics.
- *
- * @property id  
- * Optional explicit Redis Stream ID.  
- * If omitted, Redis auto-generates an ID (recommended in most cases).
- *
- * @property createdAt  
- * Optional timestamp of task creation.  
- * If omitted, the system fills this automatically.
- *
- * @property payload  
- * A structured object containing arbitrary task data.  
- * Mutually exclusive with `flat`.
- *
- * @property flat  
- * A pre-flattened array of field/value pairs.  
- * Mutually exclusive with `payload`.
- *
- * @property idemKey  
- * Optional idempotency key.  
- * If present, the queue guarantees **at most once** execution across workers.
- *
- * ---
- * ## How the system augments tasks internally
- *
- * During batching, the queue automatically injects:
- * - `createdAt`  
- * - `job`  
- * - optional `idemKey`
- *
- * This ensures every task stored in Redis carries enough metadata to be
- * routed, deduplicated, retried, logged, or reconstructed.
- *
- * ---
  * @example
- * **Object payload**
+ * **Producer side (enqueue)**
  * ```ts
- * const task: Task = {
- *   job: 'email',
- *   payload: { to: 'user@example.com', subject: 'Hello' }
- * };
+ * await q.addTasks('emails', [{
+ *   job: 'send-welcome',         // optional, can be overwritten by AddTasksOptions.job
+ *   payload: { userId: 42 },     // your data
+ *   attempt: 0,                  // optional, can be overwritten by AddTasksOptions.attempt
+ *   idemKey: 'email:welcome:42', // optional but recommended for idempotency
+ * }]);
  * ```
  *
  * @example
- * **Flat payload**
+ * **Consumer side (process)**
  * ```ts
- * const task: Task = {
- *   job: 'metrics',
- *   flat: ['cpu', 34.1, 'ram', 4120]
- * };
+ * async onExecute(queueName: string, task: Task) {
+ *   // task.id exists here (Redis Stream ID)
+ *   // task.payload is the object you originally sent
+ *   // task.attempt tells you which retry this is
+ *   return task;
+ * }
  * ```
  */
-export type Task =
-	| { job: string; id?: string; createdAt?: number; payload: any; idemKey?: string; }
-	| { job: string; id?: string; createdAt?: number; flat: JsonPrimitiveOrUndefined[]; idemKey?: string; };
+export type Task = {
+	/**
+	 * Job name (group/label) for this task.
+	 *
+	 * ### What it is
+	 * A string that identifies the “category” or “batch” this task belongs to.
+	 * It is mainly used for:
+	 * - grouping tasks for monitoring/statistics
+	 * - naming status keys (`${queueName}:${job}:...`)
+	 * - debugging (“which pipeline produced this task?”)
+	 *
+	 * ### How it is set
+	 * - You can set it on the task directly
+	 * - or override / assign it for the entire batch via `AddTasksOptions.job`
+	 * - if not provided, this library often generates a UUID
+	 *
+	 * ### Beginner tip
+	 * Use human-readable job names when you can, for example:
+	 * - `"sync:devices"`
+	 * - `"alerts:telegram"`
+	 * - `"email:welcome"`
+	 */
+	job: string;
+
+	/**
+	 * Redis Stream entry ID for this task.
+	 *
+	 * ### What it is
+	 * When a task is stored in a Redis Stream, Redis assigns it an ID like:
+	 * `"1708250000000-0"` (millisecond timestamp + sequence number).
+	 *
+	 * ### When it exists
+	 * - It is usually **missing** before enqueue (producer-side)
+	 * - It is **present** when the worker reads the task from Redis (consumer-side)
+	 *
+	 * ### Why it matters
+	 * This is the unique identifier of the stream entry.
+	 * It is used for acknowledging (`XACK`) and deleting (`XDEL`) entries.
+	 *
+	 * @defaultValue `undefined` (before enqueue)
+	 */
+	id?: string;
+
+	/**
+	 * Task creation timestamp (milliseconds since UNIX epoch).
+	 *
+	 * ### What it means
+	 * The time when the task was created/enqueued.
+	 *
+	 * ### How it is set
+	 * - If you pass `AddTasksOptions.createdAt`, that value is used
+	 * - Otherwise the library sets it to `Date.now()` during batching
+	 *
+	 * ### What it is used for
+	 * - debugging and metrics (how long tasks wait in queue)
+	 * - retry logic / dead-letter policies (optional, depending on your design)
+	 * - “stuck task” detection in combination with pending entries
+	 *
+	 * @defaultValue `Date.now()` (if not provided)
+	 */
+	createdAt?: number;
+
+	/**
+	 * User data carried by the task (the "work request").
+	 *
+	 * ### What it is
+	 * This is the payload your application cares about.
+	 * Examples:
+	 * - send an email: `{ userId: 42, template: 'welcome' }`
+	 * - process alert: `{ telegramChatId: 123, message: '...' }`
+	 * - sync device: `{ deviceId: 'abc', force: true }`
+	 *
+	 * ### Important behavior in this implementation
+	 * When tasks are enqueued, the library **serializes** your data to JSON:
+	 * - in `buildBatches()` it does `payload: JSON.stringify(taskP)`
+	 * - later on read, it tries to `JSON.parse(...)` it back
+	 *
+	 * That means:
+	 * - payload should be **JSON-serializable**
+	 * - avoid functions, class instances, circular references, BigInt without conversion, etc.
+	 *
+	 * @remarks
+	 * In your type it is `any`, because different jobs can carry completely different payload shapes.
+	 * In real projects, it’s common to create a generic version like `Task<TPayload = unknown>`.
+	 */
+	payload: any;
+
+	/**
+	 * Idempotency (deduplication) key for this task.
+	 *
+	 * ### What it is
+	 * A string that uniquely identifies the *logical operation* represented by this task.
+	 *
+	 * ### Why it exists
+	 * In distributed systems, a task can be delivered/processed more than once:
+	 * - worker crashes after processing but before acknowledge
+	 * - network issues / timeouts
+	 * - manual re-queue
+	 *
+	 * Idempotency makes retries safe by ensuring:
+	 * - only one worker can “own” the task at a time (lock)
+	 * - already completed tasks are not executed again (done marker)
+	 *
+	 * ### How it is used in this code
+	 * Workers compute internal Redis keys based on `queueName` + `idemKey`:
+	 * - done key
+	 * - lock key
+	 * - start key
+	 *
+	 * The scripts `IdempotencyAllow/Start/Done/Free` use these keys.
+	 *
+	 * ### How to choose a good key (beginner tip)
+	 * It should represent the business operation:
+	 * - `"email:welcome:user:42"`
+	 * - `"sync:device:AA:BB:CC:DD:EE:FF"`
+	 * - `"alert:telegram:chat:123:msg:999"`
+	 *
+	 * @defaultValue
+	 * If not set on the task, `addTasks()` will use `AddTasksOptions.idemKey`,
+	 * and if that is also missing, it generates a random UUID.
+	 */
+	idemKey?: string;
+
+	/**
+	 * Attempt number (retry counter).
+	 *
+	 * ### What it means
+	 * How many times this logical task has been attempted.
+	 * - `0` usually means "first try"
+	 * - `1` means "first retry"
+	 * - `2` means "second retry", etc.
+	 *
+	 * ### How it is used in this code
+	 * - On failure, if `attempt < retryCount - 1`, the task is re-enqueued with `attempt + 1`
+	 * - If retries are exhausted, it can be moved to a DLQ (dead-letter queue) if enabled
+	 *
+	 * ### Beginner tip
+	 * You can use `attempt` to implement backoff logic or change behavior on retries.
+	 *
+	 * @defaultValue `0`
+	 */
+	attempt: number;
+};

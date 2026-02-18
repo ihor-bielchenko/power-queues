@@ -20,59 +20,6 @@
 	"plugin": [],
 	"githubPages": false,
 
-	"externalSymbolLinkMappings": {
-		"typescript": {
-			"Error": "#",
-			"AbortController": "#"
-		},
-		"full-utils": {
-			"jsonDecode": "#",
-		},
-		"power-redis": {
-			"Jsonish": "#",
-			"PowerRedis.toKeyString": "#",
-			"PowerRedis.toPayload": "#",
-			"IORedisLike": "#",
-			"PowerRedis": "#"
-		},
-		"power-queues": {
-			"PowerQueue.readyKey": "#",
-			"PowerQueue.processingKey": "#",
-			"PowerQueue.ensureReserveScript": "#",
-			"PowerQueue.moveOneToProcessing": "#",
-			"PowerQueue.getReserveScriptLMOVE": "#",
-			"PowerQueue.getReserveScriptRPOPLPUSH": "#",
-			"PowerQueue.fail": "#",
-			"PowerQueue.retry": "#",
-			"PowerQueue.success": "#",
-			"PowerQueue.ack": "#",
-			"PowerQueue.processingVtKey": "#",
-			"PowerQueue.getRequeueScript": "#",
-			"PowerQueue.evalshaWithReload": "#",
-			"PowerQueue.nowSec": "#",
-			"PowerQueue.getPromoteScript": "#",
-			"PowerQueue.delayedKey": "#",
-			"PowerQueue.zaddCompatXXCH": "#",
-			"PowerQueue.startHeartbeat": "#",
-			"PowerQueue.loop": "#",
-			"PowerQueue.runners": "#",
-			"PowerQueue.logic": "#",
-			"PowerQueue.jitteredBackoffSec": "#",
-			"PowerQueue.data": "#",
-			"PowerQueue.error": "#",
-			"PowerQueues.saveScript": "#",
-			"PowerQueues.runScript": "#",
-			"PowerQueues.idempotencyAllow": "#",
-			"PowerQueues.idempotencyStart": "#",
-			"PowerQueues.sendHeartbeat": "#",
-			"PowerQueues.heartbeat": "#",
-			"PowerQueues.approve": "#",
-			"SelectStuck": "#",
-			"PowerQueues.attemptsKey": "#",
-			"IdempotencyKeys": "#"
-		}
-	},
-
 	"highlightLanguages": [ "ts", "js", "json", "bash", "regex", "lua" ],
 
 	"visibilityFilters": {
