@@ -14,6 +14,7 @@ export type AddTasksOptions = {
 	approx?: boolean;
 	exact?: boolean;
 	trimLimit?: number;
+	idemKey?: string;
 	job?: string;
 	status?: boolean;
 	statusTimeoutMs?: number;
