@@ -41,9 +41,9 @@ const queue = new PowerQueues({
 
 await queue.loadScripts(true);
 
-await queue.addTasks('mysql_create:example:table_name', [
-	{ type: 'welcome', userId: 42 },
-	{ type: 'hello', userId: 51 }
+await queue.addTasks('ws', [
+	{ body: 'welcome', userId: 42 },
+	{ body: 'hello', userId: 51 }
 ]);
 ```
 
