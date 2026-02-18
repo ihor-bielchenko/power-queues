@@ -41,15 +41,18 @@ const queue = new PowerQueues({
 
 await queue.loadScripts(true);
 
-await queue.addTasks('mysql_create:example:table_name', [
-	{ type: 'welcome', userId: 42 },
-	{ type: 'hello', userId: 51 }
+await queue.addTasks('ws', [
+	{ body: 'welcome', userId: 42 },
+	{ body: 'hello', userId: 51 }
 ]);
 ```
 
-Example of a worker for executing a MySQL insert transaction:
+Example of queue worker for sending message to client via WebSocket and executing a MySQL insert transaction:
 
 ``` ts
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 import mysql from 'mysql2/promise';
 import Redis from 'ioredis';
 import type { IORedisLike } from 'power-redis';
@@ -70,7 +73,11 @@ const pool = mysql.createPool({
 });
 const redis = new Redis('redis://127.0.0.1:6379');
 
-export class ExampleQueue extends PowerQueues {
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+export class WebSocketAndMysqlCreateQueue extends PowerQueues {
 	public readonly selectStuckCount: number = 256;
 	public readonly selectCount: number = 256;
 	public readonly retryCount: number = 3;
@@ -84,50 +91,68 @@ export class ExampleQueue extends PowerQueues {
 		this.redis = redis;
 	}
 
+	async onExecute(queueName: string, task: Task) {
+		const id = uuid();
+
+		io.to(`user:${task.payload.userId}`).emit('alerts', {
+			body: task.payload.body,
+			id,
+		});
+		return {
+			...task,
+			payload: {
+				...task.payload,
+				id,
+			},
+		};
+	}
+
 	async onBatchReady(queueName: string, tasks: Task[]) {
-		const values = tasks
-			.filter((task) => isObjFilled(task.payload))
-			.map((task) => task.payload);
+		const values = tasks.map((task) => task.payload);
+		const conn = await pool.getConnection();
+	
+		try {
+			await conn.beginTransaction();
 
-		if (isArrFilled(values)) {
-			const conn = await pool.getConnection();
+			const cols = Object.keys(values[0]);
+			const placeholder = `(${cols.map(() => '?').join(',')})`;
+			const sql = `INSERT INTO \`alerts\` (${cols.map((c) => `\`${c}\``).join(',')}) VALUES ${values.map(() => placeholder).join(',')}`;
+			const params = [];
 
-			try {
-				await conn.beginTransaction();
-
-				const cols = Object.keys(values[0]);
-				const placeholder = `(${cols.map(() => '?').join(',')})`;
-				const sql = `INSERT INTO \`alerts\` (${cols.map((c) => `\`${c}\``).join(',')}) VALUES ${values.map(() => placeholder).join(',')}`;
-				const params = [];
-
-				for (const row of values) {
-					for (const c of cols) {
-						params.push(row[c]);
-					}
+			for (const row of values) {
+				for (const c of cols) {
+					params.push(row[c]);
 				}
-				await conn.execute(sql, params);
-				await conn.commit();
 			}
-			catch (err) {
-				await conn.rollback();
-				throw err;
-			}
-			finally {
-				conn.release();
-			}
+			await conn.execute(sql, params);
+			await conn.commit();
+		}
+		catch (err) {
+			await queryRunner.rollbackTransaction();
+			throw err;
+		}
+		finally {
+			await queryRunner.release();
 		}
 	}
 
-	async onBatchError(err: any, queueName: string, tasks: Array<[ string, any, number, string, string, number ]>) {
-		this.logger.error('Transaction error', queueName, tasks.length, (process.env.NODE_ENV === 'production')
+	async onError(err: any, queueName: string, task: Task): Promise<Task> {
+		console.error('Alert error', queueName, task, (process.env.NODE_ENV === 'production')
 			? err.message
-			: err, tasks.map((task) => task[1]));
+			: err);
+		return task;
+	}
+
+	async onBatchError(err: any, queueName: string, tasks: Array<[ string, any, number, string, string, number ]>) {
+		console.error('Batch error', queueName, tasks.length, (process.env.NODE_ENV === 'production')
+			? err.message
+			: err);
 	}
 }
 
 const exampleQueue = new ExampleQueue();
 
-exampleQueue.runQueue('mysql_create:example:table_name');
+exampleQueue.runQueue('ws');
 ```
 
 ## ⚖️ power-queues vs Existing Solutions
