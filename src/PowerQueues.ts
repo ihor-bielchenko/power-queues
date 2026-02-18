@@ -405,11 +405,10 @@ export class PowerQueues extends PowerRedis {
 
 		if (!(taskP.attempt >= (this.retryCount - 1))) {
 			await this.onRetry(err, queueName, taskP);
-			await this.addTasks(queueName, [{ ...taskP.payload }], {
+			await this.addTasks(queueName, [{ ...taskP.payload, idemKey: taskP.idemKey, }], {
 				createdAt: taskP.createdAt,
 				job: taskP.job,
 				attempt: (taskP.attempt || 0) + 1,
-				idemKey: taskP.idemKey,
 			});
 		}
 		else if (this.logStatus) {
@@ -418,11 +417,10 @@ export class PowerQueues extends PowerRedis {
 
 			await this.incr(statusKey +'err', this.logStatusTimeout);
 			await this.incr(statusKey +'ready', this.logStatusTimeout);
-			await this.addTasks(dlqKey, [{ ...taskP.payload }], {
+			await this.addTasks(dlqKey, [{ ...taskP.payload, idemKey: taskP.idemKey, }], {
 				createdAt: taskP.createdAt,
 				job: taskP.job,
 				attempt: taskP.attempt,
-				idemKey: taskP.idemKey,
 			});
 		}
 		return await this.onError(err, queueName, { ...taskP, attempt: (taskP.attempt || 0) + 1 });
@@ -654,7 +652,7 @@ export class PowerQueues extends PowerRedis {
 				payload: JSON.stringify(taskP),
 				attempt: Number(opts.attempt || 0),
 				job: opts.job ?? uuid(),
-				idemKey: String((idemKey ?? opts?.idemKey) || uuid()),
+				idemKey: String(idemKey || uuid()),
 				createdAt,
 			};
 			const reqKeysLength = this.keysLength(entry);
