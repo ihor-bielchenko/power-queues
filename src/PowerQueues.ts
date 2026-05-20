@@ -1,3 +1,5 @@
+import pLimit from 'p-limit';
+import { randomUUID } from 'node:crypto';
 import { setMaxListeners } from 'node:events';
 import type { IORedisLike } from 'power-redis';
 import type {
@@ -7,16 +9,6 @@ import type {
 	IdempotencyKeys,
 } from './types';
 import { PowerRedis } from 'power-redis';
-import { 
-	isObjFilled,
-	isObj,
-	isArrFilled, 
-	isArr,
-	isStrFilled,
-	isExists,
-	wait,
-} from 'full-utils';
-import { v4 as uuid } from 'uuid';
 import {
 	XAddBulk,
 	Approve,
@@ -30,27 +22,33 @@ import {
 class Base {
 }
 
+export async function wait(timeout: number = 0) {
+	await (new Promise((resolve) => setTimeout(() => resolve(true), timeout)));
+}
+
 export class PowerQueues extends PowerRedis {
-	public abort = new AbortController();
+	private abort = new AbortController();
 	public redis!: IORedisLike;
 	public readonly scripts: Record<string, SavedScript> = {};
 	public readonly host: string = 'host';
 	public readonly group: string = 'gr1';
-	public readonly selectStuckCount: number = 200;
-	public readonly selectStuckTimeout: number = 60000;
-	public readonly selectStuckMaxTimeout: number = 80;
-	public readonly selectCount: number = 200;
-	public readonly selectTimeout: number = 3000;
-	public readonly buildBatchCount: number = 800;
-	public readonly buildBatchMaxCount: number = 10000;
+	public readonly selectStuckCount: number = 256;
+	public readonly selectStuckTimeout: number = 20000;
+	public readonly selectStuckMaxTimeout: number = 40;
+	public readonly selectCount: number = 1024;
+	public readonly selectTimeout: number = 100;
+	public readonly buildBatchCount: number = 1000;
+	public readonly buildBatchMaxCount: number = 20000;
 	public readonly retryCount: number = 1;
 	public readonly executeSync: boolean = false;
-	public readonly idemLockTimeout: number = 180000;
-	public readonly idemDoneTimeout: number = 60000;
+	public readonly idemLockTimeout: number = 15000;
+	public readonly idemDoneTimeout: number = 10000;
 	public readonly logStatus: boolean = false;
-	public readonly logStatusTimeout: number = 1800000;
-	public readonly approveCount: number = 2000;
+	public readonly logStatusTimeout: number = 120000;
+	public readonly approveCount: number = 4000;
 	public readonly removeOnExecuted: boolean = true;
+	public readonly concurrency: number = 256;
+	private limit: ReturnType<typeof pLimit> = pLimit(this.concurrency);
 
 	private signal() {
 		return this.abort.signal;
@@ -62,6 +60,8 @@ export class PowerQueues extends PowerRedis {
 
 	async runQueue(queueName: string, from: '$' | '0-0' = '0-0') {
 		setMaxListeners(0, this.abort.signal);
+
+		this.limit = pLimit(this.concurrency);
 
 		await this.createGroup(queueName, from);
 		await this.consumerLoop(queueName, from);
@@ -89,9 +89,9 @@ export class PowerQueues extends PowerRedis {
 			try {
 				tasks = await this.select(queueName, from);
 			}
-			catch (err) {
+			catch {
 			}
-			if (!isArrFilled(tasks)) {
+			if (!Array.isArray(tasks) || !(tasks.length > 0)) {
 				await wait(300);
 				continue;
 			}
@@ -164,7 +164,7 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	private async approve(queueName: string, tasks: Task[]) {
-		if (!isArrFilled(tasks)) {
+		if (!Array.isArray(tasks) || !(tasks.length > 0)) {
 			return 0;
 		}
 		const approveCount = Math.max(500, Math.min(4000, this.approveCount));
@@ -185,7 +185,7 @@ export class PowerQueues extends PowerRedis {
 	async select(queueName: string, from: '$' | '0-0' = '0-0'): Promise<any[]> {
 		let selected = await this.selectS(queueName, from);
 
-		if (!isArrFilled(selected)) {
+		if (!Array.isArray(selected) || !(selected.length > 0)) {
 			selected = await this.selectF(queueName, from);
 		}
 		return this.selectP(selected);
@@ -195,7 +195,7 @@ export class PowerQueues extends PowerRedis {
 		try {
 			const res = await this.runScript('SelectStuck', [ queueName ], [ this.group, this.consumer(), String(this.selectStuckTimeout), String(this.selectStuckCount), String(this.selectStuckMaxTimeout) ], SelectStuck);
 
-			return (isArr(res) ? res : []) as any[];
+			return (Array.isArray(res) ? res : []) as any[];
 		}
 		catch (err: any) {
 			if (String(err?.message || '').includes('NOGROUP')) {
@@ -218,7 +218,7 @@ export class PowerQueues extends PowerRedis {
 
 			rows = res?.[0]?.[1] ?? [];
 
-			if (!isArrFilled(rows)) {
+			if (!Array.isArray(rows) || !(rows.length > 0)) {
 				return [];
 			}
 		}
@@ -239,11 +239,11 @@ export class PowerQueues extends PowerRedis {
 			.map((e) => {
 				const id = Buffer.isBuffer(e?.[0]) ? e[0].toString() : e?.[0];
 				const kvRaw = e?.[1] ?? [];
-				const kv = isArr(kvRaw) ? kvRaw.map((x: any) => (Buffer.isBuffer(x) ? x.toString() : x)) : [];
+				const kv = Array.isArray(kvRaw) ? kvRaw.map((x: any) => (Buffer.isBuffer(x) ? x.toString() : x)) : [];
 	
 				return [ id as string, kv ] as [ string, any[] ];
 			})
-			.filter(([ id, kv ]) => isStrFilled(id) && isArr(kv) && (kv.length & 1) === 0)
+			.filter(([ id, kv ]) => typeof id === 'string' && id.length > 0 && Array.isArray(kv) && (kv.length & 1) === 0)
 			.map(([ id, kv ]) => {
 				const { payload, createdAt, job, idemKey, attempt } = this.values(kv);
 
@@ -301,11 +301,11 @@ export class PowerQueues extends PowerRedis {
 		let start = Date.now();
 
 		if (!this.executeSync && promises.length > 0) {
-			await Promise.all(promises.map((item) => item()));
+			await Promise.all(promises.map((item) => this.limit(() => item())));
 		}
 		await this.onBatchReady(queueName, result);
 
-		if (!isArrFilled(result) && contended > (tasks.length >> 1)) {
+		if ((!Array.isArray(result) || !(result.length > 0)) && contended > (tasks.length >> 1)) {
 			await this.waitAbortable((15 + Math.floor(Math.random() * 35)) + Math.min(250, 15 * contended + Math.floor(Math.random() * 40)));
 		}
 		return result;
@@ -529,7 +529,7 @@ export class PowerQueues extends PowerRedis {
 
 	private async runScript(name: string, keys: string[], args: (string|number)[], defaultCode?: string) {
 		if (!this.scripts[name]) {
-			if (!isStrFilled(defaultCode)) {
+			if (!(typeof defaultCode === 'string' && defaultCode.length > 0)) {
 				throw new Error(`Undefined script "${name}". Save it before executing.`);
 			}
 			this.saveScript(name, defaultCode);
@@ -586,7 +586,7 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	private saveScript(name: string, codeBody: string): string {
-		if (!isStrFilled(codeBody)) {
+		if (!(typeof codeBody === 'string' && codeBody.length > 0)) {
 			throw new Error('Script body is empty.');
 		}
 		this.scripts[name] = { codeBody };
@@ -595,13 +595,13 @@ export class PowerQueues extends PowerRedis {
 	}
 
 	async addTasks(queueName: string, data: any[], opts: AddTasksOptions = {}): Promise<string[]> {
-		if (!isArrFilled(data)) {
+		if (!Array.isArray(data) || !(data.length > 0)) {
 			throw new Error('Tasks is not filled.');
 		}
-		if (!isStrFilled(queueName)) {
+		if (!(typeof queueName === 'string' && queueName.length > 0)) {
 			throw new Error('Queue name is required.');
 		}
-		opts.job = opts.job ?? uuid();
+		opts.job = opts.job ?? randomUUID();
 
 		const batches = this.buildBatches(data, opts);
 		const result: string[] = new Array(data.length);
@@ -651,8 +651,8 @@ export class PowerQueues extends PowerRedis {
 			const entry: Task = { 
 				payload: JSON.stringify(taskP),
 				attempt: Number(opts.attempt || 0),
-				job: opts.job ?? uuid(),
-				idemKey: String(idemKey || uuid()),
+				job: opts.job ?? randomUUID(),
+				idemKey: String(idemKey || randomUUID()),
 				createdAt,
 			};
 			const reqKeysLength = this.keysLength(entry);
@@ -716,9 +716,9 @@ export class PowerQueues extends PowerRedis {
 			argv.push(String(pairs));
 
 			for (const token of flat) {
-				argv.push(!isExists(token)
+				argv.push((token === null || token === undefined)
 					? ''
-					: isStrFilled(token)
+					: (typeof token === 'string' && token.length > 0)
 						? token
 						: String(token));
 			}
