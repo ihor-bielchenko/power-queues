@@ -1,6 +1,6 @@
-import pLimit from 'p-limit';
 import { randomUUID } from 'node:crypto';
 import { setMaxListeners } from 'node:events';
+import type pLimitDefault from 'p-limit';
 import type { IORedisLike } from 'power-redis';
 import type {
 	AddTasksOptions, 
@@ -25,6 +25,18 @@ import {
 class Base {
 }
 
+type PLimit = typeof pLimitDefault;
+type Limit = ReturnType<PLimit>;
+
+const importDynamic = new Function('modulePath', 'return import(modulePath)') as (modulePath: string) => Promise<{ default: PLimit }>;
+let pLimitCache: Promise<PLimit> | undefined;
+
+async function getPLimit(): Promise<PLimit> {
+	pLimitCache ??= importDynamic('p-limit').then((mod) => mod.default);
+
+	return pLimitCache;
+}
+
 export class PowerQueues extends PowerRedis {
 	public abort = new AbortController();
 	public redis!: IORedisLike;
@@ -47,7 +59,13 @@ export class PowerQueues extends PowerRedis {
 	public readonly approveCount: number = 4000;
 	public readonly removeOnExecuted: boolean = true;
 	public readonly concurrency: number = 256;
-	private limit: ReturnType<typeof pLimit> = pLimit(this.concurrency);
+	private limit!: Limit;
+
+	private async initLimit(): Promise<void> {
+		const pLimit = await getPLimit();
+
+		this.limit = pLimit(this.concurrency);
+	}
 
 	private signal() {
 		return this.abort.signal;
@@ -60,7 +78,7 @@ export class PowerQueues extends PowerRedis {
 	async runQueue(queueName: string, from: '$' | '0-0' = '0-0') {
 		setMaxListeners(0, this.abort.signal);
 
-		this.limit = pLimit(this.concurrency);
+		await this.initLimit();
 
 		await this.createGroup(queueName, from);
 		await this.consumerLoop(queueName, from);
@@ -300,6 +318,9 @@ export class PowerQueues extends PowerRedis {
 		let start = Date.now();
 
 		if (!this.executeSync && promises.length > 0) {
+			if (!this.limit) {
+				await this.initLimit();
+			}
 			await Promise.all(promises.map((item) => this.limit(() => item())));
 		}
 		await this.onBatchReady(queueName, result);

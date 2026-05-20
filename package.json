@@ -1,6 +1,6 @@
 {
 	"name": "power-queues",
-	"version": "2.1.13",
+	"version": "2.1.14",
 	"description": "High-performance Redis Streams queue for Node.js with Lua-powered bulk XADD, idempotent workers, heartbeat locks, stuck-task recovery, retries, DLQ, and distributed processing.",
 	"author": "ihor-bielchenko",
 	"license": "MIT",
@@ -13,11 +13,12 @@
 	},
 	"homepage": "https://github.com/ihor-bielchenko/power-queues#readme",
 	"type": "module",
-	"main": "dist/index.cjs",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
+			"types": "./dist/index.d.ts",
 			"import": "./dist/index.js",
 			"require": "./dist/index.cjs",
 			"default": "./dist/index.js"
@@ -26,8 +27,12 @@
 	"files": [
 		"dist"
 	],
+	"scripts": {
+		"build": "tsup",
+		"clean": "rimraf dist docs"
+	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=20"
 	},
 	"keywords": [
 		"redis",
@@ -83,6 +88,12 @@
 		"safe-redis",
 		"power-redis"
 	],
+	"devDependencies": {
+		"@types/node": "^24.8.1",
+		"rimraf": "^6.0.1",
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.3"
+	},
 	"dependencies": {
 		"p-limit": "^7.3.0",
 		"power-redis": "^2.0.24"
