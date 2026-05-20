@@ -8,7 +8,10 @@ import type {
 	SavedScript,
 	IdempotencyKeys,
 } from './types';
-import { PowerRedis } from 'power-redis';
+import { 
+	PowerRedis,
+	wait, 
+} from 'power-redis';
 import {
 	XAddBulk,
 	Approve,
@@ -20,10 +23,6 @@ import {
 } from './scripts';
 
 class Base {
-}
-
-export async function wait(timeout: number = 0) {
-	await (new Promise((resolve) => setTimeout(() => resolve(true), timeout)));
 }
 
 export class PowerQueues extends PowerRedis {
