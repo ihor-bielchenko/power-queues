@@ -27,7 +27,7 @@ export async function wait(timeout: number = 0) {
 }
 
 export class PowerQueues extends PowerRedis {
-	private abort = new AbortController();
+	public abort = new AbortController();
 	public redis!: IORedisLike;
 	public readonly scripts: Record<string, SavedScript> = {};
 	public readonly host: string = 'host';
